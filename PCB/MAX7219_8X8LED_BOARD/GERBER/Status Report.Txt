@@ -1,0 +1,12 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : Project [8x64Matrix.PrjPcb]
+   Generated File[8x8matrix-Plated.TXT]
+   Generated File[8x8matrix.LDP]
+   Generated File[8x8matrix.DRR]
+
+
+Files Generated   : 3
+Documents Printed : 0
+
+Finished Output Generation At 16:33:56 On 2017. 10. 12.

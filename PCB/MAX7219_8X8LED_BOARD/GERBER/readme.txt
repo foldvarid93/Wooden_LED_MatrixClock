@@ -1,0 +1,1 @@
+This project not include top overlay(top silk) gerber, no have "non plated holes", and the board shape gerber is in the .GKO (Keepout layer). Have a good job, and nice day friends. :) 
