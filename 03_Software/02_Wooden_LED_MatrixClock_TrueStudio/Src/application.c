@@ -101,24 +101,43 @@ void CreateDisplayDataArray(uint8_t *Text) {
   ScrollText = true;
 }
 void SendToDisplay(uint16_t from) {
+#define DispCount 12//
+  //
+  uint8_t tmp[192];
+  for(uint8_t i=0;i<8;i++){
+	  for(uint8_t j=0;j<12;j++){
+		  tmp[(i*24)+(2*j)]=8-i;
+		  //tmp[((i-1)*24)+(2*j)+1]=tmpp[(j*8)+i-1];
+		  tmp[192-((i*24)+(2*j)+1)]=DisplayDataArray[from+(j*8)+i];
+	  }
+  }
+  //
   SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
-  for (uint8_t i = 1; i < 9; i++) {
+  for(uint8_t i=0;i<8;i++){
 	  HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-    for (uint8_t j = 0; j < 3; j++) {
+	  HAL_SPI_Transmit(&hspi2,&tmp[i*24],24,50);
+	  HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+  }
+  /*
+  for (uint8_t i = 1; i < 9; i++) {
+	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+    for (uint8_t j = 0; j < DispCount; j++) {
     	HAL_SPI_Transmit(&hspi2,&i,1,50);
-    	HAL_SPI_Transmit(&hspi2,&(DisplayDataArray[from + ((2 - j) * 8) + (i - 1)]),1,50); //data
+    	HAL_SPI_Transmit(&hspi2,&(DisplayDataArray[from + ((DispCount - j) * 8) + (i - 1)]),1,50); //data
     }
     HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
   }
+  */
   SPI_Send(REG_SHTDWN, NORMAL_MODE);
+  asm("nop");
 }
 /*********************************/				//Text functions end
 void Init_MAX7219(void){
 	SPI_Send(REG_NO_OP, NOP);
-	SPI_Send(REG_SHTDWN, NORMAL_MODE);
+	SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
 	SPI_Send(REG_DECODE, NO_DECODE);
 	SPI_Send(REG_SCANLIMIT, DISP0_7);
-	SPI_Send(REG_INTENSITY, INTENSITY_31);
+	SPI_Send(REG_INTENSITY, INTENSITY_1);
 }
 void SPI_Send(uint8_t ADDR, uint8_t CMD){
 	uint8_t tmp[24];

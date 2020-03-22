@@ -216,7 +216,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 				ScrollText = false;
 				Mode=Time;
 				CreateFrameFromTime();
-			} else {
+			}
+			else {
 				SendToDisplay(StartFrom);
 				StartFrom++;
 			}

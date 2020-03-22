@@ -31,11 +31,11 @@
 							</tool>
 							<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.1150324084" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc">
 								<option id="com.atollic.truestudio.gcc.directories.select.2111644170" name="Include path" superClass="com.atollic.truestudio.gcc.directories.select" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;D:\ISKOLAI_PROJEKTEK\ARM_CORTEX\Inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;D:\ISKOLAI_PROJEKTEK\ARM_CORTEX\Drivers\CMSIS\Device\ST\STM32L4xx\Include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;D:\ISKOLAI_PROJEKTEK\ARM_CORTEX\Drivers\CMSIS\Include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;D:\ISKOLAI_PROJEKTEK\ARM_CORTEX\Drivers\STM32L4xx_HAL_Driver\Inc\Legacy&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:D:/${ProjDirPath}/Drivers/STM32L4xx_HAL_Driver/Inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers\CMSIS\Device\ST\STM32L4xx\Include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers\CMSIS\Include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers\STM32L4xx_HAL_Driver\Inc\Legacy&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/STM32L4xx_HAL_Driver/Inc&quot;"/>
 								</option>
 								<option id="com.atollic.truestudio.gcc.symbols.defined.1999636843" name="Defined symbols" superClass="com.atollic.truestudio.gcc.symbols.defined" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="STM32L476xx"/>
