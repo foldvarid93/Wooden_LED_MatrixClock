@@ -90,7 +90,7 @@ void CreateFrameFromTime(void){
 /*********************************/				//Text functions begin
 void CreateDisplayDataArray(uint8_t *Text) {
   ScrollText = false;
-  TextLength = strlen(Text);
+  TextLength = strlen((const char*)Text);
   for (uint8_t i = 0; i < TextLength; i++) {
     for (uint8_t j = 0; j < 6; j++) {
       DisplayDataArray[(i * 6) + j] = BitSwapping(characters[Text[i]][j]);
@@ -107,7 +107,6 @@ void SendToDisplay(uint16_t from) {
   for(uint8_t i=0;i<8;i++){
 	  for(uint8_t j=0;j<12;j++){
 		  tmp[(i*24)+(2*j)]=8-i;
-		  //tmp[((i-1)*24)+(2*j)+1]=tmpp[(j*8)+i-1];
 		  tmp[192-((i*24)+(2*j)+1)]=DisplayDataArray[from+(j*8)+i];
 	  }
   }
