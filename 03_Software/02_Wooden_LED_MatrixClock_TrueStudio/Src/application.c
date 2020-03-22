@@ -67,23 +67,28 @@ void CreateFrameFromTime(void){
 	uint8_t sec_single_new = (Time_Data.Seconds % 10);//newDataTime.second() % 10;
 	for (uint8_t i = 0; i < 5; i++) {
 		if (hour_ten_new == 0) {
-			DisplayData[i] = 0x00;
+			DisplayData[i] = 0;
 		} else {
 			DisplayData[i] = BitSwapping(characters[hour_ten_new + '0'][i]);
 		}
 		DisplayData[i + 5] = BitSwapping(characters[hour_single_new + '0'][i]);
 		DisplayData[i + 13] = BitSwapping(characters[min_ten_new + '0'][i]);
 		DisplayData[i + 18] = BitSwapping(characters[min_single_new + '0'][i]);
+		DisplayData[i + 26] = BitSwapping(characters[sec_ten_new + '0'][i]);
+		DisplayData[i + 31] = BitSwapping(characters[sec_single_new + '0'][i]);
 	}
 	DisplayData[10] = 0;
 	if(Point){
 		DisplayData[11] = 0x22;
+		DisplayData[24] = 0x22;
 	}
 	else{
-		DisplayData[11] = 0x00;
+		DisplayData[11] = 0;
+		DisplayData[24] = 0;
 	}
 	DisplayData[12] = 0;
 	DisplayData[23] = 0;
+	DisplayData[25] = 0;
 	SendFrameToDisplay();
 }
 /*********************************/				//Time functions end
