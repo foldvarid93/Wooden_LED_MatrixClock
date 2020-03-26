@@ -1,0 +1,2079 @@
+
+328matrix.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .data         0000000a  00800100  00000d42  00000dd6  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  1 .text         00000d42  00000000  00000000  00000094  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .bss          00000146  0080010a  0080010a  00000de0  2**0
+                  ALLOC
+  3 .comment      00000030  00000000  00000000  00000de0  2**0
+                  CONTENTS, READONLY
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000e10  2**2
+                  CONTENTS, READONLY
+  5 .debug_aranges 00000140  00000000  00000000  00000e50  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   0000163e  00000000  00000000  00000f90  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 000004b2  00000000  00000000  000025ce  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   00000615  00000000  00000000  00002a80  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  00000388  00000000  00000000  00003098  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    00000498  00000000  00000000  00003420  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    000013dd  00000000  00000000  000038b8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_ranges 00000200  00000000  00000000  00004c95  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 34 03 	jmp	0x668	; 0x668 <__ctors_end>
+   4:	0c 94 8b 06 	jmp	0xd16	; 0xd16 <__vector_1>
+   8:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+   c:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  10:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  14:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  18:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  1c:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  20:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  24:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  28:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  2c:	0c 94 81 06 	jmp	0xd02	; 0xd02 <__vector_11>
+  30:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  34:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  38:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  3c:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  40:	0c 94 50 06 	jmp	0xca0	; 0xca0 <__vector_16>
+  44:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  48:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  4c:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  50:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  54:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  58:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  5c:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  60:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+  64:	0c 94 51 03 	jmp	0x6a2	; 0x6a2 <__bad_interrupt>
+
+00000068 <__trampolines_end>:
+  68:	ff ff       	.word	0xffff	; ????
+  6a:	ff ff       	.word	0xffff	; ????
+  6c:	ff ff       	.word	0xffff	; ????
+  6e:	ff ff       	.word	0xffff	; ????
+  70:	ff ff       	.word	0xffff	; ????
+  72:	ff ff       	.word	0xffff	; ????
+  74:	ff ff       	.word	0xffff	; ????
+  76:	ff ff       	.word	0xffff	; ????
+  78:	ff ff       	.word	0xffff	; ????
+  7a:	ff ff       	.word	0xffff	; ????
+  7c:	ff ff       	.word	0xffff	; ????
+  7e:	ff ff       	.word	0xffff	; ????
+  80:	ff ff       	.word	0xffff	; ????
+  82:	ff ff       	.word	0xffff	; ????
+  84:	ff ff       	.word	0xffff	; ????
+  86:	ff ff       	.word	0xffff	; ????
+  88:	ff ff       	.word	0xffff	; ????
+  8a:	ff ff       	.word	0xffff	; ????
+  8c:	ff ff       	.word	0xffff	; ????
+  8e:	ff ff       	.word	0xffff	; ????
+  90:	ff ff       	.word	0xffff	; ????
+  92:	ff ff       	.word	0xffff	; ????
+  94:	ff ff       	.word	0xffff	; ????
+  96:	ff ff       	.word	0xffff	; ????
+  98:	ff ff       	.word	0xffff	; ????
+  9a:	ff ff       	.word	0xffff	; ????
+  9c:	ff ff       	.word	0xffff	; ????
+  9e:	ff ff       	.word	0xffff	; ????
+  a0:	ff ff       	.word	0xffff	; ????
+  a2:	ff ff       	.word	0xffff	; ????
+  a4:	ff ff       	.word	0xffff	; ????
+  a6:	ff ff       	.word	0xffff	; ????
+  a8:	ff ff       	.word	0xffff	; ????
+  aa:	ff ff       	.word	0xffff	; ????
+  ac:	ff ff       	.word	0xffff	; ????
+  ae:	ff ff       	.word	0xffff	; ????
+  b0:	ff ff       	.word	0xffff	; ????
+  b2:	ff ff       	.word	0xffff	; ????
+  b4:	ff ff       	.word	0xffff	; ????
+  b6:	ff ff       	.word	0xffff	; ????
+  b8:	ff ff       	.word	0xffff	; ????
+  ba:	ff ff       	.word	0xffff	; ????
+  bc:	ff ff       	.word	0xffff	; ????
+  be:	ff ff       	.word	0xffff	; ????
+  c0:	ff ff       	.word	0xffff	; ????
+  c2:	ff ff       	.word	0xffff	; ????
+  c4:	ff ff       	.word	0xffff	; ????
+  c6:	ff ff       	.word	0xffff	; ????
+  c8:	ff ff       	.word	0xffff	; ????
+  ca:	ff ff       	.word	0xffff	; ????
+  cc:	ff ff       	.word	0xffff	; ????
+  ce:	ff ff       	.word	0xffff	; ????
+  d0:	ff ff       	.word	0xffff	; ????
+  d2:	ff ff       	.word	0xffff	; ????
+  d4:	ff ff       	.word	0xffff	; ????
+  d6:	ff ff       	.word	0xffff	; ????
+  d8:	ff ff       	.word	0xffff	; ????
+  da:	ff ff       	.word	0xffff	; ????
+  dc:	ff ff       	.word	0xffff	; ????
+  de:	ff ff       	.word	0xffff	; ????
+  e0:	ff ff       	.word	0xffff	; ????
+  e2:	ff ff       	.word	0xffff	; ????
+  e4:	ff ff       	.word	0xffff	; ????
+  e6:	ff ff       	.word	0xffff	; ????
+  e8:	ff ff       	.word	0xffff	; ????
+  ea:	ff ff       	.word	0xffff	; ????
+  ec:	ff ff       	.word	0xffff	; ????
+  ee:	ff ff       	.word	0xffff	; ????
+  f0:	ff ff       	.word	0xffff	; ????
+  f2:	ff ff       	.word	0xffff	; ????
+  f4:	ff ff       	.word	0xffff	; ????
+  f6:	ff ff       	.word	0xffff	; ????
+  f8:	ff ff       	.word	0xffff	; ????
+  fa:	ff ff       	.word	0xffff	; ????
+  fc:	ff ff       	.word	0xffff	; ????
+  fe:	ff ff       	.word	0xffff	; ????
+ 100:	ff ff       	.word	0xffff	; ????
+ 102:	ff ff       	.word	0xffff	; ????
+ 104:	ff ff       	.word	0xffff	; ????
+ 106:	ff ff       	.word	0xffff	; ????
+ 108:	ff ff       	.word	0xffff	; ????
+ 10a:	ff ff       	.word	0xffff	; ????
+ 10c:	ff ff       	.word	0xffff	; ????
+ 10e:	ff ff       	.word	0xffff	; ????
+ 110:	ff ff       	.word	0xffff	; ????
+ 112:	ff ff       	.word	0xffff	; ????
+ 114:	ff ff       	.word	0xffff	; ????
+ 116:	ff ff       	.word	0xffff	; ????
+ 118:	ff ff       	.word	0xffff	; ????
+ 11a:	ff ff       	.word	0xffff	; ????
+ 11c:	ff ff       	.word	0xffff	; ????
+ 11e:	ff ff       	.word	0xffff	; ????
+ 120:	ff ff       	.word	0xffff	; ????
+ 122:	ff ff       	.word	0xffff	; ????
+ 124:	ff ff       	.word	0xffff	; ????
+ 126:	ff ff       	.word	0xffff	; ????
+ 128:	ff ff       	.word	0xffff	; ????
+ 12a:	ff ff       	.word	0xffff	; ????
+ 12c:	ff ff       	.word	0xffff	; ????
+ 12e:	ff ff       	.word	0xffff	; ????
+ 130:	41 ff       	sbrs	r20, 1
+ 132:	ff ff       	.word	0xffff	; ????
+ 134:	ff f8       	.word	0xf8ff	; ????
+ 136:	ff f8       	.word	0xf8ff	; ????
+ 138:	ff ff       	.word	0xffff	; ????
+ 13a:	d7 01       	movw	r26, r14
+ 13c:	d7 01       	movw	r26, r14
+ 13e:	d7 ff       	sbrs	r29, 7
+ 140:	b7 ab       	std	Z+55, r27	; 0x37
+ 142:	01 ab       	std	Z+49, r16	; 0x31
+ 144:	db ff       	.word	0xffdb	; ????
+ 146:	f9 b9       	out	0x09, r31	; 9
+ 148:	df ef       	ldi	r29, 0xFF	; 255
+ 14a:	37 3b       	cpi	r19, 0xB7	; 183
+ 14c:	93 6d       	ori	r25, 0xD3	; 211
+ 14e:	55 bb       	out	0x15, r21	; 21
+ 150:	5f ff       	.word	0xff5f	; ????
+ 152:	ff fa       	.word	0xfaff	; ????
+ 154:	fc ff       	.word	0xfffc	; ????
+ 156:	ff ff       	.word	0xffff	; ????
+ 158:	c7 bb       	out	0x17, r28	; 23
+ 15a:	7d ff       	.word	0xff7d	; ????
+ 15c:	ff ff       	.word	0xffff	; ????
+ 15e:	7d bb       	out	0x1d, r23	; 29
+ 160:	c7 ff       	sbrs	r28, 7
+ 162:	ff ff       	.word	0xffff	; ????
+ 164:	d7 ef       	ldi	r29, 0xF7	; 247
+ 166:	83 ef       	ldi	r24, 0xF3	; 243
+ 168:	d7 ff       	sbrs	r29, 7
+ 16a:	ef ef       	ldi	r30, 0xFF	; 255
+ 16c:	83 ef       	ldi	r24, 0xF3	; 243
+ 16e:	ef ff       	.word	0xffef	; ????
+ 170:	5f 9f       	mul	r21, r31
+ 172:	ff ff       	.word	0xffff	; ????
+ 174:	ff ff       	.word	0xffff	; ????
+ 176:	ef ef       	ldi	r30, 0xFF	; 255
+ 178:	ef ef       	ldi	r30, 0xFF	; 255
+ 17a:	ef ff       	.word	0xffef	; ????
+ 17c:	ff ff       	.word	0xffff	; ????
+ 17e:	7f ff       	.word	0xff7f	; ????
+ 180:	ff ff       	.word	0xffff	; ????
+ 182:	bf df       	rcall	.-130    	; 0x102 <__trampolines_end+0x9a>
+ 184:	ef f7       	brid	.-6      	; 0x180 <__trampolines_end+0x118>
+ 186:	fb ff       	.word	0xfffb	; ????
+ 188:	83 5d       	subi	r24, 0xD3	; 211
+ 18a:	6d 75       	andi	r22, 0x5D	; 93
+ 18c:	83 ff       	sbrs	r24, 3
+ 18e:	ff 7b       	andi	r31, 0xBF	; 191
+ 190:	01 7f       	andi	r16, 0xF1	; 241
+ 192:	ff ff       	.word	0xffff	; ????
+ 194:	7b 3d       	cpi	r23, 0xDB	; 219
+ 196:	5d 6d       	ori	r21, 0xDD	; 221
+ 198:	73 ff       	sbrs	r23, 3
+ 19a:	bd 7d       	andi	r27, 0xDD	; 221
+ 19c:	75 69       	ori	r23, 0x95	; 149
+ 19e:	9d ff       	.word	0xff9d	; ????
+ 1a0:	cf d7       	rcall	.+3998   	; 0x1140 <__data_load_end+0x3f4>
+ 1a2:	db 01       	movw	r26, r22
+ 1a4:	df ff       	.word	0xffdf	; ????
+ 1a6:	b1 75       	andi	r27, 0x51	; 81
+ 1a8:	75 75       	andi	r23, 0x55	; 85
+ 1aa:	8d ff       	.word	0xff8d	; ????
+ 1ac:	87 6b       	ori	r24, 0xB7	; 183
+ 1ae:	6d 6d       	ori	r22, 0xDD	; 221
+ 1b0:	9f ff       	.word	0xff9f	; ????
+ 1b2:	fd 1d       	adc	r31, r13
+ 1b4:	ed f5       	brhc	.+122    	; 0x230 <__trampolines_end+0x1c8>
+ 1b6:	f9 ff       	.word	0xfff9	; ????
+ 1b8:	93 6d       	ori	r25, 0xD3	; 211
+ 1ba:	6d 6d       	ori	r22, 0xDD	; 221
+ 1bc:	93 ff       	sbrs	r25, 3
+ 1be:	f3 6d       	ori	r31, 0xD3	; 211
+ 1c0:	6d ad       	ldd	r22, Y+61	; 0x3d
+ 1c2:	c3 ff       	sbrs	r28, 3
+ 1c4:	ff ff       	.word	0xffff	; ????
+ 1c6:	bb ff       	.word	0xffbb	; ????
+ 1c8:	ff ff       	.word	0xffff	; ????
+ 1ca:	ff 53       	subi	r31, 0x3F	; 63
+ 1cc:	93 ff       	sbrs	r25, 3
+ 1ce:	ff ff       	.word	0xffff	; ????
+ 1d0:	ef d7       	rcall	.+4062   	; 0x11b0 <__data_load_end+0x464>
+ 1d2:	bb 7d       	andi	r27, 0xDB	; 219
+ 1d4:	ff ff       	.word	0xffff	; ????
+ 1d6:	d7 d7       	rcall	.+4014   	; 0x1186 <__data_load_end+0x43a>
+ 1d8:	d7 d7       	rcall	.+4014   	; 0x1188 <__data_load_end+0x43c>
+ 1da:	d7 ff       	sbrs	r29, 7
+ 1dc:	7d bb       	out	0x1d, r23	; 29
+ 1de:	d7 ef       	ldi	r29, 0xF7	; 247
+ 1e0:	ff ff       	.word	0xffff	; ????
+ 1e2:	fb fd       	.word	0xfdfb	; ????
+ 1e4:	5d ed       	ldi	r21, 0xDD	; 221
+ 1e6:	f3 ff       	sbrs	r31, 3
+ 1e8:	9b 6d       	ori	r25, 0xDB	; 219
+ 1ea:	0d 7d       	andi	r16, 0xDD	; 221
+ 1ec:	83 ff       	sbrs	r24, 3
+ 1ee:	03 dd       	rcall	.-1530   	; 0xfffffbf6 <__eeprom_end+0xff7efbf6>
+ 1f0:	dd dd       	rcall	.-1094   	; 0xfffffdac <__eeprom_end+0xff7efdac>
+ 1f2:	03 ff       	sbrs	r16, 3
+ 1f4:	01 6d       	ori	r16, 0xD1	; 209
+ 1f6:	6d 6d       	ori	r22, 0xDD	; 221
+ 1f8:	93 ff       	sbrs	r25, 3
+ 1fa:	83 7d       	andi	r24, 0xD3	; 211
+ 1fc:	7d 7d       	andi	r23, 0xDD	; 221
+ 1fe:	bb ff       	.word	0xffbb	; ????
+ 200:	01 7d       	andi	r16, 0xD1	; 209
+ 202:	7d 7d       	andi	r23, 0xDD	; 221
+ 204:	83 ff       	sbrs	r24, 3
+ 206:	01 6d       	ori	r16, 0xD1	; 209
+ 208:	6d 6d       	ori	r22, 0xDD	; 221
+ 20a:	7d ff       	.word	0xff7d	; ????
+ 20c:	01 ed       	ldi	r16, 0xD1	; 209
+ 20e:	ed ed       	ldi	r30, 0xDD	; 221
+ 210:	fd ff       	.word	0xfffd	; ????
+ 212:	83 7d       	andi	r24, 0xD3	; 211
+ 214:	6d 6d       	ori	r22, 0xDD	; 221
+ 216:	8b ff       	.word	0xff8b	; ????
+ 218:	01 ef       	ldi	r16, 0xF1	; 241
+ 21a:	ef ef       	ldi	r30, 0xFF	; 255
+ 21c:	01 ff       	sbrs	r16, 1
+ 21e:	ff 7d       	andi	r31, 0xDF	; 223
+ 220:	01 7d       	andi	r16, 0xD1	; 209
+ 222:	ff ff       	.word	0xffff	; ????
+ 224:	bf 7f       	andi	r27, 0xFF	; 255
+ 226:	7d 81       	ldd	r23, Y+5	; 0x05
+ 228:	fd ff       	.word	0xfffd	; ????
+ 22a:	01 ef       	ldi	r16, 0xF1	; 241
+ 22c:	d7 bb       	out	0x17, r29	; 23
+ 22e:	7d ff       	.word	0xff7d	; ????
+ 230:	01 7f       	andi	r16, 0xF1	; 241
+ 232:	7f 7f       	andi	r23, 0xFF	; 255
+ 234:	7f ff       	.word	0xff7f	; ????
+ 236:	01 fb       	bst	r16, 1
+ 238:	e7 fb       	bst	r30, 7
+ 23a:	01 ff       	sbrs	r16, 1
+ 23c:	01 f7       	brne	.-64     	; 0x1fe <__trampolines_end+0x196>
+ 23e:	ef df       	rcall	.-34     	; 0x21e <__trampolines_end+0x1b6>
+ 240:	01 ff       	sbrs	r16, 1
+ 242:	83 7d       	andi	r24, 0xD3	; 211
+ 244:	7d 7d       	andi	r23, 0xDD	; 221
+ 246:	83 ff       	sbrs	r24, 3
+ 248:	01 ed       	ldi	r16, 0xD1	; 209
+ 24a:	ed ed       	ldi	r30, 0xDD	; 221
+ 24c:	f3 ff       	sbrs	r31, 3
+ 24e:	83 7d       	andi	r24, 0xD3	; 211
+ 250:	5d bd       	out	0x2d, r21	; 45
+ 252:	43 ff       	sbrs	r20, 3
+ 254:	01 ed       	ldi	r16, 0xD1	; 209
+ 256:	cd ad       	ldd	r28, Y+61	; 0x3d
+ 258:	73 ff       	sbrs	r23, 3
+ 25a:	73 6d       	ori	r23, 0xD3	; 211
+ 25c:	6d 6d       	ori	r22, 0xDD	; 221
+ 25e:	9d ff       	.word	0xff9d	; ????
+ 260:	fd fd       	.word	0xfdfd	; ????
+ 262:	01 fd       	sbrc	r16, 1
+ 264:	fd ff       	.word	0xfffd	; ????
+ 266:	81 7f       	andi	r24, 0xF1	; 241
+ 268:	7f 7f       	andi	r23, 0xFF	; 255
+ 26a:	81 ff       	sbrs	r24, 1
+ 26c:	c1 bf       	out	0x31, r28	; 49
+ 26e:	7f bf       	out	0x3f, r23	; 63
+ 270:	c1 ff       	sbrs	r28, 1
+ 272:	81 7f       	andi	r24, 0xF1	; 241
+ 274:	8f 7f       	andi	r24, 0xFF	; 255
+ 276:	81 ff       	sbrs	r24, 1
+ 278:	39 d7       	rcall	.+3698   	; 0x10ec <__data_load_end+0x3a0>
+ 27a:	ef d7       	rcall	.+4062   	; 0x125a <__data_load_end+0x50e>
+ 27c:	39 ff       	.word	0xff39	; ????
+ 27e:	f1 ef       	ldi	r31, 0xF1	; 241
+ 280:	1f ef       	ldi	r17, 0xFF	; 255
+ 282:	f1 ff       	sbrs	r31, 1
+ 284:	3d 5d       	subi	r19, 0xDD	; 221
+ 286:	6d 75       	andi	r22, 0x5D	; 93
+ 288:	79 ff       	.word	0xff79	; ????
+ 28a:	01 7d       	andi	r16, 0xD1	; 209
+ 28c:	7d ff       	.word	0xff7d	; ????
+ 28e:	ff ff       	.word	0xffff	; ????
+ 290:	fd fb       	.word	0xfbfd	; ????
+ 292:	f7 ef       	ldi	r31, 0xF7	; 247
+ 294:	df bf       	out	0x3f, r29	; 63
+ 296:	7d 7d       	andi	r23, 0xDD	; 221
+ 298:	01 ff       	sbrs	r16, 1
+ 29a:	ff ff       	.word	0xffff	; ????
+ 29c:	f7 fb       	bst	r31, 7
+ 29e:	fd fb       	.word	0xfbfd	; ????
+ 2a0:	f7 ff       	sbrs	r31, 7
+ 2a2:	7f 7f       	andi	r23, 0xFF	; 255
+ 2a4:	7f 7f       	andi	r23, 0xFF	; 255
+ 2a6:	7f ff       	.word	0xff7f	; ????
+ 2a8:	ff fd       	.word	0xfdff	; ????
+ 2aa:	fb f7       	brvc	.-2      	; 0x2aa <__trampolines_end+0x242>
+ 2ac:	ff ff       	.word	0xffff	; ????
+ 2ae:	bf 57       	subi	r27, 0x7F	; 127
+ 2b0:	57 57       	subi	r21, 0x77	; 119
+ 2b2:	0f ff       	.word	0xff0f	; ????
+ 2b4:	01 6f       	ori	r16, 0xF1	; 241
+ 2b6:	77 77       	andi	r23, 0x77	; 119
+ 2b8:	8f ff       	.word	0xff8f	; ????
+ 2ba:	8f 77       	andi	r24, 0x7F	; 127
+ 2bc:	77 77       	andi	r23, 0x77	; 119
+ 2be:	bf ff       	.word	0xffbf	; ????
+ 2c0:	8f 77       	andi	r24, 0x7F	; 127
+ 2c2:	77 6f       	ori	r23, 0xF7	; 247
+ 2c4:	01 ff       	sbrs	r16, 1
+ 2c6:	8f 57       	subi	r24, 0x7F	; 127
+ 2c8:	57 57       	subi	r21, 0x77	; 119
+ 2ca:	cf ff       	.word	0xffcf	; ????
+ 2cc:	ef 03       	fmulsu	r22, r23
+ 2ce:	ed fd       	.word	0xfded	; ????
+ 2d0:	fb ff       	.word	0xfffb	; ????
+ 2d2:	e7 5b       	subi	r30, 0xB7	; 183
+ 2d4:	5b 5b       	subi	r21, 0xBB	; 187
+ 2d6:	83 ff       	sbrs	r24, 3
+ 2d8:	01 ef       	ldi	r16, 0xF1	; 241
+ 2da:	f7 f7       	brid	.-4      	; 0x2d8 <__trampolines_end+0x270>
+ 2dc:	0f ff       	.word	0xff0f	; ????
+ 2de:	ff 77       	andi	r31, 0x7F	; 127
+ 2e0:	05 7f       	andi	r16, 0xF5	; 245
+ 2e2:	ff ff       	.word	0xffff	; ????
+ 2e4:	bf 7f       	andi	r27, 0xFF	; 255
+ 2e6:	77 85       	ldd	r23, Z+15	; 0x0f
+ 2e8:	ff ff       	.word	0xffff	; ????
+ 2ea:	01 df       	rcall	.-510    	; 0xee <__trampolines_end+0x86>
+ 2ec:	af 77       	andi	r26, 0x7F	; 127
+ 2ee:	ff ff       	.word	0xffff	; ????
+ 2f0:	ff 7d       	andi	r31, 0xDF	; 223
+ 2f2:	01 7f       	andi	r16, 0xF1	; 241
+ 2f4:	ff ff       	.word	0xffff	; ????
+ 2f6:	07 f7       	brid	.-64     	; 0x2b8 <__trampolines_end+0x250>
+ 2f8:	cf f7       	brid	.-14     	; 0x2ec <__trampolines_end+0x284>
+ 2fa:	07 ff       	sbrs	r16, 7
+ 2fc:	07 ef       	ldi	r16, 0xF7	; 247
+ 2fe:	f7 f7       	brid	.-4      	; 0x2fc <__trampolines_end+0x294>
+ 300:	0f ff       	.word	0xff0f	; ????
+ 302:	8f 77       	andi	r24, 0x7F	; 127
+ 304:	77 77       	andi	r23, 0x77	; 119
+ 306:	8f ff       	.word	0xff8f	; ????
+ 308:	07 d7       	rcall	.+3598   	; 0x1118 <__data_load_end+0x3cc>
+ 30a:	d7 d7       	rcall	.+4014   	; 0x12ba <__data_load_end+0x56e>
+ 30c:	ef ff       	.word	0xffef	; ????
+ 30e:	ef d7       	rcall	.+4062   	; 0x12ee <__data_load_end+0x5a2>
+ 310:	d7 cf       	rjmp	.-82     	; 0x2c0 <__trampolines_end+0x258>
+ 312:	07 ff       	sbrs	r16, 7
+ 314:	07 ef       	ldi	r16, 0xF7	; 247
+ 316:	f7 f7       	brid	.-4      	; 0x314 <__trampolines_end+0x2ac>
+ 318:	ef ff       	.word	0xffef	; ????
+ 31a:	6f 57       	subi	r22, 0x7F	; 127
+ 31c:	57 57       	subi	r21, 0x77	; 119
+ 31e:	b7 ff       	sbrs	r27, 7
+ 320:	f7 81       	ldd	r31, Z+7	; 0x07
+ 322:	77 7f       	andi	r23, 0xF7	; 247
+ 324:	bf ff       	.word	0xffbf	; ????
+ 326:	87 7f       	andi	r24, 0xF7	; 247
+ 328:	7f bf       	out	0x3f, r23	; 63
+ 32a:	07 ff       	sbrs	r16, 7
+ 32c:	c7 bf       	out	0x37, r28	; 55
+ 32e:	7f bf       	out	0x3f, r23	; 63
+ 330:	c7 ff       	sbrs	r28, 7
+ 332:	87 7f       	andi	r24, 0xF7	; 247
+ 334:	9f 7f       	andi	r25, 0xFF	; 255
+ 336:	87 ff       	sbrs	r24, 7
+ 338:	77 af       	std	Z+63, r23	; 0x3f
+ 33a:	df af       	std	Y+63, r29	; 0x3f
+ 33c:	77 ff       	sbrs	r23, 7
+ 33e:	e7 5f       	subi	r30, 0xF7	; 247
+ 340:	5f 5f       	subi	r21, 0xFF	; 255
+ 342:	87 ff       	sbrs	r24, 7
+ 344:	77 37       	cpi	r23, 0x77	; 119
+ 346:	57 67       	ori	r21, 0x77	; 119
+ 348:	77 ff       	sbrs	r23, 7
+ 34a:	ef 93       	push	r30
+ 34c:	7d ff       	.word	0xff7d	; ????
+ 34e:	ff ff       	.word	0xffff	; ????
+ 350:	ff ff       	.word	0xffff	; ????
+ 352:	00 ff       	sbrs	r16, 0
+ 354:	ff ff       	.word	0xffff	; ????
+ 356:	7d 93       	st	X+, r23
+ 358:	ef ff       	.word	0xffef	; ????
+ 35a:	ff ff       	.word	0xffff	; ????
+ 35c:	ef ef       	ldi	r30, 0xFF	; 255
+ 35e:	ab c7       	rjmp	.+3926   	; 0x12b6 <__data_load_end+0x56a>
+ 360:	ef ff       	.word	0xffef	; ????
+ 362:	ef c7       	rjmp	.+4062   	; 0x1342 <__data_load_end+0x5f6>
+ 364:	ab ef       	ldi	r26, 0xFB	; 251
+ 366:	ef ff       	.word	0xffef	; ????
+ 368:	ff ef       	ldi	r31, 0xFF	; 255
+ 36a:	ef ef       	ldi	r30, 0xFF	; 255
+ 36c:	ef ef       	ldi	r30, 0xFF	; 255
+ 36e:	ff ff       	.word	0xffff	; ????
+ 370:	ff ff       	.word	0xffff	; ????
+ 372:	ff ff       	.word	0xffff	; ????
+ 374:	ff ff       	.word	0xffff	; ????
+ 376:	ff ff       	.word	0xffff	; ????
+ 378:	ff ff       	.word	0xffff	; ????
+ 37a:	ff ff       	.word	0xffff	; ????
+ 37c:	ff ff       	.word	0xffff	; ????
+ 37e:	ff ff       	.word	0xffff	; ????
+ 380:	ff ff       	.word	0xffff	; ????
+ 382:	ff ff       	.word	0xffff	; ????
+ 384:	ff ff       	.word	0xffff	; ????
+ 386:	ff ff       	.word	0xffff	; ????
+ 388:	ff ff       	.word	0xffff	; ????
+ 38a:	ff ff       	.word	0xffff	; ????
+ 38c:	ff ff       	.word	0xffff	; ????
+ 38e:	ff ff       	.word	0xffff	; ????
+ 390:	ff ff       	.word	0xffff	; ????
+ 392:	ff ff       	.word	0xffff	; ????
+ 394:	ff ff       	.word	0xffff	; ????
+ 396:	ff ff       	.word	0xffff	; ????
+ 398:	ff ff       	.word	0xffff	; ????
+ 39a:	ff ff       	.word	0xffff	; ????
+ 39c:	ff ff       	.word	0xffff	; ????
+ 39e:	ff ff       	.word	0xffff	; ????
+ 3a0:	ff ff       	.word	0xffff	; ????
+ 3a2:	ff ff       	.word	0xffff	; ????
+ 3a4:	ff ff       	.word	0xffff	; ????
+ 3a6:	ff ff       	.word	0xffff	; ????
+ 3a8:	ff ff       	.word	0xffff	; ????
+ 3aa:	ff ff       	.word	0xffff	; ????
+ 3ac:	ff ff       	.word	0xffff	; ????
+ 3ae:	ff ff       	.word	0xffff	; ????
+ 3b0:	ff ff       	.word	0xffff	; ????
+ 3b2:	ff ff       	.word	0xffff	; ????
+ 3b4:	ff ff       	.word	0xffff	; ????
+ 3b6:	ff ff       	.word	0xffff	; ????
+ 3b8:	ff ff       	.word	0xffff	; ????
+ 3ba:	ff ff       	.word	0xffff	; ????
+ 3bc:	ff ff       	.word	0xffff	; ????
+ 3be:	ff ff       	.word	0xffff	; ????
+ 3c0:	ff ff       	.word	0xffff	; ????
+ 3c2:	ff ff       	.word	0xffff	; ????
+ 3c4:	ff ff       	.word	0xffff	; ????
+ 3c6:	ff ff       	.word	0xffff	; ????
+ 3c8:	ff ff       	.word	0xffff	; ????
+ 3ca:	ff ff       	.word	0xffff	; ????
+ 3cc:	ff ff       	.word	0xffff	; ????
+ 3ce:	ff ff       	.word	0xffff	; ????
+ 3d0:	ff ff       	.word	0xffff	; ????
+ 3d2:	ff ff       	.word	0xffff	; ????
+ 3d4:	ff ff       	.word	0xffff	; ????
+ 3d6:	ff ff       	.word	0xffff	; ????
+ 3d8:	ff ff       	.word	0xffff	; ????
+ 3da:	ff ff       	.word	0xffff	; ????
+ 3dc:	ff ff       	.word	0xffff	; ????
+ 3de:	ff ff       	.word	0xffff	; ????
+ 3e0:	ff ff       	.word	0xffff	; ????
+ 3e2:	ff ff       	.word	0xffff	; ????
+ 3e4:	ff ff       	.word	0xffff	; ????
+ 3e6:	ff ff       	.word	0xffff	; ????
+ 3e8:	ff ff       	.word	0xffff	; ????
+ 3ea:	ff ff       	.word	0xffff	; ????
+ 3ec:	ff ff       	.word	0xffff	; ????
+ 3ee:	ff ff       	.word	0xffff	; ????
+ 3f0:	ff ff       	.word	0xffff	; ????
+ 3f2:	ff ff       	.word	0xffff	; ????
+ 3f4:	ff ff       	.word	0xffff	; ????
+ 3f6:	ff ff       	.word	0xffff	; ????
+ 3f8:	ff ff       	.word	0xffff	; ????
+ 3fa:	ff ff       	.word	0xffff	; ????
+ 3fc:	ff ff       	.word	0xffff	; ????
+ 3fe:	ff ff       	.word	0xffff	; ????
+ 400:	ff ff       	.word	0xffff	; ????
+ 402:	ff ff       	.word	0xffff	; ????
+ 404:	ff ff       	.word	0xffff	; ????
+ 406:	ff ff       	.word	0xffff	; ????
+ 408:	ff ff       	.word	0xffff	; ????
+ 40a:	ff ff       	.word	0xffff	; ????
+ 40c:	ff ff       	.word	0xffff	; ????
+ 40e:	ff ff       	.word	0xffff	; ????
+ 410:	ff ff       	.word	0xffff	; ????
+ 412:	ff ff       	.word	0xffff	; ????
+ 414:	ff ff       	.word	0xffff	; ????
+ 416:	ff ff       	.word	0xffff	; ????
+ 418:	ff ff       	.word	0xffff	; ????
+ 41a:	ff ff       	.word	0xffff	; ????
+ 41c:	ff ff       	.word	0xffff	; ????
+ 41e:	ff ff       	.word	0xffff	; ????
+ 420:	ff ff       	.word	0xffff	; ????
+ 422:	ff ff       	.word	0xffff	; ????
+ 424:	ff ff       	.word	0xffff	; ????
+ 426:	ff ff       	.word	0xffff	; ????
+ 428:	ff ff       	.word	0xffff	; ????
+ 42a:	ff ff       	.word	0xffff	; ????
+ 42c:	ff ff       	.word	0xffff	; ????
+ 42e:	ff ff       	.word	0xffff	; ????
+ 430:	ff ff       	.word	0xffff	; ????
+ 432:	ff ff       	.word	0xffff	; ????
+ 434:	ff ff       	.word	0xffff	; ????
+ 436:	ff ff       	.word	0xffff	; ????
+ 438:	ff ff       	.word	0xffff	; ????
+ 43a:	ff ff       	.word	0xffff	; ????
+ 43c:	ff ff       	.word	0xffff	; ????
+ 43e:	ff ff       	.word	0xffff	; ????
+ 440:	ff ff       	.word	0xffff	; ????
+ 442:	ff ff       	.word	0xffff	; ????
+ 444:	ff ff       	.word	0xffff	; ????
+ 446:	ff ff       	.word	0xffff	; ????
+ 448:	ff ff       	.word	0xffff	; ????
+ 44a:	ff ff       	.word	0xffff	; ????
+ 44c:	ff ff       	.word	0xffff	; ????
+ 44e:	ff ff       	.word	0xffff	; ????
+ 450:	ff ff       	.word	0xffff	; ????
+ 452:	ff ff       	.word	0xffff	; ????
+ 454:	ff ff       	.word	0xffff	; ????
+ 456:	ff ff       	.word	0xffff	; ????
+ 458:	ff ff       	.word	0xffff	; ????
+ 45a:	ff ff       	.word	0xffff	; ????
+ 45c:	ff ff       	.word	0xffff	; ????
+ 45e:	ff ff       	.word	0xffff	; ????
+ 460:	ff ff       	.word	0xffff	; ????
+ 462:	ff ff       	.word	0xffff	; ????
+ 464:	ff ff       	.word	0xffff	; ????
+ 466:	ff ff       	.word	0xffff	; ????
+ 468:	ff ff       	.word	0xffff	; ????
+ 46a:	ff ff       	.word	0xffff	; ????
+ 46c:	ff ff       	.word	0xffff	; ????
+ 46e:	ff ff       	.word	0xffff	; ????
+ 470:	ff ff       	.word	0xffff	; ????
+ 472:	ff ff       	.word	0xffff	; ????
+ 474:	ff ff       	.word	0xffff	; ????
+ 476:	ff ff       	.word	0xffff	; ????
+ 478:	ff ff       	.word	0xffff	; ????
+ 47a:	ff ff       	.word	0xffff	; ????
+ 47c:	ff ff       	.word	0xffff	; ????
+ 47e:	ff ff       	.word	0xffff	; ????
+ 480:	ff ff       	.word	0xffff	; ????
+ 482:	ff ff       	.word	0xffff	; ????
+ 484:	ff ff       	.word	0xffff	; ????
+ 486:	ff ff       	.word	0xffff	; ????
+ 488:	ff ff       	.word	0xffff	; ????
+ 48a:	ff ff       	.word	0xffff	; ????
+ 48c:	ff ff       	.word	0xffff	; ????
+ 48e:	ff ff       	.word	0xffff	; ????
+ 490:	ff ff       	.word	0xffff	; ????
+ 492:	ff ff       	.word	0xffff	; ????
+ 494:	ff ff       	.word	0xffff	; ????
+ 496:	ff ff       	.word	0xffff	; ????
+ 498:	ff ff       	.word	0xffff	; ????
+ 49a:	ff ff       	.word	0xffff	; ????
+ 49c:	ff ff       	.word	0xffff	; ????
+ 49e:	ff ff       	.word	0xffff	; ????
+ 4a0:	ff ff       	.word	0xffff	; ????
+ 4a2:	ff ff       	.word	0xffff	; ????
+ 4a4:	ff ff       	.word	0xffff	; ????
+ 4a6:	ff ff       	.word	0xffff	; ????
+ 4a8:	ff ff       	.word	0xffff	; ????
+ 4aa:	ff ff       	.word	0xffff	; ????
+ 4ac:	ff ff       	.word	0xffff	; ????
+ 4ae:	ff ff       	.word	0xffff	; ????
+ 4b0:	ff ff       	.word	0xffff	; ????
+ 4b2:	ff ff       	.word	0xffff	; ????
+ 4b4:	ff ff       	.word	0xffff	; ????
+ 4b6:	ff ff       	.word	0xffff	; ????
+ 4b8:	ff ff       	.word	0xffff	; ????
+ 4ba:	ff ff       	.word	0xffff	; ????
+ 4bc:	ff ff       	.word	0xffff	; ????
+ 4be:	ff ff       	.word	0xffff	; ????
+ 4c0:	ff ff       	.word	0xffff	; ????
+ 4c2:	ff ff       	.word	0xffff	; ????
+ 4c4:	ff ff       	.word	0xffff	; ????
+ 4c6:	ff ff       	.word	0xffff	; ????
+ 4c8:	ff ff       	.word	0xffff	; ????
+ 4ca:	ff ff       	.word	0xffff	; ????
+ 4cc:	ff ff       	.word	0xffff	; ????
+ 4ce:	ff ff       	.word	0xffff	; ????
+ 4d0:	ff ff       	.word	0xffff	; ????
+ 4d2:	ff ff       	.word	0xffff	; ????
+ 4d4:	ff ff       	.word	0xffff	; ????
+ 4d6:	ff ff       	.word	0xffff	; ????
+ 4d8:	ff ff       	.word	0xffff	; ????
+ 4da:	ff ff       	.word	0xffff	; ????
+ 4dc:	ff ff       	.word	0xffff	; ????
+ 4de:	ff ff       	.word	0xffff	; ????
+ 4e0:	ff ff       	.word	0xffff	; ????
+ 4e2:	ff ff       	.word	0xffff	; ????
+ 4e4:	ff ff       	.word	0xffff	; ????
+ 4e6:	ff ff       	.word	0xffff	; ????
+ 4e8:	ff ff       	.word	0xffff	; ????
+ 4ea:	ff ff       	.word	0xffff	; ????
+ 4ec:	ff ff       	.word	0xffff	; ????
+ 4ee:	03 dd       	rcall	.-1530   	; 0xfffffef6 <__eeprom_end+0xff7efef6>
+ 4f0:	d8 dd       	rcall	.-1104   	; 0xa2 <__trampolines_end+0x3a>
+ 4f2:	03 ff       	sbrs	r16, 3
+ 4f4:	ff ff       	.word	0xffff	; ????
+ 4f6:	ff ff       	.word	0xffff	; ????
+ 4f8:	ff ff       	.word	0xffff	; ????
+ 4fa:	ff ff       	.word	0xffff	; ????
+ 4fc:	ff ff       	.word	0xffff	; ????
+ 4fe:	ff ff       	.word	0xffff	; ????
+ 500:	ff ff       	.word	0xffff	; ????
+ 502:	ff ff       	.word	0xffff	; ????
+ 504:	ff ff       	.word	0xffff	; ????
+ 506:	ff ff       	.word	0xffff	; ????
+ 508:	ff ff       	.word	0xffff	; ????
+ 50a:	ff ff       	.word	0xffff	; ????
+ 50c:	ff ff       	.word	0xffff	; ????
+ 50e:	ff ff       	.word	0xffff	; ????
+ 510:	ff ff       	.word	0xffff	; ????
+ 512:	ff ff       	.word	0xffff	; ????
+ 514:	ff ff       	.word	0xffff	; ????
+ 516:	ff ff       	.word	0xffff	; ????
+ 518:	ff ff       	.word	0xffff	; ????
+ 51a:	ff ff       	.word	0xffff	; ????
+ 51c:	ff ff       	.word	0xffff	; ????
+ 51e:	01 6d       	ori	r16, 0xD1	; 209
+ 520:	68 6d       	ori	r22, 0xD8	; 216
+ 522:	7d ff       	.word	0xff7d	; ????
+ 524:	ff ff       	.word	0xffff	; ????
+ 526:	ff ff       	.word	0xffff	; ????
+ 528:	ff ff       	.word	0xffff	; ????
+ 52a:	ff ff       	.word	0xffff	; ????
+ 52c:	ff ff       	.word	0xffff	; ????
+ 52e:	ff ff       	.word	0xffff	; ????
+ 530:	ff ff       	.word	0xffff	; ????
+ 532:	ff ff       	.word	0xffff	; ????
+ 534:	ff ff       	.word	0xffff	; ????
+ 536:	77 04       	cpc	r7, r7
+ 538:	77 ff       	sbrs	r23, 7
+ 53a:	ff ff       	.word	0xffff	; ????
+ 53c:	ff ff       	.word	0xffff	; ????
+ 53e:	ff ff       	.word	0xffff	; ????
+ 540:	ff ff       	.word	0xffff	; ????
+ 542:	ff ff       	.word	0xffff	; ????
+ 544:	ff ff       	.word	0xffff	; ????
+ 546:	ff ff       	.word	0xffff	; ????
+ 548:	ff ff       	.word	0xffff	; ????
+ 54a:	ff ff       	.word	0xffff	; ????
+ 54c:	ff ff       	.word	0xffff	; ????
+ 54e:	ff ff       	.word	0xffff	; ????
+ 550:	ff ff       	.word	0xffff	; ????
+ 552:	ff ff       	.word	0xffff	; ????
+ 554:	ff ff       	.word	0xffff	; ????
+ 556:	ff ff       	.word	0xffff	; ????
+ 558:	ff ff       	.word	0xffff	; ????
+ 55a:	83 7d       	andi	r24, 0xD3	; 211
+ 55c:	78 7d       	andi	r23, 0xD8	; 216
+ 55e:	83 ff       	sbrs	r24, 3
+ 560:	ff ff       	.word	0xffff	; ????
+ 562:	ff ff       	.word	0xffff	; ????
+ 564:	ff ff       	.word	0xffff	; ????
+ 566:	87 78       	andi	r24, 0x87	; 135
+ 568:	7b 78       	andi	r23, 0x8B	; 139
+ 56a:	87 ff       	sbrs	r24, 7
+ 56c:	87 7a       	andi	r24, 0xA7	; 167
+ 56e:	7b 7a       	andi	r23, 0xAB	; 171
+ 570:	87 ff       	sbrs	r24, 7
+ 572:	ff ff       	.word	0xffff	; ????
+ 574:	ff ff       	.word	0xffff	; ????
+ 576:	ff ff       	.word	0xffff	; ????
+ 578:	ff ff       	.word	0xffff	; ????
+ 57a:	ff ff       	.word	0xffff	; ????
+ 57c:	ff ff       	.word	0xffff	; ????
+ 57e:	ff ff       	.word	0xffff	; ????
+ 580:	ff ff       	.word	0xffff	; ????
+ 582:	ff ff       	.word	0xffff	; ????
+ 584:	83 7f       	andi	r24, 0xF3	; 243
+ 586:	7c 7f       	andi	r23, 0xFC	; 252
+ 588:	83 ff       	sbrs	r24, 3
+ 58a:	83 7c       	andi	r24, 0xC3	; 195
+ 58c:	7f 7c       	andi	r23, 0xCF	; 207
+ 58e:	83 ff       	sbrs	r24, 3
+ 590:	83 7e       	andi	r24, 0xE3	; 227
+ 592:	7f 7e       	andi	r23, 0xEF	; 239
+ 594:	83 ff       	sbrs	r24, 3
+ 596:	ff ff       	.word	0xffff	; ????
+ 598:	ff ff       	.word	0xffff	; ????
+ 59a:	ff ff       	.word	0xffff	; ????
+ 59c:	ff ff       	.word	0xffff	; ????
+ 59e:	ff ff       	.word	0xffff	; ????
+ 5a0:	ff ff       	.word	0xffff	; ????
+ 5a2:	ff ff       	.word	0xffff	; ????
+ 5a4:	ff ff       	.word	0xffff	; ????
+ 5a6:	ff ff       	.word	0xffff	; ????
+ 5a8:	ff ff       	.word	0xffff	; ????
+ 5aa:	ff ff       	.word	0xffff	; ????
+ 5ac:	ff ff       	.word	0xffff	; ????
+ 5ae:	bf 57       	subi	r27, 0x7F	; 127
+ 5b0:	54 57       	subi	r21, 0x74	; 116
+ 5b2:	0f ff       	.word	0xff0f	; ????
+ 5b4:	ff ff       	.word	0xffff	; ????
+ 5b6:	ff ff       	.word	0xffff	; ????
+ 5b8:	ff ff       	.word	0xffff	; ????
+ 5ba:	ff ff       	.word	0xffff	; ????
+ 5bc:	ff ff       	.word	0xffff	; ????
+ 5be:	ff ff       	.word	0xffff	; ????
+ 5c0:	ff ff       	.word	0xffff	; ????
+ 5c2:	ff ff       	.word	0xffff	; ????
+ 5c4:	ff ff       	.word	0xffff	; ????
+ 5c6:	ff ff       	.word	0xffff	; ????
+ 5c8:	ff ff       	.word	0xffff	; ????
+ 5ca:	ff ff       	.word	0xffff	; ????
+ 5cc:	ff ff       	.word	0xffff	; ????
+ 5ce:	ff ff       	.word	0xffff	; ????
+ 5d0:	ff ff       	.word	0xffff	; ????
+ 5d2:	ff ff       	.word	0xffff	; ????
+ 5d4:	ff ff       	.word	0xffff	; ????
+ 5d6:	ff ff       	.word	0xffff	; ????
+ 5d8:	ff ff       	.word	0xffff	; ????
+ 5da:	ff ff       	.word	0xffff	; ????
+ 5dc:	ff ff       	.word	0xffff	; ????
+ 5de:	8f 57       	subi	r24, 0x7F	; 127
+ 5e0:	54 57       	subi	r21, 0x74	; 116
+ 5e2:	cf ff       	.word	0xffcf	; ????
+ 5e4:	ff ff       	.word	0xffff	; ????
+ 5e6:	ff ff       	.word	0xffff	; ????
+ 5e8:	ff ff       	.word	0xffff	; ????
+ 5ea:	ff ff       	.word	0xffff	; ????
+ 5ec:	ff ff       	.word	0xffff	; ????
+ 5ee:	ff ff       	.word	0xffff	; ????
+ 5f0:	ff ff       	.word	0xffff	; ????
+ 5f2:	ff ff       	.word	0xffff	; ????
+ 5f4:	ff ff       	.word	0xffff	; ????
+ 5f6:	77 04       	cpc	r7, r7
+ 5f8:	7f ff       	.word	0xff7f	; ????
+ 5fa:	ff ff       	.word	0xffff	; ????
+ 5fc:	ff ff       	.word	0xffff	; ????
+ 5fe:	ff ff       	.word	0xffff	; ????
+ 600:	ff ff       	.word	0xffff	; ????
+ 602:	ff ff       	.word	0xffff	; ????
+ 604:	ff ff       	.word	0xffff	; ????
+ 606:	ff ff       	.word	0xffff	; ????
+ 608:	ff ff       	.word	0xffff	; ????
+ 60a:	ff ff       	.word	0xffff	; ????
+ 60c:	ff ff       	.word	0xffff	; ????
+ 60e:	ff ff       	.word	0xffff	; ????
+ 610:	ff ff       	.word	0xffff	; ????
+ 612:	ff ff       	.word	0xffff	; ????
+ 614:	ff ff       	.word	0xffff	; ????
+ 616:	ff ff       	.word	0xffff	; ????
+ 618:	ff ff       	.word	0xffff	; ????
+ 61a:	8f 77       	andi	r24, 0x7F	; 127
+ 61c:	74 77       	andi	r23, 0x74	; 116
+ 61e:	8f ff       	.word	0xff8f	; ????
+ 620:	ff ff       	.word	0xffff	; ????
+ 622:	ff ff       	.word	0xffff	; ????
+ 624:	ff ff       	.word	0xffff	; ????
+ 626:	8f 74       	andi	r24, 0x4F	; 79
+ 628:	77 74       	andi	r23, 0x47	; 71
+ 62a:	8f ff       	.word	0xff8f	; ????
+ 62c:	8f 75       	andi	r24, 0x5F	; 95
+ 62e:	77 75       	andi	r23, 0x57	; 87
+ 630:	8f ff       	.word	0xff8f	; ????
+ 632:	ff ff       	.word	0xffff	; ????
+ 634:	ff ff       	.word	0xffff	; ????
+ 636:	ff ff       	.word	0xffff	; ????
+ 638:	ff ff       	.word	0xffff	; ????
+ 63a:	ff ff       	.word	0xffff	; ????
+ 63c:	ff ff       	.word	0xffff	; ????
+ 63e:	ff ff       	.word	0xffff	; ????
+ 640:	ff ff       	.word	0xffff	; ????
+ 642:	ff ff       	.word	0xffff	; ????
+ 644:	87 7f       	andi	r24, 0xF7	; 247
+ 646:	7c bf       	out	0x3c, r23	; 60
+ 648:	07 ff       	sbrs	r16, 7
+ 64a:	87 7c       	andi	r24, 0xC7	; 199
+ 64c:	7f bc       	out	0x2f, r7	; 47
+ 64e:	07 ff       	sbrs	r16, 7
+ 650:	87 7d       	andi	r24, 0xD7	; 215
+ 652:	7f bd       	out	0x2f, r23	; 47
+ 654:	07 ff       	sbrs	r16, 7
+ 656:	ff ff       	.word	0xffff	; ????
+ 658:	ff ff       	.word	0xffff	; ????
+ 65a:	ff ff       	.word	0xffff	; ????
+ 65c:	ff ff       	.word	0xffff	; ????
+ 65e:	ff ff       	.word	0xffff	; ????
+ 660:	ff ff       	.word	0xffff	; ????
+ 662:	ff ff       	.word	0xffff	; ????
+ 664:	ff ff       	.word	0xffff	; ????
+ 666:	ff ff       	.word	0xffff	; ????
+
+00000668 <__ctors_end>:
+ 668:	11 24       	eor	r1, r1
+ 66a:	1f be       	out	0x3f, r1	; 63
+ 66c:	cf ef       	ldi	r28, 0xFF	; 255
+ 66e:	d8 e0       	ldi	r29, 0x08	; 8
+ 670:	de bf       	out	0x3e, r29	; 62
+ 672:	cd bf       	out	0x3d, r28	; 61
+
+00000674 <__do_copy_data>:
+ 674:	11 e0       	ldi	r17, 0x01	; 1
+ 676:	a0 e0       	ldi	r26, 0x00	; 0
+ 678:	b1 e0       	ldi	r27, 0x01	; 1
+ 67a:	e2 e4       	ldi	r30, 0x42	; 66
+ 67c:	fd e0       	ldi	r31, 0x0D	; 13
+ 67e:	02 c0       	rjmp	.+4      	; 0x684 <__do_copy_data+0x10>
+ 680:	05 90       	lpm	r0, Z+
+ 682:	0d 92       	st	X+, r0
+ 684:	aa 30       	cpi	r26, 0x0A	; 10
+ 686:	b1 07       	cpc	r27, r17
+ 688:	d9 f7       	brne	.-10     	; 0x680 <__do_copy_data+0xc>
+
+0000068a <__do_clear_bss>:
+ 68a:	22 e0       	ldi	r18, 0x02	; 2
+ 68c:	aa e0       	ldi	r26, 0x0A	; 10
+ 68e:	b1 e0       	ldi	r27, 0x01	; 1
+ 690:	01 c0       	rjmp	.+2      	; 0x694 <.do_clear_bss_start>
+
+00000692 <.do_clear_bss_loop>:
+ 692:	1d 92       	st	X+, r1
+
+00000694 <.do_clear_bss_start>:
+ 694:	a0 35       	cpi	r26, 0x50	; 80
+ 696:	b2 07       	cpc	r27, r18
+ 698:	e1 f7       	brne	.-8      	; 0x692 <.do_clear_bss_loop>
+ 69a:	0e 94 3b 06 	call	0xc76	; 0xc76 <main>
+ 69e:	0c 94 9f 06 	jmp	0xd3e	; 0xd3e <_exit>
+
+000006a2 <__bad_interrupt>:
+ 6a2:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+000006a6 <fill_datatmp>:
+const unsigned char	PROGMEM szoveg[] ={"A mai dátum: "};
+const unsigned char PROGMEM	weekdays[7][10]={{"hétfõ"},{"kedd"},{"szerda"},{"csütörtök"},{"péntek"},{"szombat"},{"vasárnap"}};
+const unsigned char	PROGMEM months[12][12]={{"január"},{"február"},{"március"},{"április"},{"május"},{"június"},{"július"},
+{"augusztus"},{"szeptember"},{"október"},{"november"},{"december"}};
+/*********************************///
+void fill_datatmp(char adat,char kezd){
+ 6a6:	90 e0       	ldi	r25, 0x00	; 0
+ 6a8:	fc 01       	movw	r30, r24
+ 6aa:	ee 0f       	add	r30, r30
+ 6ac:	ff 1f       	adc	r31, r31
+ 6ae:	e8 0f       	add	r30, r24
+ 6b0:	f9 1f       	adc	r31, r25
+ 6b2:	ee 0f       	add	r30, r30
+ 6b4:	ff 1f       	adc	r31, r31
+ 6b6:	e8 59       	subi	r30, 0x98	; 152
+ 6b8:	ff 4f       	sbci	r31, 0xFF	; 255
+ 6ba:	70 e0       	ldi	r23, 0x00	; 0
+ 6bc:	db 01       	movw	r26, r22
+ 6be:	a9 5e       	subi	r26, 0xE9	; 233
+ 6c0:	be 4f       	sbci	r27, 0xFE	; 254
+ 6c2:	63 5e       	subi	r22, 0xE3	; 227
+ 6c4:	7e 4f       	sbci	r23, 0xFE	; 254
+	for(char i=0;i<6;i++){datatmp[kezd+i]=pgm_read_byte(&(characters[adat][i]));}
+ 6c6:	84 91       	lpm	r24, Z
+ 6c8:	8d 93       	st	X+, r24
+ 6ca:	31 96       	adiw	r30, 0x01	; 1
+ 6cc:	a6 17       	cp	r26, r22
+ 6ce:	b7 07       	cpc	r27, r23
+ 6d0:	d1 f7       	brne	.-12     	; 0x6c6 <fill_datatmp+0x20>
+}
+ 6d2:	08 95       	ret
+
+000006d4 <copy>:
+void copy(char target_from, char target_to, char source_from){
+	for(char i=target_from;i<target_to;i++){
+ 6d4:	86 17       	cp	r24, r22
+ 6d6:	80 f4       	brcc	.+32     	; 0x6f8 <copy+0x24>
+		data[i]=datatmp[i+source_from];
+ 6d8:	50 e0       	ldi	r21, 0x00	; 0
+ 6da:	28 2f       	mov	r18, r24
+ 6dc:	30 e0       	ldi	r19, 0x00	; 0
+ 6de:	d9 01       	movw	r26, r18
+ 6e0:	a8 5e       	subi	r26, 0xE8	; 232
+ 6e2:	bd 4f       	sbci	r27, 0xFD	; 253
+ 6e4:	29 5e       	subi	r18, 0xE9	; 233
+ 6e6:	3e 4f       	sbci	r19, 0xFE	; 254
+ 6e8:	f9 01       	movw	r30, r18
+ 6ea:	e4 0f       	add	r30, r20
+ 6ec:	f5 1f       	adc	r31, r21
+ 6ee:	90 81       	ld	r25, Z
+ 6f0:	9c 93       	st	X, r25
+/*********************************///
+void fill_datatmp(char adat,char kezd){
+	for(char i=0;i<6;i++){datatmp[kezd+i]=pgm_read_byte(&(characters[adat][i]));}
+}
+void copy(char target_from, char target_to, char source_from){
+	for(char i=target_from;i<target_to;i++){
+ 6f2:	8f 5f       	subi	r24, 0xFF	; 255
+ 6f4:	86 13       	cpse	r24, r22
+ 6f6:	f1 cf       	rjmp	.-30     	; 0x6da <copy+0x6>
+ 6f8:	08 95       	ret
+
+000006fa <fill_display>:
+		data[i]=datatmp[i+source_from];
+	}
+}
+void fill_display(TIME* time,char kezd){
+ 6fa:	0f 93       	push	r16
+ 6fc:	1f 93       	push	r17
+ 6fe:	cf 93       	push	r28
+ 700:	8c 01       	movw	r16, r24
+ 702:	c6 2f       	mov	r28, r22
+	fill_datatmp(time->hour_tens+'0',kezd+0);
+ 704:	fc 01       	movw	r30, r24
+ 706:	80 81       	ld	r24, Z
+ 708:	80 5d       	subi	r24, 0xD0	; 208
+ 70a:	0e 94 53 03 	call	0x6a6	; 0x6a6 <fill_datatmp>
+	fill_datatmp(time->hour_singles+'0',kezd+6);
+ 70e:	66 e0       	ldi	r22, 0x06	; 6
+ 710:	6c 0f       	add	r22, r28
+ 712:	f8 01       	movw	r30, r16
+ 714:	81 81       	ldd	r24, Z+1	; 0x01
+ 716:	80 5d       	subi	r24, 0xD0	; 208
+ 718:	0e 94 53 03 	call	0x6a6	; 0x6a6 <fill_datatmp>
+	fill_datatmp(':',60);	
+ 71c:	6c e3       	ldi	r22, 0x3C	; 60
+ 71e:	8a e3       	ldi	r24, 0x3A	; 58
+ 720:	0e 94 53 03 	call	0x6a6	; 0x6a6 <fill_datatmp>
+	fill_datatmp(time->min_tens+'0',kezd+18);
+ 724:	62 e1       	ldi	r22, 0x12	; 18
+ 726:	6c 0f       	add	r22, r28
+ 728:	f8 01       	movw	r30, r16
+ 72a:	82 81       	ldd	r24, Z+2	; 0x02
+ 72c:	80 5d       	subi	r24, 0xD0	; 208
+ 72e:	0e 94 53 03 	call	0x6a6	; 0x6a6 <fill_datatmp>
+	fill_datatmp(time->min_singles+'0',kezd+24);
+ 732:	68 e1       	ldi	r22, 0x18	; 24
+ 734:	6c 0f       	add	r22, r28
+ 736:	f8 01       	movw	r30, r16
+ 738:	83 81       	ldd	r24, Z+3	; 0x03
+ 73a:	80 5d       	subi	r24, 0xD0	; 208
+ 73c:	0e 94 53 03 	call	0x6a6	; 0x6a6 <fill_datatmp>
+	fill_datatmp(':',78);		
+ 740:	6e e4       	ldi	r22, 0x4E	; 78
+ 742:	8a e3       	ldi	r24, 0x3A	; 58
+ 744:	0e 94 53 03 	call	0x6a6	; 0x6a6 <fill_datatmp>
+	fill_datatmp(time->sec_tens+'0',kezd+36);
+ 748:	64 e2       	ldi	r22, 0x24	; 36
+ 74a:	6c 0f       	add	r22, r28
+ 74c:	f8 01       	movw	r30, r16
+ 74e:	84 81       	ldd	r24, Z+4	; 0x04
+ 750:	80 5d       	subi	r24, 0xD0	; 208
+ 752:	0e 94 53 03 	call	0x6a6	; 0x6a6 <fill_datatmp>
+	fill_datatmp(time->sec_singles+'0',kezd+42);
+ 756:	6a e2       	ldi	r22, 0x2A	; 42
+ 758:	6c 0f       	add	r22, r28
+ 75a:	f8 01       	movw	r30, r16
+ 75c:	85 81       	ldd	r24, Z+5	; 0x05
+ 75e:	80 5d       	subi	r24, 0xD0	; 208
+ 760:	0e 94 53 03 	call	0x6a6	; 0x6a6 <fill_datatmp>
+}
+ 764:	cf 91       	pop	r28
+ 766:	1f 91       	pop	r17
+ 768:	0f 91       	pop	r16
+ 76a:	08 95       	ret
+
+0000076c <shift>:
+void shift(const char a){
+	STROBE=0;
+ 76c:	2a 98       	cbi	0x05, 2	; 5
+ 76e:	a8 2f       	mov	r26, r24
+ 770:	b0 e0       	ldi	r27, 0x00	; 0
+ 772:	fd 01       	movw	r30, r26
+ 774:	e0 5c       	subi	r30, 0xC0	; 192
+ 776:	fd 4f       	sbci	r31, 0xFD	; 253
+ 778:	a0 5f       	subi	r26, 0xF0	; 240
+ 77a:	bd 4f       	sbci	r27, 0xFD	; 253
+	for(char i=0;i<6;i++){
+		int tmp=data[((5-i)*8)+a];
+ 77c:	68 2f       	mov	r22, r24
+ 77e:	70 e0       	ldi	r23, 0x00	; 0
+ 780:	88 e0       	ldi	r24, 0x08	; 8
+ 782:	ab 01       	movw	r20, r22
+ 784:	20 81       	ld	r18, Z
+ 786:	30 e0       	ldi	r19, 0x00	; 0
+ 788:	98 2f       	mov	r25, r24
+		for(char j=0;j<8;j++){
+			if (tmp &0x80){// 0x01){
+ 78a:	27 ff       	sbrs	r18, 7
+ 78c:	02 c0       	rjmp	.+4      	; 0x792 <shift+0x26>
+				SDAT=0;//SDAT=1;
+ 78e:	28 98       	cbi	0x05, 0	; 5
+ 790:	01 c0       	rjmp	.+2      	; 0x794 <shift+0x28>
+			}
+			else SDAT=1;//SDAT=0
+ 792:	28 9a       	sbi	0x05, 0	; 5
+			SCLK=1;
+ 794:	29 9a       	sbi	0x05, 1	; 5
+			SCLK=0;
+ 796:	29 98       	cbi	0x05, 1	; 5
+			tmp<<=1;
+ 798:	22 0f       	add	r18, r18
+ 79a:	33 1f       	adc	r19, r19
+ 79c:	91 50       	subi	r25, 0x01	; 1
+}
+void shift(const char a){
+	STROBE=0;
+	for(char i=0;i<6;i++){
+		int tmp=data[((5-i)*8)+a];
+		for(char j=0;j<8;j++){
+ 79e:	a9 f7       	brne	.-22     	; 0x78a <shift+0x1e>
+ 7a0:	38 97       	sbiw	r30, 0x08	; 8
+	fill_datatmp(time->sec_tens+'0',kezd+36);
+	fill_datatmp(time->sec_singles+'0',kezd+42);
+}
+void shift(const char a){
+	STROBE=0;
+	for(char i=0;i<6;i++){
+ 7a2:	ea 17       	cp	r30, r26
+ 7a4:	fb 07       	cpc	r31, r27
+ 7a6:	69 f7       	brne	.-38     	; 0x782 <shift+0x16>
+ 7a8:	66 e0       	ldi	r22, 0x06	; 6
+ 7aa:	70 e0       	ldi	r23, 0x00	; 0
+		int tmp=data[((5-i)*8)+a];
+ 7ac:	f8 e0       	ldi	r31, 0x08	; 8
+ 7ae:	e0 e0       	ldi	r30, 0x00	; 0
+			tmp<<=1;
+		}
+	}
+	for(int i=0;i<6;i++){
+		for(char j=8;j>=1;j--){
+			if(j==a+1){ODAT=1;}
+ 7b0:	9a 01       	movw	r18, r20
+ 7b2:	2f 5f       	subi	r18, 0xFF	; 255
+ 7b4:	3f 4f       	sbci	r19, 0xFF	; 255
+ 7b6:	0d c0       	rjmp	.+26     	; 0x7d2 <shift+0x66>
+ 7b8:	82 17       	cp	r24, r18
+ 7ba:	93 07       	cpc	r25, r19
+ 7bc:	11 f4       	brne	.+4      	; 0x7c2 <shift+0x56>
+ 7be:	2b 9a       	sbi	0x05, 3	; 5
+ 7c0:	01 c0       	rjmp	.+2      	; 0x7c4 <shift+0x58>
+			else ODAT=0;
+ 7c2:	2b 98       	cbi	0x05, 3	; 5
+			OCLK=1;
+ 7c4:	2c 9a       	sbi	0x05, 4	; 5
+			OCLK=0;
+ 7c6:	2c 98       	cbi	0x05, 4	; 5
+ 7c8:	01 97       	sbiw	r24, 0x01	; 1
+			SCLK=0;
+			tmp<<=1;
+		}
+	}
+	for(int i=0;i<6;i++){
+		for(char j=8;j>=1;j--){
+ 7ca:	b1 f7       	brne	.-20     	; 0x7b8 <shift+0x4c>
+ 7cc:	61 50       	subi	r22, 0x01	; 1
+ 7ce:	71 09       	sbc	r23, r1
+			SCLK=1;
+			SCLK=0;
+			tmp<<=1;
+		}
+	}
+	for(int i=0;i<6;i++){
+ 7d0:	19 f0       	breq	.+6      	; 0x7d8 <shift+0x6c>
+	fill_datatmp(time->sec_singles+'0',kezd+42);
+}
+void shift(const char a){
+	STROBE=0;
+	for(char i=0;i<6;i++){
+		int tmp=data[((5-i)*8)+a];
+ 7d2:	8f 2f       	mov	r24, r31
+ 7d4:	9e 2f       	mov	r25, r30
+ 7d6:	f0 cf       	rjmp	.-32     	; 0x7b8 <shift+0x4c>
+			else ODAT=0;
+			OCLK=1;
+			OCLK=0;
+		}
+	}
+	STROBE=1;
+ 7d8:	2a 9a       	sbi	0x05, 2	; 5
+ 7da:	08 95       	ret
+
+000007dc <TWIStart>:
+		data[i]=0xFF;
+	}
+}
+/*********************************///I2C functions
+void TWIStart(void){
+	TWCR = (1<<TWINT)|(1<<TWSTA)|(1<<TWEN);
+ 7dc:	84 ea       	ldi	r24, 0xA4	; 164
+ 7de:	80 93 bc 00 	sts	0x00BC, r24
+	while ((TWCR & (1<<TWINT)) == 0);
+ 7e2:	ec eb       	ldi	r30, 0xBC	; 188
+ 7e4:	f0 e0       	ldi	r31, 0x00	; 0
+ 7e6:	80 81       	ld	r24, Z
+ 7e8:	88 23       	and	r24, r24
+ 7ea:	ec f7       	brge	.-6      	; 0x7e6 <TWIStart+0xa>
+}
+ 7ec:	08 95       	ret
+
+000007ee <TWIWrite>:
+void TWIStop(void){
+	TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
+}
+void TWIWrite(uint8_t u8data){
+	TWDR = u8data;
+ 7ee:	80 93 bb 00 	sts	0x00BB, r24
+	TWCR = (1<<TWINT)|(1<<TWEN);
+ 7f2:	84 e8       	ldi	r24, 0x84	; 132
+ 7f4:	80 93 bc 00 	sts	0x00BC, r24
+	while ((TWCR & (1<<TWINT)) == 0);
+ 7f8:	ec eb       	ldi	r30, 0xBC	; 188
+ 7fa:	f0 e0       	ldi	r31, 0x00	; 0
+ 7fc:	80 81       	ld	r24, Z
+ 7fe:	88 23       	and	r24, r24
+ 800:	ec f7       	brge	.-6      	; 0x7fc <TWIWrite+0xe>
+}
+ 802:	08 95       	ret
+
+00000804 <TWIReadNACK>:
+	TWCR = (1<<TWINT)|(1<<TWEN)|(1<<TWEA);
+	while ((TWCR & (1<<TWINT)) == 0);
+	return TWDR;
+}
+char TWIReadNACK(void){
+	TWCR = (1<<TWINT)|(1<<TWEN);
+ 804:	84 e8       	ldi	r24, 0x84	; 132
+ 806:	80 93 bc 00 	sts	0x00BC, r24
+	while ((TWCR & (1<<TWINT)) == 0);
+ 80a:	ec eb       	ldi	r30, 0xBC	; 188
+ 80c:	f0 e0       	ldi	r31, 0x00	; 0
+ 80e:	80 81       	ld	r24, Z
+ 810:	88 23       	and	r24, r24
+ 812:	ec f7       	brge	.-6      	; 0x80e <TWIReadNACK+0xa>
+	return TWDR;
+ 814:	80 91 bb 00 	lds	r24, 0x00BB
+}
+ 818:	08 95       	ret
+
+0000081a <readrtcreg>:
+	*single=(tmp&0x0F);
+	tmp>>=4;
+	*ten=(tmp&0x07);
+}
+/*********************************///RTC functions
+unsigned char readrtcreg(unsigned char ADDR){
+ 81a:	cf 93       	push	r28
+ 81c:	c8 2f       	mov	r28, r24
+	unsigned char data;
+	TWIStart();
+ 81e:	0e 94 ee 03 	call	0x7dc	; 0x7dc <TWIStart>
+	TWIWrite(RTC_ADDR);
+ 822:	80 ed       	ldi	r24, 0xD0	; 208
+ 824:	0e 94 f7 03 	call	0x7ee	; 0x7ee <TWIWrite>
+	TWIWrite(ADDR);
+ 828:	8c 2f       	mov	r24, r28
+ 82a:	0e 94 f7 03 	call	0x7ee	; 0x7ee <TWIWrite>
+	TWIStart();
+ 82e:	0e 94 ee 03 	call	0x7dc	; 0x7dc <TWIStart>
+	TWIWrite(RTC_ADDR+0x01);
+ 832:	81 ed       	ldi	r24, 0xD1	; 209
+ 834:	0e 94 f7 03 	call	0x7ee	; 0x7ee <TWIWrite>
+	data=TWIReadNACK();
+ 838:	0e 94 02 04 	call	0x804	; 0x804 <TWIReadNACK>
+void TWIStart(void){
+	TWCR = (1<<TWINT)|(1<<TWSTA)|(1<<TWEN);
+	while ((TWCR & (1<<TWINT)) == 0);
+}
+void TWIStop(void){
+	TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
+ 83c:	94 e9       	ldi	r25, 0x94	; 148
+ 83e:	90 93 bc 00 	sts	0x00BC, r25
+	TWIStart();
+	TWIWrite(RTC_ADDR+0x01);
+	data=TWIReadNACK();
+	TWIStop();
+	return data;
+}
+ 842:	cf 91       	pop	r28
+ 844:	08 95       	ret
+
+00000846 <rtcread_time>:
+void rtcread_time(TIME* time){
+ 846:	0f 93       	push	r16
+ 848:	1f 93       	push	r17
+ 84a:	cf 93       	push	r28
+ 84c:	df 93       	push	r29
+ 84e:	ec 01       	movw	r28, r24
+	TWIWrite(RTC_ADDR+0x01);
+	rtcdata.sec=TWIReadACK();
+	rtcdata.min=TWIReadACK();
+	rtcdata.hour=TWIReadNACK();
+	TWIStop();*/
+	rtcdata.sec=readrtcreg(0x00);
+ 850:	80 e0       	ldi	r24, 0x00	; 0
+ 852:	0e 94 0d 04 	call	0x81a	; 0x81a <readrtcreg>
+ 856:	08 e4       	ldi	r16, 0x48	; 72
+ 858:	12 e0       	ldi	r17, 0x02	; 2
+ 85a:	f8 01       	movw	r30, r16
+ 85c:	80 83       	st	Z, r24
+	rtcdata.min=readrtcreg(0x01);
+ 85e:	81 e0       	ldi	r24, 0x01	; 1
+ 860:	0e 94 0d 04 	call	0x81a	; 0x81a <readrtcreg>
+ 864:	f8 01       	movw	r30, r16
+ 866:	81 83       	std	Z+1, r24	; 0x01
+	rtcdata.hour=readrtcreg(0x02);	
+ 868:	82 e0       	ldi	r24, 0x02	; 2
+ 86a:	0e 94 0d 04 	call	0x81a	; 0x81a <readrtcreg>
+ 86e:	f8 01       	movw	r30, r16
+ 870:	82 83       	std	Z+2, r24	; 0x02
+	tizes&0x70;
+	tmp&=0x0F;
+	return(tizes|tmp);
+}
+void felbont(unsigned char tmp, unsigned char* ten, unsigned char* single){
+	*single=(tmp&0x0F);
+ 872:	98 2f       	mov	r25, r24
+ 874:	9f 70       	andi	r25, 0x0F	; 15
+ 876:	99 83       	std	Y+1, r25	; 0x01
+	tmp>>=4;
+ 878:	98 2f       	mov	r25, r24
+ 87a:	92 95       	swap	r25
+ 87c:	9f 70       	andi	r25, 0x0F	; 15
+	*ten=(tmp&0x07);
+ 87e:	97 70       	andi	r25, 0x07	; 7
+ 880:	98 83       	st	Y, r25
+	TWIStop();*/
+	rtcdata.sec=readrtcreg(0x00);
+	rtcdata.min=readrtcreg(0x01);
+	rtcdata.hour=readrtcreg(0x02);	
+	felbont(rtcdata.hour,&time->hour_tens,&time->hour_singles);
+	felbont(rtcdata.min,&time->min_tens,&time->min_singles);
+ 882:	81 81       	ldd	r24, Z+1	; 0x01
+	tizes&0x70;
+	tmp&=0x0F;
+	return(tizes|tmp);
+}
+void felbont(unsigned char tmp, unsigned char* ten, unsigned char* single){
+	*single=(tmp&0x0F);
+ 884:	98 2f       	mov	r25, r24
+ 886:	9f 70       	andi	r25, 0x0F	; 15
+ 888:	9b 83       	std	Y+3, r25	; 0x03
+	tmp>>=4;
+ 88a:	82 95       	swap	r24
+ 88c:	8f 70       	andi	r24, 0x0F	; 15
+	*ten=(tmp&0x07);
+ 88e:	87 70       	andi	r24, 0x07	; 7
+ 890:	8a 83       	std	Y+2, r24	; 0x02
+	rtcdata.sec=readrtcreg(0x00);
+	rtcdata.min=readrtcreg(0x01);
+	rtcdata.hour=readrtcreg(0x02);	
+	felbont(rtcdata.hour,&time->hour_tens,&time->hour_singles);
+	felbont(rtcdata.min,&time->min_tens,&time->min_singles);
+	felbont(rtcdata.sec,&time->sec_tens,&time->sec_singles);
+ 892:	80 81       	ld	r24, Z
+	tizes&0x70;
+	tmp&=0x0F;
+	return(tizes|tmp);
+}
+void felbont(unsigned char tmp, unsigned char* ten, unsigned char* single){
+	*single=(tmp&0x0F);
+ 894:	98 2f       	mov	r25, r24
+ 896:	9f 70       	andi	r25, 0x0F	; 15
+ 898:	9d 83       	std	Y+5, r25	; 0x05
+	tmp>>=4;
+ 89a:	82 95       	swap	r24
+ 89c:	8f 70       	andi	r24, 0x0F	; 15
+	*ten=(tmp&0x07);
+ 89e:	87 70       	andi	r24, 0x07	; 7
+ 8a0:	8c 83       	std	Y+4, r24	; 0x04
+	rtcdata.min=readrtcreg(0x01);
+	rtcdata.hour=readrtcreg(0x02);	
+	felbont(rtcdata.hour,&time->hour_tens,&time->hour_singles);
+	felbont(rtcdata.min,&time->min_tens,&time->min_singles);
+	felbont(rtcdata.sec,&time->sec_tens,&time->sec_singles);
+}
+ 8a2:	df 91       	pop	r29
+ 8a4:	cf 91       	pop	r28
+ 8a6:	1f 91       	pop	r17
+ 8a8:	0f 91       	pop	r16
+ 8aa:	08 95       	ret
+
+000008ac <rtcread_date>:
+void rtcread_date(DATE* date){
+ 8ac:	0f 93       	push	r16
+ 8ae:	1f 93       	push	r17
+ 8b0:	cf 93       	push	r28
+ 8b2:	df 93       	push	r29
+ 8b4:	8c 01       	movw	r16, r24
+	rtcdata.day=TWIReadACK();
+	rtcdata.date=TWIReadACK();
+	rtcdata.month=TWIReadACK();
+	rtcdata.year=TWIReadNACK();
+	TWIStop();*/
+	rtcdata.day=readrtcreg(0x03);
+ 8b6:	83 e0       	ldi	r24, 0x03	; 3
+ 8b8:	0e 94 0d 04 	call	0x81a	; 0x81a <readrtcreg>
+ 8bc:	c8 e4       	ldi	r28, 0x48	; 72
+ 8be:	d2 e0       	ldi	r29, 0x02	; 2
+ 8c0:	8b 83       	std	Y+3, r24	; 0x03
+	rtcdata.date=readrtcreg(0x04);
+ 8c2:	84 e0       	ldi	r24, 0x04	; 4
+ 8c4:	0e 94 0d 04 	call	0x81a	; 0x81a <readrtcreg>
+ 8c8:	8c 83       	std	Y+4, r24	; 0x04
+	rtcdata.month=readrtcreg(0x05);
+ 8ca:	85 e0       	ldi	r24, 0x05	; 5
+ 8cc:	0e 94 0d 04 	call	0x81a	; 0x81a <readrtcreg>
+ 8d0:	8d 83       	std	Y+5, r24	; 0x05
+	rtcdata.year=readrtcreg(0x06);
+ 8d2:	86 e0       	ldi	r24, 0x06	; 6
+ 8d4:	0e 94 0d 04 	call	0x81a	; 0x81a <readrtcreg>
+ 8d8:	8e 83       	std	Y+6, r24	; 0x06
+	date->day=rtcdata.day;
+ 8da:	8b 81       	ldd	r24, Y+3	; 0x03
+ 8dc:	f8 01       	movw	r30, r16
+ 8de:	80 83       	st	Z, r24
+	felbont(rtcdata.date,&date->date_tens,&date->date_singles);
+ 8e0:	8c 81       	ldd	r24, Y+4	; 0x04
+	tizes&0x70;
+	tmp&=0x0F;
+	return(tizes|tmp);
+}
+void felbont(unsigned char tmp, unsigned char* ten, unsigned char* single){
+	*single=(tmp&0x0F);
+ 8e2:	98 2f       	mov	r25, r24
+ 8e4:	9f 70       	andi	r25, 0x0F	; 15
+ 8e6:	92 83       	std	Z+2, r25	; 0x02
+	tmp>>=4;
+ 8e8:	82 95       	swap	r24
+ 8ea:	8f 70       	andi	r24, 0x0F	; 15
+	*ten=(tmp&0x07);
+ 8ec:	87 70       	andi	r24, 0x07	; 7
+ 8ee:	81 83       	std	Z+1, r24	; 0x01
+	rtcdata.date=readrtcreg(0x04);
+	rtcdata.month=readrtcreg(0x05);
+	rtcdata.year=readrtcreg(0x06);
+	date->day=rtcdata.day;
+	felbont(rtcdata.date,&date->date_tens,&date->date_singles);
+	felbont(rtcdata.month,&date->month_tens,&date->month_singles);
+ 8f0:	8d 81       	ldd	r24, Y+5	; 0x05
+	tizes&0x70;
+	tmp&=0x0F;
+	return(tizes|tmp);
+}
+void felbont(unsigned char tmp, unsigned char* ten, unsigned char* single){
+	*single=(tmp&0x0F);
+ 8f2:	98 2f       	mov	r25, r24
+ 8f4:	9f 70       	andi	r25, 0x0F	; 15
+ 8f6:	94 83       	std	Z+4, r25	; 0x04
+	tmp>>=4;
+ 8f8:	82 95       	swap	r24
+ 8fa:	8f 70       	andi	r24, 0x0F	; 15
+	*ten=(tmp&0x07);
+ 8fc:	87 70       	andi	r24, 0x07	; 7
+ 8fe:	83 83       	std	Z+3, r24	; 0x03
+	rtcdata.month=readrtcreg(0x05);
+	rtcdata.year=readrtcreg(0x06);
+	date->day=rtcdata.day;
+	felbont(rtcdata.date,&date->date_tens,&date->date_singles);
+	felbont(rtcdata.month,&date->month_tens,&date->month_singles);
+	felbont(rtcdata.year,&date->year_tens,&date->year_singles);	
+ 900:	8e 81       	ldd	r24, Y+6	; 0x06
+	tizes&0x70;
+	tmp&=0x0F;
+	return(tizes|tmp);
+}
+void felbont(unsigned char tmp, unsigned char* ten, unsigned char* single){
+	*single=(tmp&0x0F);
+ 902:	98 2f       	mov	r25, r24
+ 904:	9f 70       	andi	r25, 0x0F	; 15
+ 906:	90 87       	std	Z+8, r25	; 0x08
+	tmp>>=4;
+ 908:	82 95       	swap	r24
+ 90a:	8f 70       	andi	r24, 0x0F	; 15
+	*ten=(tmp&0x07);
+ 90c:	87 70       	andi	r24, 0x07	; 7
+ 90e:	87 83       	std	Z+7, r24	; 0x07
+	rtcdata.year=readrtcreg(0x06);
+	date->day=rtcdata.day;
+	felbont(rtcdata.date,&date->date_tens,&date->date_singles);
+	felbont(rtcdata.month,&date->month_tens,&date->month_singles);
+	felbont(rtcdata.year,&date->year_tens,&date->year_singles);	
+}
+ 910:	df 91       	pop	r29
+ 912:	cf 91       	pop	r28
+ 914:	1f 91       	pop	r17
+ 916:	0f 91       	pop	r16
+ 918:	08 95       	ret
+
+0000091a <rtcread>:
+void rtcread(TIME* time, DATE* date){
+ 91a:	cf 93       	push	r28
+ 91c:	df 93       	push	r29
+ 91e:	eb 01       	movw	r28, r22
+	rtcread_time(time);
+ 920:	0e 94 23 04 	call	0x846	; 0x846 <rtcread_time>
+	rtcread_date(date);
+ 924:	ce 01       	movw	r24, r28
+ 926:	0e 94 56 04 	call	0x8ac	; 0x8ac <rtcread_date>
+}
+ 92a:	df 91       	pop	r29
+ 92c:	cf 91       	pop	r28
+ 92e:	08 95       	ret
+
+00000930 <first_read>:
+	TWIWrite(atalakit(12));
+	TWIWrite(atalakit(15));
+	TWIStop();	
+}
+void first_read(){
+	rtcread(&time[1],&date);
+ 930:	60 e0       	ldi	r22, 0x00	; 0
+ 932:	71 e0       	ldi	r23, 0x01	; 1
+ 934:	80 e1       	ldi	r24, 0x10	; 16
+ 936:	91 e0       	ldi	r25, 0x01	; 1
+ 938:	0e 94 8d 04 	call	0x91a	; 0x91a <rtcread>
+	fill_display(&time[1],48);
+ 93c:	60 e3       	ldi	r22, 0x30	; 48
+ 93e:	80 e1       	ldi	r24, 0x10	; 16
+ 940:	91 e0       	ldi	r25, 0x01	; 1
+ 942:	0e 94 7d 03 	call	0x6fa	; 0x6fa <fill_display>
+	copy(0,48,48);
+ 946:	40 e3       	ldi	r20, 0x30	; 48
+ 948:	60 e3       	ldi	r22, 0x30	; 48
+ 94a:	80 e0       	ldi	r24, 0x00	; 0
+ 94c:	0e 94 6a 03 	call	0x6d4	; 0x6d4 <copy>
+ 950:	08 95       	ret
+
+00000952 <concat>:
+	for(unsigned char i=0;pgm_read_byte(&text[i])!='\0'&&i<0xFF;i++){datatmp[i]=pgm_read_byte(&text[i]);}
+	text_out(datatmp);
+}
+/*********************************///Time functions
+char concat(char b, char a){
+	a>>=1;
+ 952:	66 95       	lsr	r22
+	if(b&0x01){a|=0x80;}
+ 954:	80 fd       	sbrc	r24, 0
+ 956:	60 68       	ori	r22, 0x80	; 128
+	else{a&=0x7F;}
+	return a;
+}
+ 958:	86 2f       	mov	r24, r22
+ 95a:	08 95       	ret
+
+0000095c <time_out>:
+void time_out(void){
+ 95c:	2f 92       	push	r2
+ 95e:	3f 92       	push	r3
+ 960:	5f 92       	push	r5
+ 962:	6f 92       	push	r6
+ 964:	7f 92       	push	r7
+ 966:	8f 92       	push	r8
+ 968:	9f 92       	push	r9
+ 96a:	af 92       	push	r10
+ 96c:	bf 92       	push	r11
+ 96e:	cf 92       	push	r12
+ 970:	df 92       	push	r13
+ 972:	ef 92       	push	r14
+ 974:	ff 92       	push	r15
+ 976:	0f 93       	push	r16
+ 978:	1f 93       	push	r17
+ 97a:	cf 93       	push	r28
+ 97c:	df 93       	push	r29
+ 97e:	00 d0       	rcall	.+0      	; 0x980 <time_out+0x24>
+ 980:	cd b7       	in	r28, 0x3d	; 61
+ 982:	de b7       	in	r29, 0x3e	; 62
+	MASKBYTE.B0=MASKBYTE.B1=MASKBYTE.B2=MASKBYTE.B3=MASKBYTE.B4=MASKBYTE.B5=0;
+ 984:	80 91 17 02 	lds	r24, 0x0217
+ 988:	81 7c       	andi	r24, 0xC1	; 193
+ 98a:	8e 7f       	andi	r24, 0xFE	; 254
+ 98c:	80 93 17 02 	sts	0x0217, r24
+	rtcread_time(&time[0]);
+ 990:	8a e0       	ldi	r24, 0x0A	; 10
+ 992:	91 e0       	ldi	r25, 0x01	; 1
+ 994:	0e 94 23 04 	call	0x846	; 0x846 <rtcread_time>
+	fill_display(&time[0],0);	
+ 998:	60 e0       	ldi	r22, 0x00	; 0
+ 99a:	8a e0       	ldi	r24, 0x0A	; 10
+ 99c:	91 e0       	ldi	r25, 0x01	; 1
+ 99e:	0e 94 7d 03 	call	0x6fa	; 0x6fa <fill_display>
+	
+	if (time[0].sec_singles!=time[1].sec_singles) MASKBYTE.B0=1;
+ 9a2:	ea e0       	ldi	r30, 0x0A	; 10
+ 9a4:	f1 e0       	ldi	r31, 0x01	; 1
+ 9a6:	95 81       	ldd	r25, Z+5	; 0x05
+ 9a8:	83 85       	ldd	r24, Z+11	; 0x0b
+ 9aa:	98 17       	cp	r25, r24
+ 9ac:	29 f0       	breq	.+10     	; 0x9b8 <time_out+0x5c>
+ 9ae:	80 91 17 02 	lds	r24, 0x0217
+ 9b2:	81 60       	ori	r24, 0x01	; 1
+ 9b4:	80 93 17 02 	sts	0x0217, r24
+	if (time[0].sec_tens!=time[1].sec_tens) MASKBYTE.B1=1;
+ 9b8:	ea e0       	ldi	r30, 0x0A	; 10
+ 9ba:	f1 e0       	ldi	r31, 0x01	; 1
+ 9bc:	94 81       	ldd	r25, Z+4	; 0x04
+ 9be:	82 85       	ldd	r24, Z+10	; 0x0a
+ 9c0:	98 17       	cp	r25, r24
+ 9c2:	29 f0       	breq	.+10     	; 0x9ce <time_out+0x72>
+ 9c4:	80 91 17 02 	lds	r24, 0x0217
+ 9c8:	82 60       	ori	r24, 0x02	; 2
+ 9ca:	80 93 17 02 	sts	0x0217, r24
+	if (time[0].min_singles!=time[1].min_singles) MASKBYTE.B2=1;
+ 9ce:	ea e0       	ldi	r30, 0x0A	; 10
+ 9d0:	f1 e0       	ldi	r31, 0x01	; 1
+ 9d2:	93 81       	ldd	r25, Z+3	; 0x03
+ 9d4:	81 85       	ldd	r24, Z+9	; 0x09
+ 9d6:	98 17       	cp	r25, r24
+ 9d8:	29 f0       	breq	.+10     	; 0x9e4 <time_out+0x88>
+ 9da:	80 91 17 02 	lds	r24, 0x0217
+ 9de:	84 60       	ori	r24, 0x04	; 4
+ 9e0:	80 93 17 02 	sts	0x0217, r24
+	if (time[0].min_tens!=time[1].min_tens) MASKBYTE.B3=1;
+ 9e4:	ea e0       	ldi	r30, 0x0A	; 10
+ 9e6:	f1 e0       	ldi	r31, 0x01	; 1
+ 9e8:	92 81       	ldd	r25, Z+2	; 0x02
+ 9ea:	80 85       	ldd	r24, Z+8	; 0x08
+ 9ec:	98 17       	cp	r25, r24
+ 9ee:	29 f0       	breq	.+10     	; 0x9fa <time_out+0x9e>
+ 9f0:	80 91 17 02 	lds	r24, 0x0217
+ 9f4:	88 60       	ori	r24, 0x08	; 8
+ 9f6:	80 93 17 02 	sts	0x0217, r24
+	if (time[0].hour_singles!=time[1].hour_singles) MASKBYTE.B4=1;
+ 9fa:	ea e0       	ldi	r30, 0x0A	; 10
+ 9fc:	f1 e0       	ldi	r31, 0x01	; 1
+ 9fe:	91 81       	ldd	r25, Z+1	; 0x01
+ a00:	87 81       	ldd	r24, Z+7	; 0x07
+ a02:	98 17       	cp	r25, r24
+ a04:	29 f0       	breq	.+10     	; 0xa10 <time_out+0xb4>
+ a06:	80 91 17 02 	lds	r24, 0x0217
+ a0a:	80 61       	ori	r24, 0x10	; 16
+ a0c:	80 93 17 02 	sts	0x0217, r24
+	if (time[0].hour_tens!=time[1].hour_tens) MASKBYTE.B5=1;
+ a10:	ea e0       	ldi	r30, 0x0A	; 10
+ a12:	f1 e0       	ldi	r31, 0x01	; 1
+ a14:	90 81       	ld	r25, Z
+ a16:	86 81       	ldd	r24, Z+6	; 0x06
+ a18:	98 17       	cp	r25, r24
+ a1a:	09 f4       	brne	.+2      	; 0xa1e <time_out+0xc2>
+ a1c:	b6 c0       	rjmp	.+364    	; 0xb8a <time_out+0x22e>
+ a1e:	80 91 17 02 	lds	r24, 0x0217
+ a22:	80 62       	ori	r24, 0x20	; 32
+ a24:	80 93 17 02 	sts	0x0217, r24
+ a28:	b0 c0       	rjmp	.+352    	; 0xb8a <time_out+0x22e>
+	if(!MASKBYTE.B0&&!MASKBYTE.B1&&!MASKBYTE.B2&&!MASKBYTE.B3&&!MASKBYTE.B4&&!MASKBYTE.B5){
+		//ez helyett vagy kéne 
+	}
+	else{
+		for(int j=0;j<8;j++){
+			if(MASKBYTE.B0){for(char i=0;i<6;i++){datatmp[90+i]=concat(datatmp[42+i],datatmp[90+i]);}}
+ a2a:	50 90 17 02 	lds	r5, 0x0217
+ a2e:	50 fe       	sbrs	r5, 0
+ a30:	cd c0       	rjmp	.+410    	; 0xbcc <time_out+0x270>
+ a32:	0f 2e       	mov	r0, r31
+ a34:	f1 e4       	ldi	r31, 0x41	; 65
+ a36:	af 2e       	mov	r10, r31
+ a38:	f1 e0       	ldi	r31, 0x01	; 1
+ a3a:	bf 2e       	mov	r11, r31
+ a3c:	f0 2d       	mov	r31, r0
+ a3e:	87 01       	movw	r16, r14
+ a40:	f8 01       	movw	r30, r16
+ a42:	60 81       	ld	r22, Z
+ a44:	f5 01       	movw	r30, r10
+ a46:	81 91       	ld	r24, Z+
+ a48:	5f 01       	movw	r10, r30
+ a4a:	0e 94 a9 04 	call	0x952	; 0x952 <concat>
+ a4e:	f8 01       	movw	r30, r16
+ a50:	81 93       	st	Z+, r24
+ a52:	8f 01       	movw	r16, r30
+ a54:	f1 e0       	ldi	r31, 0x01	; 1
+ a56:	07 37       	cpi	r16, 0x77	; 119
+ a58:	1f 07       	cpc	r17, r31
+ a5a:	91 f7       	brne	.-28     	; 0xa40 <time_out+0xe4>
+ a5c:	b7 c0       	rjmp	.+366    	; 0xbcc <time_out+0x270>
+			if(MASKBYTE.B1){for(char i=0;i<6;i++){datatmp[84+i]=concat(datatmp[36+i],datatmp[84+i]);}}
+ a5e:	f8 01       	movw	r30, r16
+ a60:	60 81       	ld	r22, Z
+ a62:	f5 01       	movw	r30, r10
+ a64:	81 91       	ld	r24, Z+
+ a66:	5f 01       	movw	r10, r30
+ a68:	0e 94 a9 04 	call	0x952	; 0x952 <concat>
+ a6c:	f8 01       	movw	r30, r16
+ a6e:	81 93       	st	Z+, r24
+ a70:	8f 01       	movw	r16, r30
+ a72:	ee 15       	cp	r30, r14
+ a74:	ff 05       	cpc	r31, r15
+ a76:	99 f7       	brne	.-26     	; 0xa5e <time_out+0x102>
+ a78:	b4 c0       	rjmp	.+360    	; 0xbe2 <time_out+0x286>
+			if(MASKBYTE.B2){for(char i=0;i<6;i++){datatmp[72+i]=concat(datatmp[24+i],datatmp[72+i]);}}
+ a7a:	52 fe       	sbrs	r5, 2
+ a7c:	b5 c0       	rjmp	.+362    	; 0xbe8 <time_out+0x28c>
+ a7e:	0f 2e       	mov	r0, r31
+ a80:	ff e2       	ldi	r31, 0x2F	; 47
+ a82:	af 2e       	mov	r10, r31
+ a84:	f1 e0       	ldi	r31, 0x01	; 1
+ a86:	bf 2e       	mov	r11, r31
+ a88:	f0 2d       	mov	r31, r0
+ a8a:	83 01       	movw	r16, r6
+ a8c:	0f 2e       	mov	r0, r31
+ a8e:	f5 e6       	ldi	r31, 0x65	; 101
+ a90:	8f 2e       	mov	r8, r31
+ a92:	f1 e0       	ldi	r31, 0x01	; 1
+ a94:	9f 2e       	mov	r9, r31
+ a96:	f0 2d       	mov	r31, r0
+ a98:	f8 01       	movw	r30, r16
+ a9a:	60 81       	ld	r22, Z
+ a9c:	f5 01       	movw	r30, r10
+ a9e:	81 91       	ld	r24, Z+
+ aa0:	5f 01       	movw	r10, r30
+ aa2:	0e 94 a9 04 	call	0x952	; 0x952 <concat>
+ aa6:	f8 01       	movw	r30, r16
+ aa8:	81 93       	st	Z+, r24
+ aaa:	8f 01       	movw	r16, r30
+ aac:	e8 15       	cp	r30, r8
+ aae:	f9 05       	cpc	r31, r9
+ ab0:	99 f7       	brne	.-26     	; 0xa98 <time_out+0x13c>
+ ab2:	9a c0       	rjmp	.+308    	; 0xbe8 <time_out+0x28c>
+			if(MASKBYTE.B3){for(char i=0;i<6;i++){datatmp[66+i]=concat(datatmp[18+i],datatmp[66+i]);}}
+ ab4:	53 fe       	sbrs	r5, 3
+ ab6:	9b c0       	rjmp	.+310    	; 0xbee <time_out+0x292>
+ ab8:	0f 2e       	mov	r0, r31
+ aba:	f9 e2       	ldi	r31, 0x29	; 41
+ abc:	af 2e       	mov	r10, r31
+ abe:	f1 e0       	ldi	r31, 0x01	; 1
+ ac0:	bf 2e       	mov	r11, r31
+ ac2:	f0 2d       	mov	r31, r0
+ ac4:	09 e5       	ldi	r16, 0x59	; 89
+ ac6:	11 e0       	ldi	r17, 0x01	; 1
+ ac8:	f8 01       	movw	r30, r16
+ aca:	60 81       	ld	r22, Z
+ acc:	f5 01       	movw	r30, r10
+ ace:	81 91       	ld	r24, Z+
+ ad0:	5f 01       	movw	r10, r30
+ ad2:	0e 94 a9 04 	call	0x952	; 0x952 <concat>
+ ad6:	f8 01       	movw	r30, r16
+ ad8:	81 93       	st	Z+, r24
+ ada:	8f 01       	movw	r16, r30
+ adc:	e6 15       	cp	r30, r6
+ ade:	f7 05       	cpc	r31, r7
+ ae0:	99 f7       	brne	.-26     	; 0xac8 <time_out+0x16c>
+ ae2:	85 c0       	rjmp	.+266    	; 0xbee <time_out+0x292>
+			if(MASKBYTE.B4){for(char i=0;i<6;i++){datatmp[54+i]=concat(datatmp[6+i],datatmp[54+i]);}}
+ ae4:	54 fe       	sbrs	r5, 4
+ ae6:	86 c0       	rjmp	.+268    	; 0xbf4 <time_out+0x298>
+ ae8:	56 01       	movw	r10, r12
+ aea:	0d e4       	ldi	r16, 0x4D	; 77
+ aec:	11 e0       	ldi	r17, 0x01	; 1
+ aee:	f8 01       	movw	r30, r16
+ af0:	60 81       	ld	r22, Z
+ af2:	f5 01       	movw	r30, r10
+ af4:	81 91       	ld	r24, Z+
+ af6:	5f 01       	movw	r10, r30
+ af8:	0e 94 a9 04 	call	0x952	; 0x952 <concat>
+ afc:	f8 01       	movw	r30, r16
+ afe:	81 93       	st	Z+, r24
+ b00:	8f 01       	movw	r16, r30
+ b02:	e2 15       	cp	r30, r2
+ b04:	f3 05       	cpc	r31, r3
+ b06:	99 f7       	brne	.-26     	; 0xaee <time_out+0x192>
+ b08:	75 c0       	rjmp	.+234    	; 0xbf4 <time_out+0x298>
+			if(MASKBYTE.B5){for(char i=0;i<6;i++){datatmp[48+i]=concat(datatmp[i],datatmp[48+i]);}}
+ b0a:	55 fe       	sbrs	r5, 5
+ b0c:	15 c0       	rjmp	.+42     	; 0xb38 <time_out+0x1dc>
+ b0e:	0f 2e       	mov	r0, r31
+ b10:	f7 e1       	ldi	r31, 0x17	; 23
+ b12:	af 2e       	mov	r10, r31
+ b14:	f1 e0       	ldi	r31, 0x01	; 1
+ b16:	bf 2e       	mov	r11, r31
+ b18:	f0 2d       	mov	r31, r0
+ b1a:	07 e4       	ldi	r16, 0x47	; 71
+ b1c:	11 e0       	ldi	r17, 0x01	; 1
+ b1e:	f8 01       	movw	r30, r16
+ b20:	60 81       	ld	r22, Z
+ b22:	f5 01       	movw	r30, r10
+ b24:	81 91       	ld	r24, Z+
+ b26:	5f 01       	movw	r10, r30
+ b28:	0e 94 a9 04 	call	0x952	; 0x952 <concat>
+ b2c:	f8 01       	movw	r30, r16
+ b2e:	81 93       	st	Z+, r24
+ b30:	8f 01       	movw	r16, r30
+ b32:	ac 14       	cp	r10, r12
+ b34:	bd 04       	cpc	r11, r13
+ b36:	99 f7       	brne	.-26     	; 0xb1e <time_out+0x1c2>
+ b38:	e7 e1       	ldi	r30, 0x17	; 23
+ b3a:	f1 e0       	ldi	r31, 0x01	; 1
+			for(char i=0;i<48;i++){datatmp[i]>>=1;}
+ b3c:	80 81       	ld	r24, Z
+ b3e:	86 95       	lsr	r24
+ b40:	81 93       	st	Z+, r24
+ b42:	21 e0       	ldi	r18, 0x01	; 1
+ b44:	e7 34       	cpi	r30, 0x47	; 71
+ b46:	f2 07       	cpc	r31, r18
+ b48:	c9 f7       	brne	.-14     	; 0xb3c <time_out+0x1e0>
+			copy(0,48,48);
+ b4a:	40 e3       	ldi	r20, 0x30	; 48
+ b4c:	60 e3       	ldi	r22, 0x30	; 48
+ b4e:	80 e0       	ldi	r24, 0x00	; 0
+ b50:	0e 94 6a 03 	call	0x6d4	; 0x6d4 <copy>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ b54:	8f e7       	ldi	r24, 0x7F	; 127
+ b56:	95 eb       	ldi	r25, 0xB5	; 181
+ b58:	e1 e0       	ldi	r30, 0x01	; 1
+ b5a:	81 50       	subi	r24, 0x01	; 1
+ b5c:	90 40       	sbci	r25, 0x00	; 0
+ b5e:	e0 40       	sbci	r30, 0x00	; 0
+ b60:	e1 f7       	brne	.-8      	; 0xb5a <time_out+0x1fe>
+ b62:	00 c0       	rjmp	.+0      	; 0xb64 <time_out+0x208>
+ b64:	00 00       	nop
+ b66:	89 81       	ldd	r24, Y+1	; 0x01
+ b68:	9a 81       	ldd	r25, Y+2	; 0x02
+ b6a:	01 97       	sbiw	r24, 0x01	; 1
+ b6c:	9a 83       	std	Y+2, r25	; 0x02
+ b6e:	89 83       	std	Y+1, r24	; 0x01
+	
+	if(!MASKBYTE.B0&&!MASKBYTE.B1&&!MASKBYTE.B2&&!MASKBYTE.B3&&!MASKBYTE.B4&&!MASKBYTE.B5){
+		//ez helyett vagy kéne 
+	}
+	else{
+		for(int j=0;j<8;j++){
+ b70:	89 2b       	or	r24, r25
+ b72:	09 f0       	breq	.+2      	; 0xb76 <time_out+0x21a>
+ b74:	5a cf       	rjmp	.-332    	; 0xa2a <time_out+0xce>
+			for(char i=0;i<48;i++){datatmp[i]>>=1;}
+			copy(0,48,48);
+			_delay_ms(35);
+		}
+	}
+	time[1]=time[0];
+ b76:	86 e0       	ldi	r24, 0x06	; 6
+ b78:	ea e0       	ldi	r30, 0x0A	; 10
+ b7a:	f1 e0       	ldi	r31, 0x01	; 1
+ b7c:	a0 e1       	ldi	r26, 0x10	; 16
+ b7e:	b1 e0       	ldi	r27, 0x01	; 1
+ b80:	01 90       	ld	r0, Z+
+ b82:	0d 92       	st	X+, r0
+ b84:	8a 95       	dec	r24
+ b86:	e1 f7       	brne	.-8      	; 0xb80 <time_out+0x224>
+ b88:	38 c0       	rjmp	.+112    	; 0xbfa <time_out+0x29e>
+	if (time[0].min_singles!=time[1].min_singles) MASKBYTE.B2=1;
+	if (time[0].min_tens!=time[1].min_tens) MASKBYTE.B3=1;
+	if (time[0].hour_singles!=time[1].hour_singles) MASKBYTE.B4=1;
+	if (time[0].hour_tens!=time[1].hour_tens) MASKBYTE.B5=1;
+	
+	if(!MASKBYTE.B0&&!MASKBYTE.B1&&!MASKBYTE.B2&&!MASKBYTE.B3&&!MASKBYTE.B4&&!MASKBYTE.B5){
+ b8a:	80 91 17 02 	lds	r24, 0x0217
+ b8e:	8f 73       	andi	r24, 0x3F	; 63
+ b90:	91 f3       	breq	.-28     	; 0xb76 <time_out+0x21a>
+ b92:	e8 e0       	ldi	r30, 0x08	; 8
+ b94:	f0 e0       	ldi	r31, 0x00	; 0
+ b96:	fa 83       	std	Y+2, r31	; 0x02
+ b98:	e9 83       	std	Y+1, r30	; 0x01
+ b9a:	0f 2e       	mov	r0, r31
+ b9c:	f1 e7       	ldi	r31, 0x71	; 113
+ b9e:	ef 2e       	mov	r14, r31
+ ba0:	f1 e0       	ldi	r31, 0x01	; 1
+ ba2:	ff 2e       	mov	r15, r31
+ ba4:	f0 2d       	mov	r31, r0
+ ba6:	0f 2e       	mov	r0, r31
+ ba8:	fd e1       	ldi	r31, 0x1D	; 29
+ baa:	cf 2e       	mov	r12, r31
+ bac:	f1 e0       	ldi	r31, 0x01	; 1
+ bae:	df 2e       	mov	r13, r31
+ bb0:	f0 2d       	mov	r31, r0
+ bb2:	0f 2e       	mov	r0, r31
+ bb4:	f3 e5       	ldi	r31, 0x53	; 83
+ bb6:	2f 2e       	mov	r2, r31
+ bb8:	f1 e0       	ldi	r31, 0x01	; 1
+ bba:	3f 2e       	mov	r3, r31
+ bbc:	f0 2d       	mov	r31, r0
+ bbe:	0f 2e       	mov	r0, r31
+ bc0:	ff e5       	ldi	r31, 0x5F	; 95
+ bc2:	6f 2e       	mov	r6, r31
+ bc4:	f1 e0       	ldi	r31, 0x01	; 1
+ bc6:	7f 2e       	mov	r7, r31
+ bc8:	f0 2d       	mov	r31, r0
+ bca:	2f cf       	rjmp	.-418    	; 0xa2a <time_out+0xce>
+		//ez helyett vagy kéne 
+	}
+	else{
+		for(int j=0;j<8;j++){
+			if(MASKBYTE.B0){for(char i=0;i<6;i++){datatmp[90+i]=concat(datatmp[42+i],datatmp[90+i]);}}
+			if(MASKBYTE.B1){for(char i=0;i<6;i++){datatmp[84+i]=concat(datatmp[36+i],datatmp[84+i]);}}
+ bcc:	51 fe       	sbrs	r5, 1
+ bce:	55 cf       	rjmp	.-342    	; 0xa7a <time_out+0x11e>
+ bd0:	0f 2e       	mov	r0, r31
+ bd2:	fb e3       	ldi	r31, 0x3B	; 59
+ bd4:	af 2e       	mov	r10, r31
+ bd6:	f1 e0       	ldi	r31, 0x01	; 1
+ bd8:	bf 2e       	mov	r11, r31
+ bda:	f0 2d       	mov	r31, r0
+ bdc:	0b e6       	ldi	r16, 0x6B	; 107
+ bde:	11 e0       	ldi	r17, 0x01	; 1
+ be0:	3e cf       	rjmp	.-388    	; 0xa5e <time_out+0x102>
+			if(MASKBYTE.B2){for(char i=0;i<6;i++){datatmp[72+i]=concat(datatmp[24+i],datatmp[72+i]);}}
+ be2:	52 fc       	sbrc	r5, 2
+ be4:	4c cf       	rjmp	.-360    	; 0xa7e <time_out+0x122>
+ be6:	66 cf       	rjmp	.-308    	; 0xab4 <time_out+0x158>
+			if(MASKBYTE.B3){for(char i=0;i<6;i++){datatmp[66+i]=concat(datatmp[18+i],datatmp[66+i]);}}
+ be8:	53 fc       	sbrc	r5, 3
+ bea:	66 cf       	rjmp	.-308    	; 0xab8 <time_out+0x15c>
+ bec:	7b cf       	rjmp	.-266    	; 0xae4 <time_out+0x188>
+			if(MASKBYTE.B4){for(char i=0;i<6;i++){datatmp[54+i]=concat(datatmp[6+i],datatmp[54+i]);}}
+ bee:	54 fc       	sbrc	r5, 4
+ bf0:	7b cf       	rjmp	.-266    	; 0xae8 <time_out+0x18c>
+ bf2:	8b cf       	rjmp	.-234    	; 0xb0a <time_out+0x1ae>
+			if(MASKBYTE.B5){for(char i=0;i<6;i++){datatmp[48+i]=concat(datatmp[i],datatmp[48+i]);}}
+ bf4:	55 fc       	sbrc	r5, 5
+ bf6:	8b cf       	rjmp	.-234    	; 0xb0e <time_out+0x1b2>
+ bf8:	9f cf       	rjmp	.-194    	; 0xb38 <time_out+0x1dc>
+			copy(0,48,48);
+			_delay_ms(35);
+		}
+	}
+	time[1]=time[0];
+}
+ bfa:	0f 90       	pop	r0
+ bfc:	0f 90       	pop	r0
+ bfe:	df 91       	pop	r29
+ c00:	cf 91       	pop	r28
+ c02:	1f 91       	pop	r17
+ c04:	0f 91       	pop	r16
+ c06:	ff 90       	pop	r15
+ c08:	ef 90       	pop	r14
+ c0a:	df 90       	pop	r13
+ c0c:	cf 90       	pop	r12
+ c0e:	bf 90       	pop	r11
+ c10:	af 90       	pop	r10
+ c12:	9f 90       	pop	r9
+ c14:	8f 90       	pop	r8
+ c16:	7f 90       	pop	r7
+ c18:	6f 90       	pop	r6
+ c1a:	5f 90       	pop	r5
+ c1c:	3f 90       	pop	r3
+ c1e:	2f 90       	pop	r2
+ c20:	08 95       	ret
+
+00000c22 <TWIInit>:
+	datatmp[i]='\0';
+	text_out(datatmp);
+}
+/*********************************///
+void TWIInit(void){	//set SCL to 400kHz
+	TWSR = 0x00;
+ c22:	10 92 b9 00 	sts	0x00B9, r1
+	TWBR = 0x0C;
+ c26:	8c e0       	ldi	r24, 0x0C	; 12
+ c28:	80 93 b8 00 	sts	0x00B8, r24
+	TWCR = (1<<TWEN);	//enable TWI
+ c2c:	84 e0       	ldi	r24, 0x04	; 4
+ c2e:	80 93 bc 00 	sts	0x00BC, r24
+ c32:	08 95       	ret
+
+00000c34 <init_avr>:
+}
+void init_avr(void){
+	DDRB=0xFF;
+ c34:	8f ef       	ldi	r24, 0xFF	; 255
+ c36:	84 b9       	out	0x04, r24	; 4
+	DDRC=0xFF;
+ c38:	87 b9       	out	0x07, r24	; 7
+	DDRD=0b11111011;	//DDRD &= ~(1 << DDD2);     // Clear the PD2 pin	// PD2 (PCINT0 pin) is now an input
+ c3a:	8b ef       	ldi	r24, 0xFB	; 251
+ c3c:	8a b9       	out	0x0a, r24	; 10
+	PORTD |= (1 << PORTD2);    // turn On the Pull-up	// PD2 is now an input with pull-up enabled
+ c3e:	5a 9a       	sbi	0x0b, 2	; 11
+	EICRA |= (1 << ISC01);    // set INT0 to trigger on ANY logic change
+ c40:	e9 e6       	ldi	r30, 0x69	; 105
+ c42:	f0 e0       	ldi	r31, 0x00	; 0
+ c44:	80 81       	ld	r24, Z
+ c46:	82 60       	ori	r24, 0x02	; 2
+ c48:	80 83       	st	Z, r24
+	EIMSK |= (1 << INT0);     // Turns on INT0
+ c4a:	e8 9a       	sbi	0x1d, 0	; 29
+ c4c:	08 95       	ret
+
+00000c4e <Init_Timer0>:
+}	
+void Init_Timer0(void){
+	TCCR0A|=0B00000010;//setWGM01
+ c4e:	84 b5       	in	r24, 0x24	; 36
+ c50:	82 60       	ori	r24, 0x02	; 2
+ c52:	84 bd       	out	0x24, r24	; 36
+	TCCR0A&=0B11111110;//clearWGM00
+ c54:	84 b5       	in	r24, 0x24	; 36
+ c56:	8e 7f       	andi	r24, 0xFE	; 254
+ c58:	84 bd       	out	0x24, r24	; 36
+	TCCR0B|=0B00000011;//setCS01
+ c5a:	85 b5       	in	r24, 0x25	; 37
+ c5c:	83 60       	ori	r24, 0x03	; 3
+ c5e:	85 bd       	out	0x25, r24	; 37
+	TCCR0B&=0B11110011;//clearWGM02, clearCS00, clear CS02		
+ c60:	85 b5       	in	r24, 0x25	; 37
+ c62:	83 7f       	andi	r24, 0xF3	; 243
+ c64:	85 bd       	out	0x25, r24	; 37
+	TIMSK0 |= (1 << TOIE0);
+ c66:	ee e6       	ldi	r30, 0x6E	; 110
+ c68:	f0 e0       	ldi	r31, 0x00	; 0
+ c6a:	80 81       	ld	r24, Z
+ c6c:	81 60       	ori	r24, 0x01	; 1
+ c6e:	80 83       	st	Z, r24
+	OCR0A=0xFF;
+ c70:	8f ef       	ldi	r24, 0xFF	; 255
+ c72:	87 bd       	out	0x27, r24	; 39
+ c74:	08 95       	ret
+
+00000c76 <main>:
+    TIMSK1 |= (1 << OCIE1A);
+    TCCR1B |= (1 << CS12) | (1 << CS10);
+}
+/*********************************///
+void main(void){
+	init_avr();	
+ c76:	0e 94 1a 06 	call	0xc34	; 0xc34 <init_avr>
+	Init_Timer0();
+ c7a:	0e 94 27 06 	call	0xc4e	; 0xc4e <Init_Timer0>
+	sei();
+ c7e:	78 94       	sei
+	TWIInit();
+ c80:	0e 94 11 06 	call	0xc22	; 0xc22 <TWIInit>
+	//TWIWrite(SEC_REG+7);
+	//TWIWrite(0x10);
+	//TWIStop();	
+	//rtcwritetime();
+	//rtcwritedate();
+	first_read();
+ c84:	0e 94 98 04 	call	0x930	; 0x930 <first_read>
+    while (1){
+		//const_text_out(szoveg);
+		//date_out();
+		time_out();
+ c88:	0e 94 ae 04 	call	0x95c	; 0x95c <time_out>
+ c8c:	2f e7       	ldi	r18, 0x7F	; 127
+ c8e:	88 e3       	ldi	r24, 0x38	; 56
+ c90:	91 e0       	ldi	r25, 0x01	; 1
+ c92:	21 50       	subi	r18, 0x01	; 1
+ c94:	80 40       	sbci	r24, 0x00	; 0
+ c96:	90 40       	sbci	r25, 0x00	; 0
+ c98:	e1 f7       	brne	.-8      	; 0xc92 <main+0x1c>
+ c9a:	00 c0       	rjmp	.+0      	; 0xc9c <main+0x26>
+ c9c:	00 00       	nop
+ c9e:	f4 cf       	rjmp	.-24     	; 0xc88 <main+0x12>
+
+00000ca0 <__vector_16>:
+		_delay_ms(25);
+	}
+}
+/*********************************///
+ISR (TIMER0_OVF_vect){
+ ca0:	1f 92       	push	r1
+ ca2:	0f 92       	push	r0
+ ca4:	0f b6       	in	r0, 0x3f	; 63
+ ca6:	0f 92       	push	r0
+ ca8:	11 24       	eor	r1, r1
+ caa:	2f 93       	push	r18
+ cac:	3f 93       	push	r19
+ cae:	4f 93       	push	r20
+ cb0:	5f 93       	push	r21
+ cb2:	6f 93       	push	r22
+ cb4:	7f 93       	push	r23
+ cb6:	8f 93       	push	r24
+ cb8:	9f 93       	push	r25
+ cba:	af 93       	push	r26
+ cbc:	bf 93       	push	r27
+ cbe:	ef 93       	push	r30
+ cc0:	ff 93       	push	r31
+	if (IT==8){	IT=0;}
+ cc2:	80 91 16 01 	lds	r24, 0x0116
+ cc6:	88 30       	cpi	r24, 0x08	; 8
+ cc8:	11 f4       	brne	.+4      	; 0xcce <__vector_16+0x2e>
+ cca:	10 92 16 01 	sts	0x0116, r1
+	shift(IT);
+ cce:	80 91 16 01 	lds	r24, 0x0116
+ cd2:	0e 94 b6 03 	call	0x76c	; 0x76c <shift>
+	IT++;
+ cd6:	80 91 16 01 	lds	r24, 0x0116
+ cda:	8f 5f       	subi	r24, 0xFF	; 255
+ cdc:	80 93 16 01 	sts	0x0116, r24
+}
+ ce0:	ff 91       	pop	r31
+ ce2:	ef 91       	pop	r30
+ ce4:	bf 91       	pop	r27
+ ce6:	af 91       	pop	r26
+ ce8:	9f 91       	pop	r25
+ cea:	8f 91       	pop	r24
+ cec:	7f 91       	pop	r23
+ cee:	6f 91       	pop	r22
+ cf0:	5f 91       	pop	r21
+ cf2:	4f 91       	pop	r20
+ cf4:	3f 91       	pop	r19
+ cf6:	2f 91       	pop	r18
+ cf8:	0f 90       	pop	r0
+ cfa:	0f be       	out	0x3f, r0	; 63
+ cfc:	0f 90       	pop	r0
+ cfe:	1f 90       	pop	r1
+ d00:	18 95       	reti
+
+00000d02 <__vector_11>:
+ISR (TIMER1_COMPA_vect){
+ d02:	1f 92       	push	r1
+ d04:	0f 92       	push	r0
+ d06:	0f b6       	in	r0, 0x3f	; 63
+ d08:	0f 92       	push	r0
+ d0a:	11 24       	eor	r1, r1
+	///spi kiszolgálás 
+}
+ d0c:	0f 90       	pop	r0
+ d0e:	0f be       	out	0x3f, r0	; 63
+ d10:	0f 90       	pop	r0
+ d12:	1f 90       	pop	r1
+ d14:	18 95       	reti
+
+00000d16 <__vector_1>:
+ISR (INT0_vect){
+ d16:	1f 92       	push	r1
+ d18:	0f 92       	push	r0
+ d1a:	0f b6       	in	r0, 0x3f	; 63
+ d1c:	0f 92       	push	r0
+ d1e:	11 24       	eor	r1, r1
+ d20:	8f 93       	push	r24
+	portb.bit.b5=~portb.bit.b5;
+ d22:	85 b1       	in	r24, 0x05	; 5
+ d24:	85 fb       	bst	r24, 5
+ d26:	88 27       	eor	r24, r24
+ d28:	80 f9       	bld	r24, 0
+ d2a:	80 ff       	sbrs	r24, 0
+ d2c:	2d 9a       	sbi	0x05, 5	; 5
+ d2e:	80 fd       	sbrc	r24, 0
+ d30:	2d 98       	cbi	0x05, 5	; 5
+}
+ d32:	8f 91       	pop	r24
+ d34:	0f 90       	pop	r0
+ d36:	0f be       	out	0x3f, r0	; 63
+ d38:	0f 90       	pop	r0
+ d3a:	1f 90       	pop	r1
+ d3c:	18 95       	reti
+
+00000d3e <_exit>:
+ d3e:	f8 94       	cli
+
+00000d40 <__stop_program>:
+ d40:	ff cf       	rjmp	.-2      	; 0xd40 <__stop_program>

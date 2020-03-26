@@ -116,11 +116,19 @@ struct {
 /***********************************************///constants declarations begin
 RTC_DATA				RTC_Data;							//sec,min,hour,day,date,month,year
 RTC_TimeTypeDef	 		Time_Data;							//idõt tároló struktúrapéldány
+//RTC_TimeTypeDef			time[2];
+TIME					time[2];
 RTC_DateTypeDef			Date_Data;							//dátumot tároló struktórapéldány
 uint8_t					DisplayData[96];					//kijelzõ oszlopainak adatai
+uint8_t					NewTimeDataArray[36];
+bool 					TimeDiffIndicator[6];
 bool					Point;
 bool					ScrollText;
 bool 					ScrollEnd;
+bool 					FirstRun;
+bool 					UpdateTime;
+bool 					Flip;
+uint8_t 				FlipCounter;
 uint8_t 				StartFrom;
 uint8_t					TextLength;
 uint8_t 				TextArray[256];
@@ -151,5 +159,6 @@ void FormatDateToText(void);
 void FormatTimeToText(void);
 void CreateFrameFromTime(void);
 void SendTextToDisplay(char *Text);
+void time_out(void);
 /***********************************************///functions declaration end
 #endif

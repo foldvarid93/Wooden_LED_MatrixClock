@@ -55,6 +55,263 @@ void CreateDateData(void){
 }
 /*********************************/				//Date functions end
 /*********************************/				//Time functions begin
+void TimeAnimation(uint8_t* Dest,uint8_t* Source){
+	for(uint8_t i=0;i<6;i++){
+		(Dest[i])<<=1;
+		if ((Source[i])&0x80){
+			(Dest[i])|=0x01;
+		}
+		else{
+			(Dest[i])&=0xFE;
+		}
+		Source[i]<<=1;
+	}
+/*	if(Iteration==1){
+		Old<<=1;
+	}
+	if(b&0x01){
+		a|=0x80;
+	}
+	else{
+		a&=0x7F;
+	}
+	return a;*/
+}
+char concat(char b, char a){
+	a>>=1;
+	if(b&0x01){
+		a|=0x80;
+	}
+	else{
+		a&=0x7F;
+	}
+	return a;
+}
+void time_out(void){
+#define StartIdx 28
+#define HourTensStartIdx 	StartIdx
+#define HourSinglesStartIdx StartIdx+6
+#define HourMinDoubleDot 	HourSinglesStartIdx+6
+#define MinTensStartIdx 	HourMinDoubleDot+2
+#define MinSinglesStartIdx 	MinTensStartIdx+6
+#define MinSecDoubleDot 	MinSinglesStartIdx+6
+#define SecTensStartIdx 	MinSecDoubleDot+2
+#define SecSinglesStartIdx 	SecTensStartIdx+6
+
+	if(FirstRun==1){
+		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
+		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
+
+		time[0].hour_tens=Time_Data.Hours / 10;
+		time[0].hour_singles=Time_Data.Hours % 10;
+		time[0].min_tens=Time_Data.Minutes / 10;
+		time[0].min_singles=Time_Data.Minutes % 10;
+		time[0].sec_tens=Time_Data.Seconds / 10;
+		time[0].sec_singles=Time_Data.Seconds % 10;
+
+		for (uint8_t i = 0; i < 5; i++) {
+			if (time[0].hour_tens == 0) {
+				DisplayData[i+HourTensStartIdx] = 0;
+			} else {
+				DisplayData[i+HourTensStartIdx] = BitSwapping(characters[time[0].hour_tens+ '0'][i]);
+			}
+			DisplayData[i + HourSinglesStartIdx] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
+			DisplayData[i + MinTensStartIdx] = BitSwapping(characters[time[0].min_tens + '0'][i]);
+			DisplayData[i + MinSinglesStartIdx] = BitSwapping(characters[time[0].min_singles + '0'][i]);
+			DisplayData[i + SecTensStartIdx] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
+			DisplayData[i + SecSinglesStartIdx] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
+		}
+		DisplayData[HourMinDoubleDot] = 0x22;
+		DisplayData[MinSecDoubleDot] = 0x22;
+
+		SendFrameToDisplay();
+
+		time[1]=time[0];
+		FirstRun=0;
+	}
+	if(UpdateTime==1){
+		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
+		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
+
+		time[0].hour_tens=Time_Data.Hours / 10;
+		time[0].hour_singles=Time_Data.Hours % 10;
+		time[0].min_tens=Time_Data.Minutes / 10;
+		time[0].min_singles=Time_Data.Minutes % 10;
+		time[0].sec_tens=Time_Data.Seconds / 10;
+		time[0].sec_singles=Time_Data.Seconds % 10;
+
+		if(time[0].sec_singles!=time[1].sec_singles){
+			TimeDiffIndicator[5]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i + 30] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[5]=0;
+		}
+		if(time[0].sec_tens!=time[1].sec_tens){
+			TimeDiffIndicator[4]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i + 24] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[4]=0;
+		}
+		if(time[0].min_singles!=time[1].min_singles){
+			TimeDiffIndicator[3]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i + 18] = BitSwapping(characters[time[0].min_singles + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[3]=0;
+		}
+		if(time[0].min_tens!=time[1].min_tens){
+			TimeDiffIndicator[2]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i + 12] = BitSwapping(characters[time[0].min_tens + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[2]=0;
+		}
+		if(time[0].hour_singles!=time[1].hour_singles){
+			TimeDiffIndicator[1]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i + 6] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[1]=0;
+		}
+		if(time[0].hour_tens!=time[1].hour_tens){
+			TimeDiffIndicator[0]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i] = BitSwapping(characters[time[0].hour_tens + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[0]=0;
+		}
+		time[1]=time[0];
+		UpdateTime=0;
+	}
+	if(Flip==1){
+		if (TimeDiffIndicator[0]){
+			TimeAnimation(&DisplayData[HourTensStartIdx],&NewTimeDataArray[0]);
+		}
+		if (TimeDiffIndicator[1]){
+			TimeAnimation(&DisplayData[HourSinglesStartIdx],&NewTimeDataArray[6]);
+		}
+		if (TimeDiffIndicator[2]){
+			TimeAnimation(&DisplayData[MinTensStartIdx],&NewTimeDataArray[12]);
+		}
+		if(TimeDiffIndicator[3]){
+			TimeAnimation(&DisplayData[MinSinglesStartIdx],&NewTimeDataArray[18]);
+		}
+		if(TimeDiffIndicator[4]){
+			TimeAnimation(&DisplayData[SecTensStartIdx],&NewTimeDataArray[24]);
+		}
+		if(TimeDiffIndicator[5]){
+			TimeAnimation(&DisplayData[SecSinglesStartIdx],&NewTimeDataArray[30]);
+		}
+		SendFrameToDisplay();
+		FlipCounter++;
+		if(FlipCounter==8){
+			FlipCounter=0;
+			Flip=0;
+		}
+	}
+/*
+	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
+	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
+
+	time[0].hour_tens=Time_Data.Hours / 10;
+	time[0].hour_singles=Time_Data.Hours % 10;
+	time[0].min_tens=Time_Data.Minutes / 10;
+	time[0].min_singles=Time_Data.Minutes % 10;
+	time[0].sec_tens=Time_Data.Seconds / 10;
+	time[0].sec_singles=Time_Data.Seconds % 10;
+
+	if(time[0].sec_singles!=time[1].sec_singles){
+		TimeDiffIndicator[5]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i + 30] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[5]=0;
+	}
+	if(time[0].sec_tens!=time[1].sec_tens){
+		TimeDiffIndicator[4]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i + 24] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[4]=0;
+	}
+	if(time[0].min_singles!=time[1].min_singles){
+		TimeDiffIndicator[3]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i + 18] = BitSwapping(characters[time[0].min_singles + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[3]=0;
+	}
+	if(time[0].min_tens!=time[1].min_tens){
+		TimeDiffIndicator[2]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i + 12] = BitSwapping(characters[time[0].min_tens + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[2]=0;
+	}
+	if(time[0].hour_singles!=time[1].hour_singles){
+		TimeDiffIndicator[1]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i + 6] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[1]=0;
+	}
+	if(time[0].hour_tens!=time[1].hour_tens){
+		TimeDiffIndicator[0]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i] = BitSwapping(characters[time[0].hour_tens + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[0]=0;
+	}
+	for(uint8_t i=0;i<8;i++){
+		if (TimeDiffIndicator[0]){
+			TimeAnimation(&DisplayData[HourTensStartIdx],&NewTimeDataArray[0]);
+		}
+		if (TimeDiffIndicator[1]){
+			TimeAnimation(&DisplayData[HourSinglesStartIdx],&NewTimeDataArray[6]);
+		}
+		if (TimeDiffIndicator[2]){
+			TimeAnimation(&DisplayData[MinTensStartIdx],&NewTimeDataArray[12]);
+		}
+		if(TimeDiffIndicator[3]){
+			TimeAnimation(&DisplayData[MinSinglesStartIdx],&NewTimeDataArray[18]);
+		}
+		if(TimeDiffIndicator[4]){
+			TimeAnimation(&DisplayData[SecTensStartIdx],&NewTimeDataArray[24]);
+		}
+		if(TimeDiffIndicator[5]){
+			TimeAnimation(&DisplayData[SecSinglesStartIdx],&NewTimeDataArray[30]);
+		}
+		SendFrameToDisplay();
+	}
+
+	time[1]=time[0];*/
+}
 void CreateFrameFromTime(void){
 	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
 	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
@@ -141,7 +398,7 @@ void Init_MAX7219(void){
 	SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
 	SPI_Send(REG_DECODE, NO_DECODE);
 	SPI_Send(REG_SCANLIMIT, DISP0_7);
-	SPI_Send(REG_INTENSITY, INTENSITY_1);
+	SPI_Send(REG_INTENSITY, INTENSITY_3);
 }
 void SPI_Send(uint8_t ADDR, uint8_t CMD){
 	uint8_t tmp[24];

@@ -97,7 +97,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart2,UartBuff,5);
   /* USER CODE END 2 */
-
+  FirstRun=1;
+  UpdateTime=0;
+  Flip=0;
+  FlipCounter=0;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1){
@@ -175,16 +178,19 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc){
 	Point=!Point;
+	UpdateTime=1;
+	time_out();
+	Flip=1;
 	if(Mode==Time){
-		CreateFrameFromTime();
+		//time_out();//CreateFrameFromTime();
 		seconds++;
 	}
-	if(seconds==10){
+/*	if(seconds==10){
 		CreateDateData();
 		CreateDisplayDataArray(TextArray);
 		Mode=Date;
 		seconds=0;
-	}
+	}*/
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	if (huart->Instance == USART2)	{
@@ -211,6 +217,9 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart){
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	UNUSED(htim);
 	if(htim->Instance==TIM3){
+		if(Flip==1){
+			time_out();
+		}
 		if (ScrollText) {
 			if (StartFrom == ((TextLength * 6) - 24)) {
 				ScrollText = false;

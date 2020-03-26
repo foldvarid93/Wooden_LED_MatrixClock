@@ -52,7 +52,7 @@ void TIM3_Init()
 	htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim3.Init.CounterMode = TIM_COUNTERMODE_DOWN;
 	htim3.Init.Prescaler = 1000;
-	htim3.Init.Period = 800;
+	htim3.Init.Period = 1600;
 	htim3.State = HAL_TIM_STATE_RESET;
 	HAL_TIM_Base_Init(&htim3);
 	HAL_NVIC_SetPriority(TIM4_IRQn, 0, 2);
