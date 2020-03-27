@@ -398,7 +398,7 @@ void Init_MAX7219(void){
 	SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
 	SPI_Send(REG_DECODE, NO_DECODE);
 	SPI_Send(REG_SCANLIMIT, DISP0_7);
-	SPI_Send(REG_INTENSITY, INTENSITY_3);
+	SPI_Send(REG_INTENSITY, INTENSITY_31);
 }
 void SPI_Send(uint8_t ADDR, uint8_t CMD){
 	uint8_t tmp[24];
@@ -411,29 +411,31 @@ void SPI_Send(uint8_t ADDR, uint8_t CMD){
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
 }
 void SendFrameToDisplay(void){
-	uint8_t tmp[24];
+	uint8_t tmp1[24];
+	uint8_t tmp2[24];
+	uint8_t tmp3[8][24];
 	for(uint8_t i=0;i<DispNum;i++){
-		tmp[2*i]=REG_SHTDWN;
-		tmp[(2*i)+1]=SHUTDOWN_MODE;
+		tmp1[2*i]=REG_SHTDWN;
+		tmp1[(2*i)+1]=SHUTDOWN_MODE;
+		tmp2[2*i]=REG_SHTDWN;
+		tmp2[(2*i)+1]=NORMAL_MODE;
 	}
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi2,tmp,24,100);
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
 	for(uint8_t i=8;i>0;i--){
 		for(uint8_t j=0;j<DispNum;j++){
-			tmp[2*j]=i;
-			tmp[(2*j)+1]=DisplayData[DispLength-(8*j)-9+i];
+			tmp3[i-1][2*j]=i;
+			tmp3[i-1][(2*j)+1]=DisplayData[DispLength-(8*j)-9+i];
 		}
-		HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_RESET);
-		HAL_SPI_Transmit(&hspi2, tmp, 24, 100);
-		HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_SET);
-	}
-	for(uint8_t i=0;i<DispNum;i++){
-		tmp[2*i]=REG_SHTDWN;
-		tmp[(2*i)+1]=NORMAL_MODE;
 	}
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi2,tmp,24,100);
+	HAL_SPI_Transmit(&hspi2,tmp1,24,100);
+	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+	for(uint8_t i=8;i>0;i--){
+		HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&hspi2, &tmp3[i-1][0], 24, 100);
+		HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_SET);
+	}
+	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi2,tmp2,24,100);
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
 }
 uint8_t BitSwapping(uint8_t ch){
