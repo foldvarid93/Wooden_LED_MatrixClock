@@ -1,0 +1,13 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : PCB Document [MAX7219_8X8LED_BOARD.PcbDoc]
+   Generated File[MAX7219_8X8LED_BOARD-Plated.TXT]
+   Generated File[MAX7219_8X8LED_BOARD-NonPlated.TXT]
+   Generated File[MAX7219_8X8LED_BOARD.LDP]
+   Generated File[MAX7219_8X8LED_BOARD.DRR]
+
+
+Files Generated   : 4
+Documents Printed : 0
+
+Finished Output Generation At 19:29:28 On 2020. 08. 23.

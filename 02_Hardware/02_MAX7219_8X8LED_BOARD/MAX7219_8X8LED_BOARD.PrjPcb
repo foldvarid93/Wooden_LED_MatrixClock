@@ -71,6 +71,79 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=TKJWTTLC
 
+[Document3]
+DocumentPath=MAX7219_8X8LED_BOARD.OutJob
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
+[GeneratedDocument1]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\NC Drill\MAX7219_8X8LED_BOARD-NonPlated.TXT
+DItemRevisionGUID=
+
+[GeneratedDocument2]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\NC Drill\MAX7219_8X8LED_BOARD-Plated.TXT
+DItemRevisionGUID=
+
+[GeneratedDocument3]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\NC Drill\MAX7219_8X8LED_BOARD.DRR
+DItemRevisionGUID=
+
+[GeneratedDocument4]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\GerberX2\MAX7219_8X8LED_BOARD.EXTREP
+DItemRevisionGUID=
+
+[GeneratedDocument5]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\NC Drill\MAX7219_8X8LED_BOARD.LDP
+DItemRevisionGUID=
+
+[GeneratedDocument6]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\GerberX2\MAX7219_8X8LED_BOARD.REP
+DItemRevisionGUID=
+
+[GeneratedDocument7]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\GerberX2\MAX7219_8X8LED_BOARD.RUL
+DItemRevisionGUID=
+
+[GeneratedDocument8]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\GerberX2\MAX7219_8X8LED_BOARD_Copper_Signal_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument9]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\GerberX2\MAX7219_8X8LED_BOARD_Copper_Signal_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument10]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\GerberX2\MAX7219_8X8LED_BOARD_Legend_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument11]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\GerberX2\MAX7219_8X8LED_BOARD_Legend_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument12]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\GerberX2\MAX7219_8X8LED_BOARD_Mechanical_2.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument13]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\GerberX2\MAX7219_8X8LED_BOARD_Soldermask_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument14]
+DocumentPath=Project Outputs for MAX7219_8X8LED_BOARD\GerberX2\MAX7219_8X8LED_BOARD_Soldermask_Top.gbr
+DItemRevisionGUID=
+
 [Configuration1]
 Name=Default Configuration
 ParameterCount=0
