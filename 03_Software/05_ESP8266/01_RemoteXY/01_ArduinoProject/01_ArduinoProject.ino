@@ -26,7 +26,7 @@
 #include <RemoteXY.h>
 
 // RemoteXY connection settings 
-#define REMOTEXY_WIFI_SSID "RemoteXY"
+#define REMOTEXY_WIFI_SSID "123"
 #define REMOTEXY_WIFI_PASSWORD "12345678"
 #define REMOTEXY_SERVER_PORT 6377
 

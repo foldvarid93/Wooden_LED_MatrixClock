@@ -28,7 +28,7 @@ DItemRevisionGUID=
 ReportSuppressedErrorsInMessages=0
 FSMCodingStyle=eFMSDropDownList_OneProcess
 FSMEncodingStyle=eFMSDropDownList_OneHot
-OutputPath=
+OutputPath=Project Outputs for CONTROL_BOARD_V2
 LogFolderPath=
 ManagedProjectGUID=
 IncludeDesignInRelease=0
@@ -122,10 +122,6 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=BSKKESSP
 
-[GeneratedDocument1]
-DocumentPath=Project Outputs for CONTROL_BOARD_V2\Design Rule Check - CONTROL_BOARD_V2.html
-DItemRevisionGUID=
-
 [Configuration1]
 Name=Default Configuration
 ParameterCount=0
@@ -137,7 +133,7 @@ ContentTypeGUID=
 ConfigurationType=
 
 [Generic_EDE]
-OutputDir=
+OutputDir=Project Outputs for CONTROL_BOARD_V2
 
 [OutputGroup1]
 Name=Netlist Outputs
