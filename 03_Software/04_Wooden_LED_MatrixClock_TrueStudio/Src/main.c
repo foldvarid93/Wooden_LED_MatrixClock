@@ -19,16 +19,18 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+//#include "main.h"
 #include "adc.h"
 #include "i2c.h"
+#include "rtc.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "application.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -86,7 +88,16 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+  /**Configure the Systick interrupt time
+  */
+HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
 
+  /**Configure the Systick
+  */
+HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+
+/* SysTick_IRQn interrupt configuration */
+HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -96,8 +107,22 @@ int main(void)
   MX_ADC1_Init();
   MX_I2C3_Init();
   MX_SPI2_Init();
+  MX_RTC_Init();
+  MX_TIM3_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-
+  Init_MAX7219();
+  HAL_UART_Receive_IT(&huart2,UartBuff,5);
+  FirstRun=1;
+  UpdateTime=0;
+  Flip=0;
+  FlipCounter=0;
+  Point=false;
+  seconds=0;
+  Mode=Time;
+  HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_Base_Start_IT(&htim4);
+  __HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -119,6 +144,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage 
   */
@@ -126,9 +152,11 @@ void SystemClock_Config(void)
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = 8;
@@ -153,10 +181,81 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+  PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
+{
+	Point=!Point;
+	UpdateTime=1;
+	time_out();
+	Flip=1;
+	if(Mode==Time){
+		//time_out();//CreateFrameFromTime();
+		seconds++;
+	}
+/*	if(seconds==10){
+		CreateDateData();
+		CreateDisplayDataArray(TextArray);
+		Mode=Date;
+		seconds=0;
+	}*/
+}
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (huart->Instance == USART2)	{
+		if('0'<=UartBuff[0]&&UartBuff[0]<='9' &&'0'<=UartBuff[1]&&UartBuff[1]<='9'&&UartBuff[2]==':'&&
+				'0'<=UartBuff[3]&&UartBuff[3]<='9'&&'0'<=UartBuff[4]&&UartBuff[4]<='9')
+		{
+			RTC_TimeTypeDef Time;
+			RTC_DateTypeDef Date;
+			Time.Hours=(UartBuff[0]-'0')*10+(UartBuff[1]-'0');
+			Time.Minutes=(UartBuff[3]-'0')*10+(UartBuff[4]-'0');
+			Time.DayLightSaving=RTC_DAYLIGHTSAVING_NONE;
+			HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+			HAL_RTC_GetDate(&hrtc,&Date,RTC_FORMAT_BIN);
+			HAL_RTC_GetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+		}
+		HAL_UART_Receive_IT(&huart2,UartBuff,5);
+	}
+}
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->ErrorCode == HAL_UART_ERROR_ORE){
+		HAL_UART_Receive_IT(&huart2,UartBuff,5);
+	}
+}
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	UNUSED(htim);
+	if(htim->Instance==TIM3){
+		if(Flip==1){
+			time_out();
+		}
+		if (ScrollText) {
+			if (StartFrom == ((TextLength * 6) - 24)) {
+				ScrollText = false;
+				Mode=Time;
+				CreateFrameFromTime();
+			}
+			else {
+				SendToDisplay(StartFrom);
+				StartFrom++;
+			}
+		}
+	}
+	if(htim->Instance==TIM4){
+	}
+}
+void HAL_SYSTICK_Callback(void)
+{
+}
 /* USER CODE END 4 */
 
 /**
