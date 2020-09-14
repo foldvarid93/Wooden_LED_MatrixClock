@@ -472,7 +472,7 @@ void Init_ESP8266(void)
 void Init_Application(void)
 {
 	  Init_MAX7219();
-	  HAL_UART_Receive_IT(&huart2,UartBuff,5);
+	  //HAL_UART_Receive_IT(&huart2,UartBuff,5);
 	  /**/
 	  Init_ESP8266();
 	  /**/
@@ -497,10 +497,24 @@ void Run_Application(void)
 		RemoteXY_Handler();
 		if(RemoteXY.button_1==1)
 		{
-			Uart_sendstring("SSID: ", &huart2);
-			Uart_sendstring(strcat(RemoteXY.edit_1,"\n"), &huart2);
-			Uart_sendstring("PASS: ", &huart2);
-			Uart_sendstring(strcat(RemoteXY.edit_2,"\n"), &huart2);
+			//Uart_sendstring("SSID: ", &huart2);
+			//Uart_sendstring(strcat(RemoteXY.edit_1,"\n"), &huart2);
+			//Uart_sendstring("PASS: ", &huart2);
+			//Uart_sendstring(strcat(RemoteXY.edit_2,"\n"), &huart2);
+			/**/
+			if('0'<=RemoteXY.edit_2[0]&&RemoteXY.edit_2[0]<='9' &&'0'<=RemoteXY.edit_2[1]&&RemoteXY.edit_2[1]<='9'&&RemoteXY.edit_2[2]==':'&&
+					'0'<=RemoteXY.edit_2[3]&&RemoteXY.edit_2[3]<='9'&&'0'<=RemoteXY.edit_2[4]&&RemoteXY.edit_2[4]<='9')
+			{
+				RTC_TimeTypeDef Time;
+				RTC_DateTypeDef Date;
+				Time.Hours=(RemoteXY.edit_2[0]-'0')*10+(RemoteXY.edit_2[1]-'0');
+				Time.Minutes=(RemoteXY.edit_2[3]-'0')*10+(RemoteXY.edit_2[4]-'0');
+				Time.DayLightSaving=RTC_DAYLIGHTSAVING_NONE;
+				HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+				HAL_RTC_GetDate(&hrtc,&Date,RTC_FORMAT_BIN);
+				HAL_RTC_GetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+			}
+			/**/
 		    RemoteXY.button_1=0;
 		}
 	}

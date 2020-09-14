@@ -252,7 +252,8 @@ void CRemoteXY_Init(const void * _conf, void * _var, const char * _accessPasswor
     
   void handlerModule(void)
   {
-    while (serial.available()>0) {
+    while (serial.available()>0)
+    {
       if (remotexy.connectAvailable) break;
       if (remotexy.freeAvailable) {
         serial.read();
