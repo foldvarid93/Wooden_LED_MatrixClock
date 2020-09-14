@@ -2,14 +2,21 @@
 #define	_APPLICATION_H_
 /***********************************************///includes begin
 #include "stm32f4xx_hal.h"
+#include "main.h"
+#include "adc.h"
+#include "i2c.h"
+#include "rtc.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "rtc.h"
+/**/
 #include "characters.h"
-#include "stdbool.h"
 #include "string.h"
-#include "main.h"
+#include "stdbool.h"
+#include "remotexy.h"
+#include "UartRingbuffer_multi.h"
+/**/
 /***********************************************///includes end
 /***********************************************///typedef begin
 typedef struct RTC_DATA{
@@ -161,5 +168,8 @@ void FormatTimeToText(void);
 void CreateFrameFromTime(void);
 void SendTextToDisplay(char *Text);
 void time_out(void);
+void Init_Application(void);
+void Run_Application(void);
+void Init_ESP8266(void);
 /***********************************************///functions declaration end
 #endif

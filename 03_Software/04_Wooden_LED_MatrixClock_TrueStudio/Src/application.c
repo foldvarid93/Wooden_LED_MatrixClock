@@ -455,3 +455,123 @@ void RTCWrite(RTC_TimeTypeDef Time){
 	Time.Minutes=37;
 	HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
 }
+/* ESP8266 Functions Start ---------------------------------------------------------*/
+void Init_ESP8266(void)
+{
+	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_SET);
+	HAL_Delay(100);
+	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_SET);
+	Ringbuf_init();
+	RemoteXY_Init();
+}
+/* ESP8266 Functions End ---------------------------------------------------------*/
+
+/* Application Main Functions Start ---------------------------------------------------------*/
+void Init_Application(void)
+{
+	  Init_MAX7219();
+	  HAL_UART_Receive_IT(&huart2,UartBuff,5);
+	  /**/
+	  Init_ESP8266();
+	  /**/
+	  FirstRun=1;
+	  UpdateTime=0;
+	  Flip=0;
+	  FlipCounter=0;
+	  Point=false;
+	  seconds=0;
+	  Mode=Time;
+	  /**/
+	  HAL_TIM_Base_Start_IT(&htim3);
+	  HAL_TIM_Base_Start_IT(&htim4);
+	  __HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
+
+}
+
+void Run_Application(void)
+{
+	while(1)
+	{
+		RemoteXY_Handler();
+		if(RemoteXY.button_1==1)
+		{
+			Uart_sendstring("SSID: ", &huart2);
+			Uart_sendstring(strcat(RemoteXY.edit_1,"\n"), &huart2);
+			Uart_sendstring("PASS: ", &huart2);
+			Uart_sendstring(strcat(RemoteXY.edit_2,"\n"), &huart2);
+		    RemoteXY.button_1=0;
+		}
+	}
+
+}
+/* Application Main Functions End ---------------------------------------------------------*/
+/* Interrupt Callbacks Start ---------------------------------------------------------*/
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
+{
+	Point=!Point;
+	UpdateTime=1;
+	time_out();
+	Flip=1;
+	if(Mode==Time){
+		//time_out();//CreateFrameFromTime();
+		seconds++;
+	}
+/*	if(seconds==10){
+		CreateDateData();
+		CreateDisplayDataArray(TextArray);
+		Mode=Date;
+		seconds=0;
+	}*/
+}
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (huart->Instance == USART2)	{
+		if('0'<=UartBuff[0]&&UartBuff[0]<='9' &&'0'<=UartBuff[1]&&UartBuff[1]<='9'&&UartBuff[2]==':'&&
+				'0'<=UartBuff[3]&&UartBuff[3]<='9'&&'0'<=UartBuff[4]&&UartBuff[4]<='9')
+		{
+			RTC_TimeTypeDef Time;
+			RTC_DateTypeDef Date;
+			Time.Hours=(UartBuff[0]-'0')*10+(UartBuff[1]-'0');
+			Time.Minutes=(UartBuff[3]-'0')*10+(UartBuff[4]-'0');
+			Time.DayLightSaving=RTC_DAYLIGHTSAVING_NONE;
+			HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+			HAL_RTC_GetDate(&hrtc,&Date,RTC_FORMAT_BIN);
+			HAL_RTC_GetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+		}
+		HAL_UART_Receive_IT(&huart2,UartBuff,5);
+	}
+}
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->ErrorCode == HAL_UART_ERROR_ORE){
+		HAL_UART_Receive_IT(&huart2,UartBuff,5);
+	}
+}
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	UNUSED(htim);
+	if(htim->Instance==TIM3){
+		if(Flip==1){
+			time_out();
+		}
+		if (ScrollText) {
+			if (StartFrom == ((TextLength * 6) - 24)) {
+				ScrollText = false;
+				Mode=Time;
+				CreateFrameFromTime();
+			}
+			else {
+				SendToDisplay(StartFrom);
+				StartFrom++;
+			}
+		}
+	}
+	if(htim->Instance==TIM4){
+	}
+}
+void HAL_SYSTICK_Callback(void)
+{
+}
+/* Interrupt Callbacks End ---------------------------------------------------------*/
