@@ -51,26 +51,27 @@ void MX_RTC_Init(void)
     
   /* USER CODE END Check_RTC_BKUP */
 
-  /** Initialize RTC and set the Time and Date 
-  */
-  sTime.Hours = 9;
-  sTime.Minutes = 23;
-  sTime.Seconds = 0;
-  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-  sTime.StoreOperation = RTC_STOREOPERATION_RESET;
-  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sDate.WeekDay = RTC_WEEKDAY_SUNDAY;
-  sDate.Month = RTC_MONTH_SEPTEMBER;
-  sDate.Date = 13;
-  sDate.Year = 20;
+//  /** Initialize RTC and set the Time and Date
+//  */
+//  sTime.Hours = 9;
+//  sTime.Minutes = 23;
+//  sTime.Seconds = 0;
+//  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+//  sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+//  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+//  sDate.WeekDay = RTC_WEEKDAY_SUNDAY;
+//  sDate.Month = RTC_MONTH_SEPTEMBER;
+//  sDate.Date = 13;
+//  sDate.Year = 20;
+//
+//  if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
 
-  if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK)
-  {
-    Error_Handler();
-  }
   /** Enable the Alarm A 
   */
   sAlarm.AlarmTime.Hours = 0;
