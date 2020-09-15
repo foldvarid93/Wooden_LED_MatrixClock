@@ -1,4 +1,9 @@
+/*********************************///
 #include "application.h"
+/*********************************///
+//Flash variables
+bool FlashWriteEnabled=true;
+uint16_t VirtAddVarTab;//[NB_OF_VAR] = {0x0001};
 /*********************************///
 const uint8_t	DateText[] ={"A mai dátum: "};
 const uint8_t	WeekDays[7][10]={
@@ -471,27 +476,39 @@ void Init_ESP8266(void)
 /* Application Main Functions Start ---------------------------------------------------------*/
 void Init_Application(void)
 {
-	  Init_MAX7219();
-	  //HAL_UART_Receive_IT(&huart2,UartBuff,5);
-	  /**/
-	  Init_ESP8266();
-	  /**/
-	  FirstRun=1;
-	  UpdateTime=0;
-	  Flip=0;
-	  FlipCounter=0;
-	  Point=false;
-	  seconds=0;
-	  Mode=Time;
-	  /**/
-	  HAL_TIM_Base_Start_IT(&htim3);
-	  HAL_TIM_Base_Start_IT(&htim4);
-	  __HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
+	/**/
+	HAL_FLASH_Unlock();
+	if (EE_Init() != EE_OK) {
+		Error_Handler();
+	}
+	/*
+	uint8_t Arr[]="Hello";
+	if (EE_WriteCharArray(0x0100, &Arr) != EE_OK) {
+		Error_Handler();
+	}
+	*/
+	Init_MAX7219();
+	//HAL_UART_Receive_IT(&huart2,UartBuff,5);
+	/**/
+	Init_ESP8266();
+	/**/
+	FirstRun=1;
+	UpdateTime=0;
+	Flip=0;
+	FlipCounter=0;
+	Point=false;
+	seconds=0;
+	Mode=Time;
+	/**/
+	HAL_TIM_Base_Start_IT(&htim3);
+	HAL_TIM_Base_Start_IT(&htim4);
+	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
 
 }
 
 void Run_Application(void)
 {
+	char Array[0xFF];
 	while(1)
 	{
 		RemoteXY_Handler();
@@ -513,6 +530,16 @@ void Run_Application(void)
 				HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
 				HAL_RTC_GetDate(&hrtc,&Date,RTC_FORMAT_BIN);
 				HAL_RTC_GetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+			}
+			strcpy(Array, "SSID:");
+			strcat(Array,RemoteXY.edit_1);
+			if (EE_WriteCharArray(0x0100, (uint8_t*)Array) != EE_OK) {
+				Error_Handler();
+			}
+			strcpy(Array, "PASS: ");
+			strcat(Array,RemoteXY.edit_2);
+			if (EE_WriteCharArray(0x0200, (uint8_t*)Array) != EE_OK) {
+				Error_Handler();
 			}
 			/**/
 		    RemoteXY.button_1=0;

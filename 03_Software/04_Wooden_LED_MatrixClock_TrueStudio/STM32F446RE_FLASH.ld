@@ -61,8 +61,11 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
+FLASH_BOOT	(rx)	: ORIGIN = 0x08000000, LENGTH = 32K
+EEPROM (rwx)		: ORIGIN = 0x08008000, LENGTH = 32K
+FLASH (rx)      : ORIGIN = 0x8010000, LENGTH = 448K 
 RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 128K
-FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 512K
+//EEPROM (rx)		: ORIGIN = 0x8060000, LENGTH = 128K /**/
 }
 
 /* Define output sections */
@@ -74,7 +77,7 @@ SECTIONS
     . = ALIGN(4);
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
-  } >FLASH
+  } >FLASH_BOOT
 
   /* The program code and other data goes into FLASH */
   .text :

@@ -16,6 +16,7 @@
 #include "stdbool.h"
 #include "remotexy.h"
 #include "UartRingbuffer_multi.h"
+#include "eeprom.h"
 /**/
 /***********************************************///includes end
 /***********************************************///typedef begin
