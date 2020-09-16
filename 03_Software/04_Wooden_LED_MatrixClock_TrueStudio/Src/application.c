@@ -526,12 +526,15 @@ void Run_Application(void)
 				RTC_DateTypeDef Date;
 				Time.Hours=(RemoteXY.edit_2[0]-'0')*10+(RemoteXY.edit_2[1]-'0');
 				Time.Minutes=(RemoteXY.edit_2[3]-'0')*10+(RemoteXY.edit_2[4]-'0');
+				Time.Seconds=0;
+				Time.SubSeconds=0;
+				Time.TimeFormat=RTC_HOURFORMAT12_AM;
 				Time.DayLightSaving=RTC_DAYLIGHTSAVING_NONE;
 				HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
 				HAL_RTC_GetDate(&hrtc,&Date,RTC_FORMAT_BIN);
 				HAL_RTC_GetTime(&hrtc,&Time,RTC_FORMAT_BIN);
 			}
-			strcpy(Array, "SSID:");
+			strcpy(Array, "SSID: ");
 			strcat(Array,RemoteXY.edit_1);
 			if (EE_WriteCharArray(0x0100, (uint8_t*)Array) != EE_OK) {
 				Error_Handler();
