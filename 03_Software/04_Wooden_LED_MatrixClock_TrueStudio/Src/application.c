@@ -403,7 +403,7 @@ void Init_MAX7219(void){
 	SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
 	SPI_Send(REG_DECODE, NO_DECODE);
 	SPI_Send(REG_SCANLIMIT, DISP0_7);
-	SPI_Send(REG_INTENSITY, INTENSITY_31);
+	SPI_Send(REG_INTENSITY, INTENSITY_1);
 }
 void SPI_Send(uint8_t ADDR, uint8_t CMD){
 	uint8_t tmp[24];
@@ -490,7 +490,9 @@ void Init_Application(void)
 	Init_MAX7219();
 	//HAL_UART_Receive_IT(&huart2,UartBuff,5);
 	/**/
-	Init_ESP8266();
+	//Init_ESP8266();
+	/**/
+	ESP8266_NTP_Init;
 	/**/
 	FirstRun=1;
 	UpdateTime=0;
