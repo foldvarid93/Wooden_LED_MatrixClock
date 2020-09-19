@@ -168,7 +168,7 @@ void CRemoteXY_Init(const void * _conf, void * _var,
 	//Uart_flush (&huart3);
 }
 
-uint8_t initModule() {
+uint8_t initModule(void) {
 
 #if defined(REMOTEXY__DEBUGLOGS)
 	DEBUGLOGS_write ("Find ESP module...");
@@ -671,7 +671,7 @@ void resetWire(void) {
 	remotexy.wireTimeOut = HAL_GetTick();
 }
 
-void handler(void)
+void RemoteXY_Handler(void)
 {
 	uint8_t *p;
 	uint16_t i;

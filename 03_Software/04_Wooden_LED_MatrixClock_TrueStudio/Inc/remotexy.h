@@ -195,7 +195,7 @@ struct Serial_t
 #define REMOTEXY_ACCESS_PASSWORD ""
 #endif 
 
-#define RemoteXY_Handler() handler ()
+//#define RemoteXY_Handler() handler ()
 #define RemoteXY_isConnected() isConnected ()
 #define RemoteXY_sendInputVariables() sendInputVariables ()
 #define RemoteXY_didSendInputVariables() didSendInputVariables ()
@@ -262,6 +262,8 @@ struct Serial_t
   
 	void resetWire(void);
   
+	void RemoteXY_Handler(void);
+
 	void handler(void);
 
 	uint16_t initCRC(void);

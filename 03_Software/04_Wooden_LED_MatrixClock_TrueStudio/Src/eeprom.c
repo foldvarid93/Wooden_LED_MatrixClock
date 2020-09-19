@@ -414,9 +414,9 @@ uint16_t EE_ReadCharArray(uint16_t VirtAddress, uint16_t Data)
 	uint8_t Length;
 	char Array[256];
 	uint16_t ReadStatus = 1;
-	if ((EE_ReadVariable(VirtAddress, &Length)) == HAL_OK) {
+	if ((EE_ReadVariable(VirtAddress, (uint16_t*) &Length)) == HAL_OK) {
 		for(uint8_t i=1;i<Length+1;i++){
-			EE_ReadVariable(VirtAddress+i, Array[i]);
+			EE_ReadVariable(VirtAddress+i, (uint16_t*) Array);
 		}
 	}
 	else{

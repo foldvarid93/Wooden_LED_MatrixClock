@@ -17,6 +17,7 @@
 #include "remotexy.h"
 #include "UartRingbuffer_multi.h"
 #include "eeprom.h"
+#include "ntp.h"
 /**/
 /***********************************************///includes end
 /***********************************************///typedef begin

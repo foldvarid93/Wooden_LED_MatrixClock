@@ -505,7 +505,6 @@ void Init_Application(void)
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
 	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
-
 }
 
 void Run_Application(void)
