@@ -403,7 +403,7 @@ void Init_MAX7219(void){
 	SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
 	SPI_Send(REG_DECODE, NO_DECODE);
 	SPI_Send(REG_SCANLIMIT, DISP0_7);
-	SPI_Send(REG_INTENSITY, INTENSITY_1);
+	SPI_Send(REG_INTENSITY, INTENSITY_3);
 }
 void SPI_Send(uint8_t ADDR, uint8_t CMD){
 	uint8_t tmp[24];
@@ -492,7 +492,7 @@ void Init_Application(void)
 	/**/
 	//Init_ESP8266();
 	/**/
-	ESP8266_NTP_Init;
+	ESP8266_NTP_Init();
 	/**/
 	FirstRun=1;
 	UpdateTime=0;
@@ -512,6 +512,7 @@ void Run_Application(void)
 	char Array[0xFF];
 	while(1)
 	{
+		ESP8266_NTP_GetPacket();
 		RemoteXY_Handler();
 		if(RemoteXY.button_1==1)
 		{

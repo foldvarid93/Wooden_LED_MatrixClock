@@ -97,8 +97,7 @@ unsigned long ESP8266_NTP_EpochUnixNTP(void)
 	unsigned long epochUnix;
 
 	// AT+CIPSTART="UDP","fr.pool.ntp.org",123
-	ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"fr.pool.ntp.org\",123", OK_STR,
-			LONG_PAUSE);
+	ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"fr.pool.ntp.org\",123", OK_STR,LONG_PAUSE);
 	ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE); //send 48 (NTP_PACKET_SIZE) bytes
 	ESP8266_NTP_EmptyRX(1000UL); // empty the buffer (we get a > character)
 	serial.write((const uint8_t) *NTP_Packet); // the first 4 bytes matters, then we don't care, whatever is in the memory will do
@@ -151,15 +150,10 @@ void ESP8266_NTP_Init(void)
 
 void ESP8266_NTP_GetPacket(void)
 {
-	/*
-	 int c;
-	 unsigned long currentTime;
-	 static unsigned long lastTime = 0;
 	 unsigned long epochUnix;
 	 uint8_t  ntpHours, ntpMinutes, ntpSeconds;
-	 DateTime now;
 
-	 if (HAL_GetTick() - lastTime >= 5000UL) { // change 5000UL to adjust your RTC once a day use (NUMBEROFSECONDSPERDAY * 1000UL)
+	 //if (HAL_GetTick() - lastTime >= 5000UL) { // change 5000UL to adjust your RTC once a day use (NUMBEROFSECONDSPERDAY * 1000UL)
 	 //now = rtc.now();
 	 epochUnix = ESP8266_NTP_EpochUnixNTP();
 	 ntpHours = (epochUnix  % NUMBEROFSECONDSPERDAY) / NUMBEROFSECONDSPERHOUR;
@@ -173,6 +167,7 @@ void ESP8266_NTP_GetPacket(void)
 
 	 // print the hour, minute and second:
 	 //Serial.print("The local NTP time is ");
+	 /*
 	 Serial.print(ntpHours); // print the hour ()
 	 Serial.print(':');
 	 if ( ntpMinutes < 10 ) Serial.print('0');    // In the first 10 minutes of each hour, we'll want a leading '0'
@@ -197,7 +192,6 @@ void ESP8266_NTP_GetPacket(void)
 	 Serial.println();
 
 	 lastTime = HAL_GetTick();
-	 }
 	 */
-	// do something else here
+	// }
 }
