@@ -1,4 +1,9 @@
+/*********************************///
 #include "application.h"
+/*********************************///
+//Flash variables
+bool FlashWriteEnabled=true;
+uint16_t VirtAddVarTab;//[NB_OF_VAR] = {0x0001};
 /*********************************///
 const uint8_t	DateText[] ={"A mai dátum: "};
 const uint8_t	WeekDays[7][10]={
@@ -22,234 +27,383 @@ const uint8_t	Months[12][12]={
 								{"október"},
 								{"november"},
 								{"december"}};
-uint8_t *RxData=&TextArray[0];
-uint8_t RxBufferIndex;
-uint8_t AtCommandLength;
-bool ReceiveComplete=false;
-const uint8_t	ATRST[]="AT+RST";
-const uint8_t	AT[]="ATE0";
-const uint8_t	ESP8266RST[]="AT+RST";
-/*********************************/				//ESP8266 functions begin
-void SendAtCommandToEsp8266(uint8_t *String){
-	uint8_t AtCommandLength=strlen(String);
-	static uint8_t TmpArray[30];
-	for(uint8_t i=0;i<AtCommandLength;i++){
-		TmpArray[i]=String[i];
-	}
-	TmpArray[AtCommandLength++]='\r';
-	TmpArray[AtCommandLength++]='\n';
-	RxBufferIndex=0;
-	HAL_UART_Transmit(&huart3, TmpArray, AtCommandLength,1);
-	HAL_UART_Receive_IT(&huart3, RxData+RxBufferIndex, 1);
-}
-void Init_ESP8266(void){
-	HAL_GPIO_WritePin(ESP_RESET_PORT,ESP_RESET_PIN,GPIO_PIN_RESET);
-	HAL_Delay(3000);
-	HAL_GPIO_WritePin(ESP_RESET_PORT,ESP_RESET_PIN,GPIO_PIN_SET);
-}
-/*********************************/				//ESP8266 functions begin
 /*********************************/				//Date functions begin
-void FormatDateToText(void){
+void CreateDateData(void){
 	uint8_t	i=0;
-	for(i=0;i<16;i++){							//16 szóköz
+	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
+	for(i=0;i<4;i++){							//16 szóköz
 		TextArray[i]=' ';
 	}
 	for(uint8_t j=0;DateText[j]!='\0';i++,j++){	//A mai dátum:
 		TextArray[i]=DateText[j];
 	}
-	TextArray[i++]=Date_Data.year_thousands+'0';
-	TextArray[i++]=Date_Data.year_hundreds+'0';
-	TextArray[i++]=Date_Data.year_tens+'0';
-	TextArray[i++]=Date_Data.year_singles+'0';	//évszám
+	TextArray[i++]='2';
+	TextArray[i++]='0';
+	TextArray[i++]=(Date_Data.Year/10)+'0';
+	TextArray[i++]=(Date_Data.Year%10)+'0';	//évszám
 	TextArray[i++]='.';							//pont
-	TextArray[i++]=Date_Data.month_tens+'0';
-	TextArray[i++]=Date_Data.month_singles+'0';	//hónap
+	TextArray[i++]=Date_Data.Month/10+'0';
+	TextArray[i++]=Date_Data.Month%10+'0';	//hónap
 	TextArray[i++]='.';							//pont
-	TextArray[i++]=Date_Data.date_tens+'0';
-	TextArray[i++]=Date_Data.date_singles+'0';	//nap
+	TextArray[i++]=Date_Data.Date/10+'0';
+	TextArray[i++]=Date_Data.Date%10+'0';	//nap
 	TextArray[i++]='.';							//pont
 	TextArray[i++]=',';							//vesszõ
-	for(uint8_t j=0;WeekDays[Date_Data.day-1][j]!='\0';i++,j++){
-		TextArray[i]=WeekDays[Date_Data.day-1][j];		//a hét napja
+	for(uint8_t j=0;WeekDays[Date_Data.WeekDay-1][j]!='\0';i++,j++){
+		TextArray[i]=WeekDays[Date_Data.WeekDay-1][j];		//a hét napja
 	}
-	for(uint8_t j=0;j<16;i++,j++){				//16 szóköz
+	for(uint8_t j=0;j<4;i++,j++){				//16 szóköz
 		TextArray[i]=' ';
 	}
 	TextArray[i]='\0';							//lezáró nulla
 }
 /*********************************/				//Date functions end
 /*********************************/				//Time functions begin
-void FormatTimeToText(void){
-	uint8_t i = 0;
-	for (i = 0; i < 16; i++) {							//16 szóköz
-		TextArray[i] = ' ';
+void TimeAnimation(uint8_t* Dest,uint8_t* Source){
+	for(uint8_t i=0;i<6;i++){
+		(Dest[i])<<=1;
+		if ((Source[i])&0x80){
+			(Dest[i])|=0x01;
+		}
+		else{
+			(Dest[i])&=0xFE;
+		}
+		Source[i]<<=1;
 	}
-	TextArray[i++]=Time_Data.hour_tens+'0';
-	TextArray[i++]=Time_Data.hour_singles+'0';	//óra
-	TextArray[i++]=':';
-	TextArray[i++]=Time_Data.min_tens+'0';
-	TextArray[i++]=Time_Data.min_singles+'0';	//perc
-	TextArray[i++]=':';
-	TextArray[i++]=Time_Data.sec_tens+'0';
-	TextArray[i++]=Time_Data.sec_singles+'0';
-	for(uint8_t j=0;j<16;i++,j++){				//16 szóköz
-		TextArray[i]=' ';
+/*	if(Iteration==1){
+		Old<<=1;
 	}
-	TextArray[i]='\0';
+	if(b&0x01){
+		a|=0x80;
+	}
+	else{
+		a&=0x7F;
+	}
+	return a;*/
+}
+char concat(char b, char a){
+	a>>=1;
+	if(b&0x01){
+		a|=0x80;
+	}
+	else{
+		a&=0x7F;
+	}
+	return a;
+}
+void time_out(void){
+#define StartIdx 28
+#define HourTensStartIdx 	StartIdx
+#define HourSinglesStartIdx StartIdx+6
+#define HourMinDoubleDot 	HourSinglesStartIdx+6
+#define MinTensStartIdx 	HourMinDoubleDot+2
+#define MinSinglesStartIdx 	MinTensStartIdx+6
+#define MinSecDoubleDot 	MinSinglesStartIdx+6
+#define SecTensStartIdx 	MinSecDoubleDot+2
+#define SecSinglesStartIdx 	SecTensStartIdx+6
+
+	if(FirstRun==1){
+		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
+		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
+
+		time[0].hour_tens=Time_Data.Hours / 10;
+		time[0].hour_singles=Time_Data.Hours % 10;
+		time[0].min_tens=Time_Data.Minutes / 10;
+		time[0].min_singles=Time_Data.Minutes % 10;
+		time[0].sec_tens=Time_Data.Seconds / 10;
+		time[0].sec_singles=Time_Data.Seconds % 10;
+
+		for (uint8_t i = 0; i < 5; i++) {
+			if (time[0].hour_tens == 0) {
+				DisplayData[i+HourTensStartIdx] = 0;
+			} else {
+				DisplayData[i+HourTensStartIdx] = BitSwapping(characters[time[0].hour_tens+ '0'][i]);
+			}
+			DisplayData[i + HourSinglesStartIdx] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
+			DisplayData[i + MinTensStartIdx] = BitSwapping(characters[time[0].min_tens + '0'][i]);
+			DisplayData[i + MinSinglesStartIdx] = BitSwapping(characters[time[0].min_singles + '0'][i]);
+			DisplayData[i + SecTensStartIdx] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
+			DisplayData[i + SecSinglesStartIdx] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
+		}
+		DisplayData[HourMinDoubleDot] = 0x22;
+		DisplayData[MinSecDoubleDot] = 0x22;
+
+		SendFrameToDisplay();
+
+		time[1]=time[0];
+		FirstRun=0;
+	}
+	if(UpdateTime==1){
+		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
+		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
+
+		time[0].hour_tens=Time_Data.Hours / 10;
+		time[0].hour_singles=Time_Data.Hours % 10;
+		time[0].min_tens=Time_Data.Minutes / 10;
+		time[0].min_singles=Time_Data.Minutes % 10;
+		time[0].sec_tens=Time_Data.Seconds / 10;
+		time[0].sec_singles=Time_Data.Seconds % 10;
+
+		if(time[0].sec_singles!=time[1].sec_singles){
+			TimeDiffIndicator[5]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i + 30] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[5]=0;
+		}
+		if(time[0].sec_tens!=time[1].sec_tens){
+			TimeDiffIndicator[4]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i + 24] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[4]=0;
+		}
+		if(time[0].min_singles!=time[1].min_singles){
+			TimeDiffIndicator[3]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i + 18] = BitSwapping(characters[time[0].min_singles + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[3]=0;
+		}
+		if(time[0].min_tens!=time[1].min_tens){
+			TimeDiffIndicator[2]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i + 12] = BitSwapping(characters[time[0].min_tens + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[2]=0;
+		}
+		if(time[0].hour_singles!=time[1].hour_singles){
+			TimeDiffIndicator[1]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i + 6] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[1]=0;
+		}
+		if(time[0].hour_tens!=time[1].hour_tens){
+			TimeDiffIndicator[0]=1;
+			for(uint8_t i=0;i<5;i++){
+				NewTimeDataArray[i] = BitSwapping(characters[time[0].hour_tens + '0'][i]);
+			}
+		}
+		else {
+			TimeDiffIndicator[0]=0;
+		}
+		time[1]=time[0];
+		UpdateTime=0;
+	}
+	if(Flip==1){
+		if (TimeDiffIndicator[0]){
+			TimeAnimation(&DisplayData[HourTensStartIdx],&NewTimeDataArray[0]);
+		}
+		if (TimeDiffIndicator[1]){
+			TimeAnimation(&DisplayData[HourSinglesStartIdx],&NewTimeDataArray[6]);
+		}
+		if (TimeDiffIndicator[2]){
+			TimeAnimation(&DisplayData[MinTensStartIdx],&NewTimeDataArray[12]);
+		}
+		if(TimeDiffIndicator[3]){
+			TimeAnimation(&DisplayData[MinSinglesStartIdx],&NewTimeDataArray[18]);
+		}
+		if(TimeDiffIndicator[4]){
+			TimeAnimation(&DisplayData[SecTensStartIdx],&NewTimeDataArray[24]);
+		}
+		if(TimeDiffIndicator[5]){
+			TimeAnimation(&DisplayData[SecSinglesStartIdx],&NewTimeDataArray[30]);
+		}
+		SendFrameToDisplay();
+		FlipCounter++;
+		if(FlipCounter==8){
+			FlipCounter=0;
+			Flip=0;
+		}
+	}
+/*
+	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
+	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
+
+	time[0].hour_tens=Time_Data.Hours / 10;
+	time[0].hour_singles=Time_Data.Hours % 10;
+	time[0].min_tens=Time_Data.Minutes / 10;
+	time[0].min_singles=Time_Data.Minutes % 10;
+	time[0].sec_tens=Time_Data.Seconds / 10;
+	time[0].sec_singles=Time_Data.Seconds % 10;
+
+	if(time[0].sec_singles!=time[1].sec_singles){
+		TimeDiffIndicator[5]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i + 30] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[5]=0;
+	}
+	if(time[0].sec_tens!=time[1].sec_tens){
+		TimeDiffIndicator[4]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i + 24] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[4]=0;
+	}
+	if(time[0].min_singles!=time[1].min_singles){
+		TimeDiffIndicator[3]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i + 18] = BitSwapping(characters[time[0].min_singles + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[3]=0;
+	}
+	if(time[0].min_tens!=time[1].min_tens){
+		TimeDiffIndicator[2]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i + 12] = BitSwapping(characters[time[0].min_tens + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[2]=0;
+	}
+	if(time[0].hour_singles!=time[1].hour_singles){
+		TimeDiffIndicator[1]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i + 6] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[1]=0;
+	}
+	if(time[0].hour_tens!=time[1].hour_tens){
+		TimeDiffIndicator[0]=1;
+		for(uint8_t i=0;i<5;i++){
+			NewTimeDataArray[i] = BitSwapping(characters[time[0].hour_tens + '0'][i]);
+		}
+	}
+	else {
+		TimeDiffIndicator[0]=0;
+	}
+	for(uint8_t i=0;i<8;i++){
+		if (TimeDiffIndicator[0]){
+			TimeAnimation(&DisplayData[HourTensStartIdx],&NewTimeDataArray[0]);
+		}
+		if (TimeDiffIndicator[1]){
+			TimeAnimation(&DisplayData[HourSinglesStartIdx],&NewTimeDataArray[6]);
+		}
+		if (TimeDiffIndicator[2]){
+			TimeAnimation(&DisplayData[MinTensStartIdx],&NewTimeDataArray[12]);
+		}
+		if(TimeDiffIndicator[3]){
+			TimeAnimation(&DisplayData[MinSinglesStartIdx],&NewTimeDataArray[18]);
+		}
+		if(TimeDiffIndicator[4]){
+			TimeAnimation(&DisplayData[SecTensStartIdx],&NewTimeDataArray[24]);
+		}
+		if(TimeDiffIndicator[5]){
+			TimeAnimation(&DisplayData[SecSinglesStartIdx],&NewTimeDataArray[30]);
+		}
+		SendFrameToDisplay();
+	}
+
+	time[1]=time[0];*/
 }
 void CreateFrameFromTime(void){
-	RTC_TimeTypeDef RTC_TimeData;
+	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
 
-	static uint8_t Time[12];
-	static uint8_t *TimeOldData = &Time[0];
-	static uint8_t *TimeNewData = &Time[6];
-
-	static uint8_t TmpArray[72];
-	static uint8_t *OldDataPtr = &TmpArray[0];
-	static uint8_t *NewDataPtr = &TmpArray[36];
-
-	if (indx == 0) {
-		HAL_RTC_GetTime(&hrtc, &RTC_TimeData, RTC_FORMAT_BIN);
-		HAL_RTC_GetDate(&hrtc, NULL, RTC_FORMAT_BIN);
-
-		*TimeNewData = (RTC_TimeData.Hours / 10) + '0';
-		*(TimeNewData + 1) = (RTC_TimeData.Hours % 10) + '0';
-		*(TimeNewData + 2) = (RTC_TimeData.Minutes / 10) + '0';
-		*(TimeNewData + 3) = (RTC_TimeData.Minutes % 10) + '0';
-		*(TimeNewData + 4) = (RTC_TimeData.Seconds / 10) + '0';
-		*(TimeNewData + 5) = (RTC_TimeData.Seconds % 10) + '0';
-
-		for (uint8_t i = 0; i < 6; i++) {
-			for (uint8_t j = 0; j < 6; j++) {
-				*(NewDataPtr + (i * 6) + j) = BitSwapping(characters[*(TimeNewData + i)][j]);}
+	uint8_t hour_ten_new = (Time_Data.Hours / 10);//newDataTime.hour() / 10;
+	uint8_t hour_single_new = (Time_Data.Hours % 10);//newDataTime.hour() % 10;
+	uint8_t min_ten_new = (Time_Data.Minutes / 10);//newDataTime.minute() / 10;
+	uint8_t min_single_new = (Time_Data.Minutes % 10);//newDataTime.minute() % 10;
+	uint8_t sec_ten_new = (Time_Data.Seconds / 10);//newDataTime.second() / 10;
+	uint8_t sec_single_new = (Time_Data.Seconds % 10);//newDataTime.second() % 10;
+	for (uint8_t i = 0; i < 5; i++) {
+		if (hour_ten_new == 0) {
+			DisplayData[i] = 0;
+		} else {
+			DisplayData[i] = BitSwapping(characters[hour_ten_new + '0'][i]);
 		}
+		DisplayData[i + 5] = BitSwapping(characters[hour_single_new + '0'][i]);
+		DisplayData[i + 13] = BitSwapping(characters[min_ten_new + '0'][i]);
+		DisplayData[i + 18] = BitSwapping(characters[min_single_new + '0'][i]);
+		DisplayData[i + 26] = BitSwapping(characters[sec_ten_new + '0'][i]);
+		DisplayData[i + 31] = BitSwapping(characters[sec_single_new + '0'][i]);
 	}
-	if (*TimeNewData != *TimeOldData) {
-		for (uint8_t i = 0; i < 6; i++) {
-			*(OldDataPtr + i) <<= 1;
-			*(OldDataPtr + i) &= 0B11111110;
-			if (*(NewDataPtr + i) & 0B10000000) {*(OldDataPtr + i) |= 0B00000001;}
-			*(NewDataPtr + i) <<= 1;
-		}
+	DisplayData[10] = 0;
+	if(Point){
+		DisplayData[11] = 0x22;
+		DisplayData[24] = 0x22;
 	}
-	if (*(TimeNewData + 1) != *(TimeOldData + 1)) {
-		for (uint8_t i = 6; i < 12; i++) {
-			*(OldDataPtr + i) <<= 1;
-			*(OldDataPtr + i) &= 0B11111110;
-			if (*(NewDataPtr + i) & 0B10000000) {*(OldDataPtr + i) |= 0B00000001;}
-			*(NewDataPtr + i) <<= 1;
-		}
+	else{
+		DisplayData[11] = 0;
+		DisplayData[24] = 0;
 	}
-	if (*(TimeNewData + 2) != *(TimeOldData + 2)) {
-		for (uint8_t i = 12; i < 18; i++) {
-			*(OldDataPtr + i) <<= 1;
-			*(OldDataPtr + i) &= 0B11111110;
-			if (*(NewDataPtr + i) & 0B10000000) {*(OldDataPtr + i) |= 0B00000001;}
-			*(NewDataPtr + i) <<= 1;
-		}
-	}
-	if (*(TimeNewData + 3) != *(TimeOldData + 3)) {
-		for (uint8_t i = 18; i < 24; i++) {
-			*(OldDataPtr + i) <<= 1;
-			*(OldDataPtr + i) &= 0B11111110;
-			if (*(NewDataPtr + i) & 0B10000000) {*(OldDataPtr + i) |= 0B00000001;}
-			*(NewDataPtr + i) <<= 1;
-		}
-	}
-	if (*(TimeNewData + 4) != *(TimeOldData + 4)) {
-		for (uint8_t i = 24; i < 30; i++) {
-			*(OldDataPtr + i) <<= 1;
-			*(OldDataPtr + i) &= 0B11111110;
-			if (*(NewDataPtr + i) & 0B10000000) {*(OldDataPtr + i) |= 0B00000001;}
-			*(NewDataPtr + i) <<= 1;
-		}
-	}
-	if (*(TimeNewData + 5) != *(TimeOldData + 5)) {
-		for (uint8_t i = 30; i < 36; i++) {
-			*(OldDataPtr + i) <<= 1;
-			*(OldDataPtr + i) &= 0B11111110;
-			if (*(NewDataPtr + i) & 0B10000000) {*(OldDataPtr + i) |= 0B00000001;}
-			*(NewDataPtr + i) <<= 1;
-		}
-	}
-	for (uint8_t i = 0; i < 6; i++) {							//Kettõspontok
-		DisplayData[i] = 0;
-		DisplayData[i + 6] = 0;
-		DisplayData[i + 12] = 0;
-		DisplayData[i + 18] = 0;
-		DisplayData[i + 24] = *(OldDataPtr + i);
-		DisplayData[i + 30] = *(OldDataPtr + i + 6);
-		DisplayData[i + 36] = DisplayData[i + 54] = BitSwapping(characters[':'][i]);
-		DisplayData[i + 42] = *(OldDataPtr + i + 12);
-		DisplayData[i + 48] = *(OldDataPtr + i + 18);
-		DisplayData[i + 60] = *(OldDataPtr + i + 24);
-		DisplayData[i + 66] = *(OldDataPtr + i + 30);
-		DisplayData[i + 72] = 0;
-		DisplayData[i + 78] = 0;
-		DisplayData[i + 84] = 0;
-		DisplayData[i + 90] = 0;
-	}
-	for (uint8_t i = 0; i < 6; i++) {
-		DisplayData[i] = *(OldDataPtr + i + 30);
-	}
+	DisplayData[12] = 0;
+	DisplayData[23] = 0;
+	DisplayData[25] = 0;
 	SendFrameToDisplay();
-	indx++;
-	if (indx == 8) {
-		indx = 0;
-		uint8_t *tmp = TimeOldData;
-		TimeOldData = TimeNewData;
-		TimeNewData = tmp;
-	}
 }
 /*********************************/				//Time functions end
 /*********************************/				//Text functions begin
-void SendTextToDisplay(uint8_t *Text){
-	uint8_t TextLength=0, ActualChar=0, column=0,kar_elt=0;	//length=strlength(text);
-	while(Text[TextLength]!='\0'){					//Length of the text array
-		TextLength++;
-	}
-	if(TextLength==0){								//ha 0 hosszú a szöveg rögtön return
-		return;
-	}
-	if(TextLength<=16){								//16 karakter fér ki a kijelzõre, ha 16 vagy annál rövidebb akkor gond nélkül kifér
-		for(uint8_t i=0;i<TextLength;i++){
-			ActualChar=Text[i];
-			for(uint8_t j=0;j<6;j++){
-				DisplayData[column]=BitSwapping(characters[ActualChar][j]);
-			}
-		}
-		SendFrameToDisplay();
-		return;
-	}
-	else{											//Ha hosszabb mint 16 akkor shiftelni kell
-		for(uint8_t i=0;i<16;i++){
-			ActualChar=Text[i];
-			for(uint8_t j=0;j<6;j++){
-				DisplayData[i]=BitSwapping(characters[i][j]);
-			}
-		}
-		SendFrameToDisplay();						//megjeleníti az elsõ 16 karaktert
-		for (kar_elt = 16; kar_elt < TextLength; kar_elt++) {
-			ActualChar = Text[kar_elt];
-			for (uint8_t i=0; i < 6; i++) {
-				for (uint8_t j = 0; j < (DispLength-1); j++) {
-					DisplayData[j] = DisplayData[j + 1];
-				}
-				DisplayData[DispLength-1] = BitSwapping(characters[ActualChar][i]);
-				SendFrameToDisplay();
-				HAL_Delay(50);
-			}
-		}
-		return;
-	}
+void CreateDisplayDataArray(uint8_t *Text) {
+  ScrollText = false;
+  TextLength = strlen((const char*)Text);
+  for (uint8_t i = 0; i < TextLength; i++) {
+    for (uint8_t j = 0; j < 6; j++) {
+      DisplayDataArray[(i * 6) + j] = BitSwapping(characters[Text[i]][j]);
+    }
+  }
+  StartFrom = 0;
+  ScrollEnd = false;
+  ScrollText = true;
+}
+void SendToDisplay(uint16_t from) {
+#define DispCount 12//
+  //
+  uint8_t tmp[192];
+  for(uint8_t i=0;i<8;i++){
+	  for(uint8_t j=0;j<12;j++){
+		  tmp[(i*24)+(2*j)]=8-i;
+		  tmp[192-((i*24)+(2*j)+1)]=DisplayDataArray[from+(j*8)+i];
+	  }
+  }
+  //
+  SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
+  for(uint8_t i=0;i<8;i++){
+	  HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	  HAL_SPI_Transmit(&hspi2,&tmp[i*24],24,50);
+	  HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+  }
+  /*
+  for (uint8_t i = 1; i < 9; i++) {
+	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+    for (uint8_t j = 0; j < DispCount; j++) {
+    	HAL_SPI_Transmit(&hspi2,&i,1,50);
+    	HAL_SPI_Transmit(&hspi2,&(DisplayDataArray[from + ((DispCount - j) * 8) + (i - 1)]),1,50); //data
+    }
+    HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+  }
+  */
+  SPI_Send(REG_SHTDWN, NORMAL_MODE);
+  asm("nop");
 }
 /*********************************/				//Text functions end
 void Init_MAX7219(void){
 	SPI_Send(REG_NO_OP, NOP);
-	SPI_Send(REG_SHTDWN, NORMAL_MODE);
+	SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
 	SPI_Send(REG_DECODE, NO_DECODE);
 	SPI_Send(REG_SCANLIMIT, DISP0_7);
-	SPI_Send(REG_INTENSITY, INTENSITY_1);
+	SPI_Send(REG_INTENSITY, INTENSITY_3);
 }
 void SPI_Send(uint8_t ADDR, uint8_t CMD){
 	uint8_t tmp[24];
@@ -262,50 +416,32 @@ void SPI_Send(uint8_t ADDR, uint8_t CMD){
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
 }
 void SendFrameToDisplay(void){
-	uint8_t tmp[24];
+	uint8_t tmp1[24];
+	uint8_t tmp2[24];
+	uint8_t tmp3[8][24];
 	for(uint8_t i=0;i<DispNum;i++){
-		tmp[2*i]=REG_SHTDWN;
-		tmp[(2*i)+1]=SHUTDOWN_MODE;
+		tmp1[2*i]=REG_SHTDWN;
+		tmp1[(2*i)+1]=SHUTDOWN_MODE;
+		tmp2[2*i]=REG_SHTDWN;
+		tmp2[(2*i)+1]=NORMAL_MODE;
 	}
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi2,tmp,24,100);
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
 	for(uint8_t i=8;i>0;i--){
 		for(uint8_t j=0;j<DispNum;j++){
-			tmp[2*j]=i;
-			tmp[(2*j)+1]=DisplayData[DispLength-(8*j)-9+i];
+			tmp3[i-1][2*j]=i;
+			tmp3[i-1][(2*j)+1]=DisplayData[DispLength-(8*j)-9+i];
 		}
-		HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_RESET);
-		HAL_SPI_Transmit(&hspi2, tmp, 24, 100);
-		HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_SET);
-	}
-	for(uint8_t i=0;i<DispNum;i++){
-		tmp[2*i]=REG_SHTDWN;
-		tmp[(2*i)+1]=NORMAL_MODE;
 	}
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi2,tmp,24,100);
+	HAL_SPI_Transmit(&hspi2,tmp1,24,100);
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
-}
-void TestData(void){
-	for(uint8_t i=0; i<DispLength;i++){
-		DisplayData[i]=0xFF;
+	for(uint8_t i=8;i>0;i--){
+		HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&hspi2, &tmp3[i-1][0], 24, 100);
+		HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_SET);
 	}
-}
-void ClearDisplay(void){
-	for(uint8_t i=0; i<DispLength;i++){
-		DisplayData[i]=0;
-	}
-}
-void ClearDisplayFromTo(uint8_t from, uint8_t to){
-	for(uint8_t i=from;i<to;i++){
-		DisplayData[i]=0;
-	}
-}
-void TestText(uint8_t ch){
-	for(uint8_t i=0;i<6;i++){
-		DisplayData[i]=BitSwapping(characters[ch][i]);
-	}
+	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi2,tmp2,24,100);
+	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
 }
 uint8_t BitSwapping(uint8_t ch){
 	uint8_t retval=0x00;
@@ -319,44 +455,169 @@ uint8_t BitSwapping(uint8_t ch){
 	if (ch&0B10000000) retval|=0B00000001;
 	return ~retval;
 }
-void RTC_Read(void){
-	RTC_TimeTypeDef Time;
-	RTC_DateTypeDef Date;
-	HAL_RTC_GetTime(&hrtc, &Time, RTC_FORMAT_BIN);
-	HAL_RTC_GetDate(&hrtc,&Date,RTC_FORMAT_BIN);
-	RTC_Data.sec=Time.Seconds;
-	RTC_Data.min=Time.Minutes;
-	RTC_Data.hour=Time.Hours;
-	RTC_Data.day=Date.WeekDay;
-	RTC_Data.date=Date.Date;
-	RTC_Data.month=Date.Month;
-	RTC_Data.year=Date.Year;
-	ConvertRTCToDateAndTime(&RTC_Data,&Time_Data,&Date_Data);
+void RTCWrite(RTC_TimeTypeDef Time){
+	Time.Hours=16;
+	Time.Minutes=37;
+	HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
 }
-void BinToTensAndSingles(uint8_t binary, uint8_t *tens, uint8_t *singles){
-	*tens=binary/10;
-	*singles=binary%10;
+/* ESP8266 Functions Start ---------------------------------------------------------*/
+void Init_ESP8266(void)
+{
+	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_SET);
+	HAL_Delay(100);
+	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_SET);
+	Ringbuf_init();
+	RemoteXY_Init();
 }
-void ConvertRTCToDateAndTime(RTC_DATA *RTC_Data,TIME *Time_Data, DATE *Date_Data){
-	Time_Data->hour_tens=RTC_Data->hour/10;
-	Time_Data->hour_singles=RTC_Data->hour%10;
+/* ESP8266 Functions End ---------------------------------------------------------*/
 
-	Time_Data->min_tens=RTC_Data->min/10;
-	Time_Data->min_singles=RTC_Data->min%10;
-
-	Time_Data->sec_tens=RTC_Data->sec/10;
-	Time_Data->sec_singles=RTC_Data->sec%10;
-
-	Date_Data->day=RTC_Data->day;
-
-	Date_Data->date_tens=RTC_Data->date/10;
-	Date_Data->date_singles=RTC_Data->date%10;
-
-	Date_Data->month_tens=RTC_Data->month/10;
-	Date_Data->month_singles=RTC_Data->month%10;
-
-	Date_Data->year_thousands=2;
-	Date_Data->year_hundreds=0;
-	Date_Data->year_tens=RTC_Data->year/10;
-	Date_Data->year_singles=RTC_Data->year%10;
+/* Application Main Functions Start ---------------------------------------------------------*/
+void Init_Application(void)
+{
+	/**/
+	HAL_FLASH_Unlock();
+	if (EE_Init() != EE_OK) {
+		Error_Handler();
+	}
+	/*
+	uint8_t Arr[]="Hello";
+	if (EE_WriteCharArray(0x0100, &Arr) != EE_OK) {
+		Error_Handler();
+	}
+	*/
+	Init_MAX7219();
+	//HAL_UART_Receive_IT(&huart2,UartBuff,5);
+	/**/
+	//Init_ESP8266();
+	/**/
+	ESP8266_NTP_Init();
+	/**/
+	FirstRun=1;
+	UpdateTime=0;
+	Flip=0;
+	FlipCounter=0;
+	Point=false;
+	seconds=0;
+	Mode=Time;
+	/**/
+	HAL_TIM_Base_Start_IT(&htim3);
+	HAL_TIM_Base_Start_IT(&htim4);
+	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
 }
+
+void Run_Application(void)
+{
+	char Array[0xFF];
+	while(1)
+	{
+		ESP8266_NTP_GetPacket();
+		RemoteXY_Handler();
+		if(RemoteXY.button_1==1)
+		{
+			//Uart_sendstring("SSID: ", &huart2);
+			//Uart_sendstring(strcat(RemoteXY.edit_1,"\n"), &huart2);
+			//Uart_sendstring("PASS: ", &huart2);
+			//Uart_sendstring(strcat(RemoteXY.edit_2,"\n"), &huart2);
+			/**/
+			if('0'<=RemoteXY.edit_2[0]&&RemoteXY.edit_2[0]<='9' &&'0'<=RemoteXY.edit_2[1]&&RemoteXY.edit_2[1]<='9'&&RemoteXY.edit_2[2]==':'&&
+					'0'<=RemoteXY.edit_2[3]&&RemoteXY.edit_2[3]<='9'&&'0'<=RemoteXY.edit_2[4]&&RemoteXY.edit_2[4]<='9')
+			{
+				RTC_TimeTypeDef Time;
+				RTC_DateTypeDef Date;
+				Time.Hours=(RemoteXY.edit_2[0]-'0')*10+(RemoteXY.edit_2[1]-'0');
+				Time.Minutes=(RemoteXY.edit_2[3]-'0')*10+(RemoteXY.edit_2[4]-'0');
+				Time.Seconds=0;
+				Time.SubSeconds=0;
+				Time.TimeFormat=RTC_HOURFORMAT12_AM;
+				Time.DayLightSaving=RTC_DAYLIGHTSAVING_NONE;
+				HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+				HAL_RTC_GetDate(&hrtc,&Date,RTC_FORMAT_BIN);
+				HAL_RTC_GetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+			}
+			strcpy(Array, "SSID: ");
+			strcat(Array,RemoteXY.edit_1);
+			if (EE_WriteCharArray(0x0100, (uint8_t*)Array) != EE_OK) {
+				Error_Handler();
+			}
+			strcpy(Array, "PASS: ");
+			strcat(Array,RemoteXY.edit_2);
+			if (EE_WriteCharArray(0x0200, (uint8_t*)Array) != EE_OK) {
+				Error_Handler();
+			}
+			/**/
+		    RemoteXY.button_1=0;
+		}
+	}
+
+}
+/* Application Main Functions End ---------------------------------------------------------*/
+/* Interrupt Callbacks Start ---------------------------------------------------------*/
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
+{
+	Point=!Point;
+	UpdateTime=1;
+	time_out();
+	Flip=1;
+	if(Mode==Time){
+		//time_out();//CreateFrameFromTime();
+		seconds++;
+	}
+/*	if(seconds==10){
+		CreateDateData();
+		CreateDisplayDataArray(TextArray);
+		Mode=Date;
+		seconds=0;
+	}*/
+}
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (huart->Instance == USART2)	{
+		if('0'<=UartBuff[0]&&UartBuff[0]<='9' &&'0'<=UartBuff[1]&&UartBuff[1]<='9'&&UartBuff[2]==':'&&
+				'0'<=UartBuff[3]&&UartBuff[3]<='9'&&'0'<=UartBuff[4]&&UartBuff[4]<='9')
+		{
+			RTC_TimeTypeDef Time;
+			RTC_DateTypeDef Date;
+			Time.Hours=(UartBuff[0]-'0')*10+(UartBuff[1]-'0');
+			Time.Minutes=(UartBuff[3]-'0')*10+(UartBuff[4]-'0');
+			Time.DayLightSaving=RTC_DAYLIGHTSAVING_NONE;
+			HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+			HAL_RTC_GetDate(&hrtc,&Date,RTC_FORMAT_BIN);
+			HAL_RTC_GetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+		}
+		HAL_UART_Receive_IT(&huart2,UartBuff,5);
+	}
+}
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->ErrorCode == HAL_UART_ERROR_ORE){
+		HAL_UART_Receive_IT(&huart2,UartBuff,5);
+	}
+}
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	UNUSED(htim);
+	if(htim->Instance==TIM3){
+		if(Flip==1){
+			time_out();
+		}
+		if (ScrollText) {
+			if (StartFrom == ((TextLength * 6) - 24)) {
+				ScrollText = false;
+				Mode=Time;
+				CreateFrameFromTime();
+			}
+			else {
+				SendToDisplay(StartFrom);
+				StartFrom++;
+			}
+		}
+	}
+	if(htim->Instance==TIM4){
+	}
+}
+void HAL_SYSTICK_Callback(void)
+{
+}
+/* Interrupt Callbacks End ---------------------------------------------------------*/

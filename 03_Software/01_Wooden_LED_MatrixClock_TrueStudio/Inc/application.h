@@ -1,12 +1,24 @@
 #ifndef _APPLICATION_H_
 #define	_APPLICATION_H_
 /***********************************************///includes begin
-#include "stm32l4xx_hal.h"
+#include "stm32f4xx_hal.h"
+#include "main.h"
+#include "adc.h"
+#include "i2c.h"
+#include "rtc.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "rtc.h"
+/**/
 #include "characters.h"
+#include "string.h"
+#include "stdbool.h"
+#include "remotexy.h"
+#include "UartRingbuffer_multi.h"
+#include "eeprom.h"
+#include "ntp.h"
+/**/
 /***********************************************///includes end
 /***********************************************///typedef begin
 typedef struct RTC_DATA{
@@ -55,10 +67,10 @@ struct {
 #define DispNum 			12
 #define DispLength 			96
 /***********************************************///MAX7219 define constants begin
-#define ESP_RESET_PIN		GPIO_PIN_13
-#define ESP_RESET_PORT		GPIO_PIN_13
-#define MAX7219_CS_PIN		GPIO_PIN_12			//Chip select pin
-#define MAX7219_CS_PORT		GPIOB
+#define ESP_RESET_PIN		ESP8266_RST_Pin
+#define ESP_RESET_PORT		ESP8266_RST_GPIO_Port
+#define MAX7219_CS_PIN		SPI2_CS_Pin			//Chip select pin
+#define MAX7219_CS_PORT		SPI2_CS_GPIO_Port
 //MAX7219 register definitions
 #define REG_NO_OP			0x00
 #define REG_DIG0			0x01
@@ -112,23 +124,37 @@ struct {
 #define NOP					0x00
 /***********************************************///MAX7219 define constants end
 /***********************************************///constants declarations begin
-RTC_DATA	RTC_Data;							//sec,min,hour,day,date,month,year
-TIME	 	Time_Data;							//idõt tároló struktúrapéldány
-DATE		Date_Data;							//dátumot tároló struktórapéldány
-uint8_t		TextArray[1024];					//szövegtömb
-uint8_t		DisplayData[96];					//kijelzõ oszlopainak adatai
-extern const uint8_t	WeekDays[7][10];		//h,k,sz,cs,p,sz,v szövegesen
-extern const uint8_t	Months[12][12];			//jan,feb.....dec szövegesen
-const uint8_t	AT[];
-const uint8_t	ATRST[];
-uint8_t indx;
-uint8_t *RxData;
-uint8_t RxBufferIndex;
-bool ReceiveComplete;
-uint8_t AtCommandLength;
+RTC_DATA				RTC_Data;							//sec,min,hour,day,date,month,year
+RTC_TimeTypeDef	 		Time_Data;							//idõt tároló struktúrapéldány
+//RTC_TimeTypeDef			time[2];
+TIME					time[2];
+RTC_DateTypeDef			Date_Data;							//dátumot tároló struktórapéldány
+uint8_t					DisplayData[96];					//kijelzõ oszlopainak adatai
+uint8_t					NewTimeDataArray[36];
+bool 					TimeDiffIndicator[6];
+bool					Point;
+bool					ScrollText;
+bool 					ScrollEnd;
+bool 					FirstRun;
+bool 					UpdateTime;
+bool 					Flip;
+uint8_t 				FlipCounter;
+uint8_t 				StartFrom;
+uint8_t					TextLength;
+uint8_t 				TextArray[256];
+uint8_t 				DisplayDataArray[1536];
+uint8_t 				UartBuff[5];						//HH:MM formátumhoz elég 5 byte
+uint8_t 				TimeData[4];						//ebben van tárolva az idõ
+uint8_t 				seconds;
+enum 					mode{Time, Date} Mode;
+extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v szövegesen
+extern const uint8_t	Months[12][12];						//jan,feb.....dec szövegesen
 /***********************************************///constants declarations end
 /***********************************************///functions declaration begin
 void Init_MAX7219(void);
+void CreateDateData(void);
+void CreateDisplayDataArray(uint8_t* Text);
+void SendToDisplay(uint16_t from);
 void SPI_Send(uint8_t ADDR, uint8_t CMD);
 void SendFrameToDisplay(void);
 void TestData(void);
@@ -142,6 +168,10 @@ void ConvertRTCToDateAndTime(RTC_DATA *RTC_DATA,TIME *Time_Data, DATE *Date_Data
 void FormatDateToText(void);
 void FormatTimeToText(void);
 void CreateFrameFromTime(void);
-void SendTextToDisplay(uint8_t *Text);
+void SendTextToDisplay(char *Text);
+void time_out(void);
+void Init_Application(void);
+void Run_Application(void);
+void Init_ESP8266(void);
 /***********************************************///functions declaration end
 #endif
