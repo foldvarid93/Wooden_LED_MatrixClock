@@ -18,6 +18,7 @@
 #include "UartRingbuffer_multi.h"
 #include "eeprom.h"
 #include "ntp.h"
+#include "NTPClient.h"
 /**/
 /***********************************************///includes end
 /***********************************************///typedef begin
@@ -125,11 +126,11 @@ struct {
 /***********************************************///MAX7219 define constants end
 /***********************************************///constants declarations begin
 RTC_DATA				RTC_Data;							//sec,min,hour,day,date,month,year
-RTC_TimeTypeDef	 		Time_Data;							//idõt tároló struktúrapéldány
+RTC_TimeTypeDef	 		Time_Data;							//idï¿½t tï¿½rolï¿½ struktï¿½rapï¿½ldï¿½ny
 //RTC_TimeTypeDef			time[2];
 TIME					time[2];
-RTC_DateTypeDef			Date_Data;							//dátumot tároló struktórapéldány
-uint8_t					DisplayData[96];					//kijelzõ oszlopainak adatai
+RTC_DateTypeDef			Date_Data;							//dï¿½tumot tï¿½rolï¿½ struktï¿½rapï¿½ldï¿½ny
+uint8_t					DisplayData[96];					//kijelzï¿½ oszlopainak adatai
 uint8_t					NewTimeDataArray[36];
 bool 					TimeDiffIndicator[6];
 bool					Point;
@@ -143,12 +144,12 @@ uint8_t 				StartFrom;
 uint8_t					TextLength;
 uint8_t 				TextArray[256];
 uint8_t 				DisplayDataArray[1536];
-uint8_t 				UartBuff[5];						//HH:MM formátumhoz elég 5 byte
-uint8_t 				TimeData[4];						//ebben van tárolva az idõ
+uint8_t 				UartBuff[5];						//HH:MM formï¿½tumhoz elï¿½g 5 byte
+uint8_t 				TimeData[4];						//ebben van tï¿½rolva az idï¿½
 uint8_t 				seconds;
 enum 					mode{Time, Date} Mode;
-extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v szövegesen
-extern const uint8_t	Months[12][12];						//jan,feb.....dec szövegesen
+extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v szï¿½vegesen
+extern const uint8_t	Months[12][12];						//jan,feb.....dec szï¿½vegesen
 /***********************************************///constants declarations end
 /***********************************************///functions declaration begin
 void Init_MAX7219(void);

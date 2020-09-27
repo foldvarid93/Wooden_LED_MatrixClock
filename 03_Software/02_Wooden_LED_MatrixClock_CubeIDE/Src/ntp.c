@@ -90,6 +90,12 @@ bool ESP8266_NTP_ATCommand(const char * command, const char * endMarker,unsigned
 // number of seconds sice Jan 1 1970
 // adjusted for timezoneDeltaFromUTC
 // --------------------------------------
+void sendNTPPacket(const char * Packet, uint8_t Length)
+{
+	for (uint8_t i = 0; i < Length; i++) {
+		serial.write(*(Packet+i));
+	}
+}
 
 unsigned long ESP8266_NTP_EpochUnixNTP(void)
 {
@@ -97,10 +103,12 @@ unsigned long ESP8266_NTP_EpochUnixNTP(void)
 	unsigned long epochUnix;
 
 	// AT+CIPSTART="UDP","fr.pool.ntp.org",123
-	ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"fr.pool.ntp.org\",123", OK_STR,LONG_PAUSE);
+	ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"pool.ntp.org\",123", OK_STR,LONG_PAUSE);
 	ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE); //send 48 (NTP_PACKET_SIZE) bytes
 	ESP8266_NTP_EmptyRX(1000UL); // empty the buffer (we get a > character)
-	serial.write((const uint8_t) *NTP_Packet); // the first 4 bytes matters, then we don't care, whatever is in the memory will do
+	sendNTPPacket((char*)NTP_Packet, NTP_PACKET_SIZE);
+	//sendATCommand((char *)NTP_Packet);
+	//serial.write((const uint8_t) *NTP_Packet); // the first 4 bytes matters, then we don't care, whatever is in the memory will do
 
 	// skip  AT command answer ("Recv 48 bytes\r\n\r\nSEND OK\r\n\r\n+IPD,48:")
 	ESP8266_NTP_WaitForString(":", SHORT_PAUSE);
