@@ -131,7 +131,7 @@ const char * AT_MESSAGE_IPD = "+IPD,?,*:";
 //variables
 CRemoteXY remotexy;
 
-Serial_t serial = { .read = NULL, .write = NULL, .available = NULL };
+Serial_t serial = { .read = NULL, .write = NULL, .available = NULL , .find = NULL, .println = NULL};
 extern UART_HandleTypeDef huart3;
 
 extern ring_buffer *_rx_buffer1;
@@ -551,6 +551,9 @@ void initSerial(void)
 	serial.write = &UartWrite;
 	serial.read = &UartRead;
 	serial.available = &UartAvailable;
+	serial.find = &UartFind;
+	serial.println = &UartPrintLn;
+	serial.print = &UartPrint;
 }
 void UartWrite(uint8_t d)
 {
@@ -564,6 +567,21 @@ uint8_t UartRead(void)
 uint8_t UartAvailable(void)
 {
 	return (uint8_t) IsDataAvailable(&huart3);
+}
+uint8_t UartFind(char *str)
+{
+	return (uint8_t) Look_for(str, (char*)_rx_buffer1->buffer);
+//	return (uint8_t) IsDataAvailable(str,_rx_buffer1);
+}
+void UartPrintLn(char *str)
+{
+	while(*str!='\0') Uart_write(*str++, &huart3);
+	UartWrite('\r');
+	UartWrite('\n');
+}
+void UartPrint(char *str)
+{
+	while(*str!='\0') Uart_write(*str++, &huart3);
 }
 /**********************************************************************************************************/
 

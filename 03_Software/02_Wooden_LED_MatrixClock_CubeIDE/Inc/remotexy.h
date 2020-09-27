@@ -181,12 +181,17 @@ typedef struct Serial_t Serial_t;
 typedef uint8_t (*ReadFunc)(void);
 typedef void (*WriteFunc)(uint8_t d);
 typedef uint8_t (*AvailableFunc)(void);
-
+typedef uint8_t (*FindFunc)(char *str);
+typedef void (*PrintLnFunc)(char *str);
+typedef void (*PrintFunc)(char *str);
 struct Serial_t
 {
 	ReadFunc read;
 	WriteFunc write;
 	AvailableFunc available;
+	FindFunc find;
+	PrintLnFunc println;
+	PrintFunc print;
 };
 //variables
 
@@ -249,6 +254,12 @@ struct Serial_t
 	uint8_t UartRead(void);
 
 	uint8_t UartAvailable(void);
+
+	uint8_t UartFind(char *str);
+
+	void UartPrintLn(char *str);
+
+	void UartPrint(char *str);
 
 	char* rxy_itos(uint16_t i, char* s);
 

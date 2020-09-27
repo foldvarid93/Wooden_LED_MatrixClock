@@ -89,12 +89,12 @@ repeat:
 	else
 		{
 			so_far =0;
-			if (indx >= bufferlength) return -1;
+			if (indx >= bufferlength) return 0;
 			goto repeat;
 		}
 
 	if (so_far == stringlength) return 1;
-	else return -1;
+	else return 0;
 }
 
 

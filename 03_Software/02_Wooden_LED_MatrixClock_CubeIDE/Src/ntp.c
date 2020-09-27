@@ -149,6 +149,7 @@ void ESP8266_NTP_Init(void)
 	//
 	ESP8266_NTP_ATCommand("AT+RESTORE", "ready", LONG_PAUSE); // reset
 	ESP8266_NTP_EmptyRX(SHORT_PAUSE);
+	ESP8266_NTP_ATCommand("ATE0", OK_STR, SHORT_PAUSE); // reset
 	ESP8266_NTP_ATCommand("AT", OK_STR, SHORT_PAUSE); //is all OK?
 	ESP8266_NTP_ATCommand("AT+CWMODE=1", OK_STR, SHORT_PAUSE); //Set the wireless mode
 	ESP8266_NTP_ATCommand("AT+CWQAP", OK_STR, SHORT_PAUSE); //disconnect  - it shouldn't be but just to make sure

@@ -5,26 +5,26 @@
 bool FlashWriteEnabled=true;
 uint16_t VirtAddVarTab;//[NB_OF_VAR] = {0x0001};
 /*********************************///
-const uint8_t	DateText[] ={"A mai dátum: "};
+const uint8_t	DateText[] ={"A mai dï¿½tum: "};
 const uint8_t	WeekDays[7][10]={
-								{"hétfõ"},
+								{"hï¿½tfï¿½"},
 								{"kedd"},
 								{"szerda"},
-								{"csütörtök"},
-								{"péntek"},
+								{"csï¿½tï¿½rtï¿½k"},
+								{"pï¿½ntek"},
 								{"szombat"},
-								{"vasárnap"}};
+								{"vasï¿½rnap"}};
 const uint8_t	Months[12][12]={
-								{"január"},
-								{"február"},
-								{"március"},
-								{"április"},
-								{"május"},
-								{"június"},
-								{"július"},
+								{"januï¿½r"},
+								{"februï¿½r"},
+								{"mï¿½rcius"},
+								{"ï¿½prilis"},
+								{"mï¿½jus"},
+								{"jï¿½nius"},
+								{"jï¿½lius"},
 								{"augusztus"},
 								{"szeptember"},
-								{"október"},
+								{"oktï¿½ber"},
 								{"november"},
 								{"december"}};
 /*********************************/				//Date functions begin
@@ -32,31 +32,31 @@ void CreateDateData(void){
 	uint8_t	i=0;
 	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
 	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
-	for(i=0;i<4;i++){							//16 szóköz
+	for(i=0;i<4;i++){							//16 szï¿½kï¿½z
 		TextArray[i]=' ';
 	}
-	for(uint8_t j=0;DateText[j]!='\0';i++,j++){	//A mai dátum:
+	for(uint8_t j=0;DateText[j]!='\0';i++,j++){	//A mai dï¿½tum:
 		TextArray[i]=DateText[j];
 	}
 	TextArray[i++]='2';
 	TextArray[i++]='0';
 	TextArray[i++]=(Date_Data.Year/10)+'0';
-	TextArray[i++]=(Date_Data.Year%10)+'0';	//évszám
+	TextArray[i++]=(Date_Data.Year%10)+'0';	//ï¿½vszï¿½m
 	TextArray[i++]='.';							//pont
 	TextArray[i++]=Date_Data.Month/10+'0';
-	TextArray[i++]=Date_Data.Month%10+'0';	//hónap
+	TextArray[i++]=Date_Data.Month%10+'0';	//hï¿½nap
 	TextArray[i++]='.';							//pont
 	TextArray[i++]=Date_Data.Date/10+'0';
 	TextArray[i++]=Date_Data.Date%10+'0';	//nap
 	TextArray[i++]='.';							//pont
-	TextArray[i++]=',';							//vesszõ
+	TextArray[i++]=',';							//vesszï¿½
 	for(uint8_t j=0;WeekDays[Date_Data.WeekDay-1][j]!='\0';i++,j++){
-		TextArray[i]=WeekDays[Date_Data.WeekDay-1][j];		//a hét napja
+		TextArray[i]=WeekDays[Date_Data.WeekDay-1][j];		//a hï¿½t napja
 	}
-	for(uint8_t j=0;j<4;i++,j++){				//16 szóköz
+	for(uint8_t j=0;j<4;i++,j++){				//16 szï¿½kï¿½z
 		TextArray[i]=' ';
 	}
-	TextArray[i]='\0';							//lezáró nulla
+	TextArray[i]='\0';							//lezï¿½rï¿½ nulla
 }
 /*********************************/				//Date functions end
 /*********************************/				//Time functions begin
@@ -494,6 +494,8 @@ void Init_Application(void)
 	/**/
 	ESP8266_NTP_Init();
 	/**/
+
+	/**/
 	FirstRun=1;
 	UpdateTime=0;
 	Flip=0;
@@ -512,7 +514,8 @@ void Run_Application(void)
 	char Array[0xFF];
 	while(1)
 	{
-		ESP8266_NTP_GetPacket();
+		//ESP8266_NTP_GetPacket();
+		ntpupdate();
 		RemoteXY_Handler();
 		if(RemoteXY.button_1==1)
 		{
