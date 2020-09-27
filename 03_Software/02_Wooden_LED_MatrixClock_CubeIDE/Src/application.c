@@ -516,7 +516,8 @@ void Run_Application(void)
 	{
 		//ESP8266_NTP_GetPacket();
 		ntpupdate();
-		RemoteXY_Handler();
+		HAL_Delay(2000);
+		//RemoteXY_Handler();
 		if(RemoteXY.button_1==1)
 		{
 			//Uart_sendstring("SSID: ", &huart2);

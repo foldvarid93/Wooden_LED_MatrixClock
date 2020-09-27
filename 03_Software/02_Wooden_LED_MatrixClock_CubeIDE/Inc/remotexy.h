@@ -257,6 +257,8 @@ struct Serial_t
 
 	uint8_t UartFind(char *str);
 
+	void UartPrintCharArray(char *str, uint8_t Length);
+
 	void UartPrintLn(char *str);
 
 	void UartPrint(char *str);

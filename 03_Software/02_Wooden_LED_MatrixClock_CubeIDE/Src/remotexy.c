@@ -87,7 +87,7 @@
 
  */
 #include "remotexy.h"
-#include "UartRingbuffer_multi.h"
+#include "UartRingbuffer.h"
 
 #define REMOTEXY_WIFI__POINT
 //#define REMOTEXY__DEBUGLOGS Serial
@@ -134,7 +134,7 @@ CRemoteXY remotexy;
 Serial_t serial = { .read = NULL, .write = NULL, .available = NULL , .find = NULL, .println = NULL};
 extern UART_HandleTypeDef huart3;
 
-extern ring_buffer *_rx_buffer1;
+extern ring_buffer *_rx_buffer;
 
 uint8_t RemoteXY_CONF[] = { 255, 48, 0, 0, 0, 66, 0, 10, 66, 1, 1, 1, 26, 63,
 		12, 12, 36, 8, 83, 101, 116, 0, 7, 4, 2, 26, 59, 7, 2, 27, 38, 36, 129,
@@ -165,7 +165,7 @@ void CRemoteXY_Init(const void * _conf, void * _var,
 	remotexy.sendBytesLater = 0;
 	init(_conf, _var, _accessPassword);
 	remotexy.moduleTestTimeout = HAL_GetTick();
-	//Uart_flush (&huart3);
+	//Uart_flush ();
 }
 
 uint8_t initModule(void) {
@@ -557,31 +557,45 @@ void initSerial(void)
 }
 void UartWrite(uint8_t d)
 {
-	Uart_write(d, &huart3);
+	Uart_write(d);
 }
 
 uint8_t UartRead(void)
 {
-	return (uint8_t) Uart_read(&huart3);
+	return (uint8_t) Uart_read();
 }
 uint8_t UartAvailable(void)
 {
-	return (uint8_t) IsDataAvailable(&huart3);
+	return (uint8_t) IsDataAvailable();
 }
 uint8_t UartFind(char *str)
 {
-	return (uint8_t) Look_for(str, (char*)_rx_buffer1->buffer);
-//	return (uint8_t) IsDataAvailable(str,_rx_buffer1);
+	return (uint8_t) Look_for(str, (char*)_rx_buffer->buffer);
 }
 void UartPrintLn(char *str)
 {
-	while(*str!='\0') Uart_write(*str++, &huart3);
+	while(*str!='\0')
+	{
+		Uart_write(*str++);
+	}
 	UartWrite('\r');
 	UartWrite('\n');
 }
 void UartPrint(char *str)
 {
-	while(*str!='\0') Uart_write(*str++, &huart3);
+	while(*str!='\0')
+	{
+		Uart_write(*str++);
+	}
+}
+void UartPrintCharArray(char *str, uint8_t Length)
+{
+	uint16_t i=0;
+	while(i<Length)
+	{
+		Uart_write(*(str+i));
+		i++;
+	}
 }
 /**********************************************************************************************************/
 

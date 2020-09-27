@@ -67,6 +67,9 @@ void store_char(unsigned char c, ring_buffer *buffer)
     buffer->buffer[buffer->head] = c;
     buffer->head = i;
   }
+  else{
+	  Error_Handler();
+  }
 }
 
 
@@ -320,7 +323,7 @@ again:
 	}
 
 	if (so_far == len) return 1;
-	else return -1;
+	else return 0;
 }
 
 void Uart_isr (UART_HandleTypeDef *huart)
