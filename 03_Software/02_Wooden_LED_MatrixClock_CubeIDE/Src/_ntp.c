@@ -51,15 +51,7 @@ void ntpupdate()
       i++;
       if ( ( i < NTP_PACKET_SIZE ) && ( serial.available() == 0 ) )
       {
-        while (serial.available() == 0) // you may have to wait for some bytes
-        {
-          counta += 1;
-          //dbgSerial.print("!");
-          HAL_Delay(100);
-          if (counta == 15) {
-            exit;
-          }
-        }
+    	  Error_Handler();
       }
     }
   }
