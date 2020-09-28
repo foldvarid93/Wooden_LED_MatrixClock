@@ -13,6 +13,9 @@
 #define SHORT_PAUSE 1000UL
 #define LONG_PAUSE  5000UL
 #define ESPSERIALBAUD 115200 // Set to whatever is the default for your ESP. 
+#define seventyYears  	(2208988800UL)
+#define TimeZone 		(2U)
+#define UTCOffset 		(3600U * TimeZone)
 // =====================================================================================
 
 void ESP8266_NTP_EmptyRX(unsigned long duration);
@@ -27,5 +30,6 @@ void ESP8266_NTP_Init(void);
 
 void ESP8266_NTP_GetPacket(void);
 
+RTC_DATA ESP8266_NTP_GetDateTime(void);
 // =====================================================================================
 #endif

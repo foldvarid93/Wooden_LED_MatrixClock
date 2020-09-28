@@ -2,6 +2,11 @@
 extern Serial_t serial;
 extern const char * OK_STR;
 extern ring_buffer *_rx_buffer;
+
+#define seventyYears  	(2208988800UL)
+#define TimeZone 		(2U)
+#define UTCOffset 		(3600U * TimeZone)
+
 void ntpupdate()
 {
   const uint8_t NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
@@ -36,24 +41,28 @@ void ntpupdate()
   if((Wait_for ((char*)OK_STR)) == 0){
 	  Error_Handler();
   }
-  HAL_Delay(1000);
-  int counta = 0;
+  HAL_Delay(200);
+
   memset(packetBuffer, 0, NTP_PACKET_SIZE);
   if (serial.find("+IPD,48:"))
   {
-    int i = 0;
-    while (serial.available() > 0) {
-      uint8_t ch = serial.read();
-      if (i < NTP_PACKET_SIZE)
-      {
-        packetBuffer[i] = ch;
-      }
-      i++;
-      if ( ( i < NTP_PACKET_SIZE ) && ( serial.available() == 0 ) )
-      {
-    	  Error_Handler();
-      }
-    }
+	  int i = 0;
+	  for(i=0;i<10;i++){
+		  serial.read();
+	  }
+	  i=0;
+	  while (serial.available() > 0) {
+		  uint8_t ch = serial.read();
+		  if (i < NTP_PACKET_SIZE)
+		  {
+			  packetBuffer[i] = ch;
+		  }
+		  i++;
+		  if ( ( i < NTP_PACKET_SIZE ) && ( serial.available() == 0 ) )
+		  {
+			  Error_Handler();
+		  }
+	  }
   }
    //the timestamp starts at byte 40 of the received packet and is four bytes,
   // or two words, long. First, esxtract the two words:
@@ -69,9 +78,8 @@ void ntpupdate()
   // now convert NTP time into everyday time:
   //dbgSerial.print("Unix time = ");
   // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
-  const unsigned long seventyYears = 2208988800UL;
   // subtract seventy years:
-  unsigned long epoch = secsSince1900 - seventyYears;
+  unsigned long epoch = secsSince1900 - seventyYears + UTCOffset;
   // print Unix time:
   //dbgSerial.println(epoch);
 

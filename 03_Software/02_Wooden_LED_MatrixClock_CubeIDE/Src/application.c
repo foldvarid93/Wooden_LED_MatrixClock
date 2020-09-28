@@ -5,26 +5,26 @@
 bool FlashWriteEnabled=true;
 uint16_t VirtAddVarTab;//[NB_OF_VAR] = {0x0001};
 /*********************************///
-const uint8_t	DateText[] ={"A mai d�tum: "};
+const uint8_t	DateText[] ={"A mai dátum: "};
 const uint8_t	WeekDays[7][10]={
-								{"h�tf�"},
+								{"hétfő"},
 								{"kedd"},
 								{"szerda"},
-								{"cs�t�rt�k"},
-								{"p�ntek"},
+								{"csütörtök"},
+								{"péntek"},
 								{"szombat"},
-								{"vas�rnap"}};
+								{"vasárnap"}};
 const uint8_t	Months[12][12]={
-								{"janu�r"},
-								{"febru�r"},
-								{"m�rcius"},
-								{"�prilis"},
-								{"m�jus"},
-								{"j�nius"},
-								{"j�lius"},
+								{"január"},
+								{"február"},
+								{"március"},
+								{"április"},
+								{"május"},
+								{"június"},
+								{"július"},
 								{"augusztus"},
 								{"szeptember"},
-								{"okt�ber"},
+								{"október"},
 								{"november"},
 								{"december"}};
 /*********************************/				//Date functions begin
@@ -515,7 +515,8 @@ void Run_Application(void)
 	while(1)
 	{
 		//ESP8266_NTP_GetPacket();
-		ntpupdate();
+		//ntpupdate();
+		ESP8266_NTP_GetDateTime();
 		HAL_Delay(2000);
 		//RemoteXY_Handler();
 		if(RemoteXY.button_1==1)
