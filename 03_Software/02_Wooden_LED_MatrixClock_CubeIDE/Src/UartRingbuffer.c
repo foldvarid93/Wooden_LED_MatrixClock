@@ -353,7 +353,6 @@ int Wait_forr (char *string, int delay)
 		}
 		/*no available data wait for data or timeout*/
 		else{
-			break;
 		}
 	}
 	return 0;//return with 0, fail or timeout

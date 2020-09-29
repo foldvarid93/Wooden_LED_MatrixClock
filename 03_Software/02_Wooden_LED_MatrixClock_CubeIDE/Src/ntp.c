@@ -166,25 +166,38 @@ void ESP8266_NTP_Init(void)
 
 	/**/
 	if(ESP8266_NTP_ATCommand("AT+RESTORE", "ready", LONG_PAUSE) == 0){
-		Error_Handler();
+		  while(1){
+			  asm("nop");//debugnop
+		  }
 	}
 	if(ESP8266_NTP_ATCommand("AT", OK_STR, SHORT_PAUSE) == 0){
-		Error_Handler();
-	}
+		Error_Handler();		  while(1){
+			  asm("nop");//debugnop
+		  }	}
 	if(ESP8266_NTP_ATCommand("ATE0", OK_STR, SHORT_PAUSE) == 0){
-		Error_Handler();
+		  while(1){
+			  asm("nop");//debugnop
+		  }
 	}
 	if(ESP8266_NTP_ATCommand("AT+CWMODE=1", OK_STR, SHORT_PAUSE) == 0){
-		Error_Handler();
+		  while(1){
+			  asm("nop");//debugnop
+		  }
 	}
 	if(ESP8266_NTP_ATCommand("AT+CWQAP", OK_STR, SHORT_PAUSE) == 0){
-		Error_Handler();
+		  while(1){
+			  asm("nop");//debugnop
+		  }
 	}
 	if(ESP8266_NTP_ATCommand("AT+CWJAP=\"foldvarid93\",\"19701971\"", OK_STR,15000) == 0){
-		Error_Handler();
+		  while(1){
+			  asm("nop");//debugnop
+		  }
 	}
 	if(ESP8266_NTP_ATCommand("AT+CIPMUX=0", OK_STR, SHORT_PAUSE) == 0){
-		Error_Handler();
+		  while(1){
+			  asm("nop");//debugnop
+		  }
 	}
 	/* */
 	/*
@@ -209,7 +222,9 @@ RTC_DataType ESP8266_NTP_GetDateTime(void)
 	uint8_t packetBuffer[ NTP_PACKET_SIZE];
 	/**/
 	  if((ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"pool.ntp.org\",123", OK_STR, 1000)) == 0 ){//if connection failed -> error
-		  Error_Handler();
+		  while(1){
+			  asm("nop");//debugnop
+		  }
 	  }
 	  //serial.println("AT+CIPSTART=\"UDP\",\"hu.pool.ntp.org\",123");
 
@@ -232,21 +247,33 @@ RTC_DataType ESP8266_NTP_GetDateTime(void)
 	  //serial.println("AT+CIPSEND=48");
 
 	  if(ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE) == 0){
-		  Error_Handler();
+		  while(1){
+			  asm("nop");//debugnop
+		  }
 	  }
 	  //ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE); // reset
 	  //serial.println(NTP_PACKET_SIZE);
 	  //Uart_flush();
 	  /**/
 	  UartPrintCharArray((char*)packetBuffer,NTP_PACKET_SIZE);
-	  if((waitATAnswer(OK_STR, SHORT_PAUSE)) == 0){
+	  /*
+	   if((waitATAnswer(OK_STR, SHORT_PAUSE)) == 0){
 	  //if((Wait_for((char*)"\r\nOK\r\n")) == 0){
-		  Error_Handler();
+		  while(1){
+			  asm("nop");//debugnop
+		  }
 	  }
+	  */
 	  memset(packetBuffer, 0, NTP_PACKET_SIZE);
-
 	  int i = 0;
-	  if (waitATAnswer("+IPD,48:",1000) == 1){
+	  //if (waitATAnswer("+IPD,48:",1000) == 1){
+	  if (Wait_forr("+IPD,48:",1000) == 1){
+		  while (1){
+			  if(serial.available()>=48)
+			  {
+				 break;
+			  }
+		  }
 		  while (serial.available() > 0) {
 			  uint8_t ch = serial.read();
 			  if (i < NTP_PACKET_SIZE)
@@ -261,7 +288,9 @@ RTC_DataType ESP8266_NTP_GetDateTime(void)
 		  }
 	  }
 	  else{
-		  Error_Handler();
+		  while(1){
+			  asm("nop");//debugnop
+		  }
 	  }
 /*
 	  if (serial.find("+IPD,48:"))
@@ -325,7 +354,9 @@ RTC_DataType ESP8266_NTP_GetDateTime(void)
 	  //dbgSerial.println(" ");
 	  //HAL_Delay(500);
 	  if((ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE)) == 0){
-		  Error_Handler();
+		  while(1){
+			  asm("nop");//debugnop
+		  }
 	  }
 	  //ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE); // reset
 	  //serial.println("AT+CIPCLOSE");
