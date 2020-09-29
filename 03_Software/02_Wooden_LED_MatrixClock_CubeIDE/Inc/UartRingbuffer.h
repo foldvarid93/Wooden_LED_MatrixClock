@@ -87,6 +87,7 @@ int Get_after (char *string, uint8_t numberofchars, char *buffertosave);
 * USAGE: while (!(Wait_for("some string")));
 */
 int Wait_for (char *string);
+int Wait_forr (char *string, int delay);
 
 
 /* the ISR for the uart. put it in the IRQ handler */

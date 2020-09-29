@@ -86,12 +86,8 @@
      - update input variables on a smartphone;
           
 */
-#include <inttypes.h>
-#include <string.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include "stm32f4xx_hal.h"
+
+#include "application.h"
 
 
 //#define REMOTEXY__DEBUGLOGS Serial

@@ -86,8 +86,7 @@
  - update input variables on a smartphone;
 
  */
-#include "remotexy.h"
-#include "UartRingbuffer.h"
+#include "application.h"
 
 #define REMOTEXY_WIFI__POINT
 //#define REMOTEXY__DEBUGLOGS Serial

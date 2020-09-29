@@ -1,6 +1,8 @@
 #ifndef __NTP_H
 #define __NTP_H
-#include "main.h"
+#include "application.h"
+#include "stdbool.h"
+#include "typedef.h"
 // =====================================================================================
 #define SECONDROUNDINGTHRESHOLD 115
 #define SEVENTYYEARS 2208988800UL
@@ -28,8 +30,6 @@ unsigned long ESP8266_NTP_EpochUnixNTP(void);
 
 void ESP8266_NTP_Init(void);
 
-void ESP8266_NTP_GetPacket(void);
-
-RTC_DATA ESP8266_NTP_GetDateTime(void);
+RTC_DataType ESP8266_NTP_GetDateTime(void);
 // =====================================================================================
 #endif

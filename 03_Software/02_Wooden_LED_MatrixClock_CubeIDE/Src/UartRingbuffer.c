@@ -6,9 +6,7 @@
  *
  *  Modified on: 11-April-2020
  */
-
-#include "UartRingbuffer.h"
-#include <string.h>
+#include "application.h"
 
 /**** define the UART you are using  ****/
 
@@ -273,7 +271,6 @@ int Get_after (char *string, uint8_t numberofchars, char *buffertosave)
 	return 1;
 }
 
-
 int Wait_for (char *string)
 {
 	int so_far =0;
@@ -300,7 +297,124 @@ again:
 	else return -1;
 }
 
+int Wait_forr (char *string, int delay)
+{
+	int so_far =0;
+	char tmp[256];
+	int len = strlen (string);
+	uint8_t Diff=0;
+	uint8_t TmpIdx=0;
+	uint32_t timeOut = HAL_GetTick();//save start timestamp
 
+	while (HAL_GetTick() - timeOut <= delay) {
+		/*if new data available*/
+		if(IsDataAvailable()){
+			/*check the tail and head index*/
+			if(_rx_buffer->head > _rx_buffer-> tail){
+				Diff=_rx_buffer->head - _rx_buffer->tail;
+			}
+			else if(_rx_buffer->tail > _rx_buffer-> head){
+				Diff= (UART_BUFFER_SIZE - _rx_buffer->tail) +_rx_buffer->head;
+			}
+			else{
+				Diff=0;
+			}
+			/*if enough caracter arrived to check*/
+			if( Diff >= len)
+			{
+				/*seek the first matching character*/
+				while (Uart_peek() != string[so_far])
+				{
+					_rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;
+				}
+				TmpIdx=_rx_buffer->tail;
+				/*if the first character mach, continue*/
+				for(uint8_t i=0;i<len;i++)
+				{
+					tmp[i]=_rx_buffer->buffer[TmpIdx];
+					TmpIdx = (TmpIdx + 1) % UART_BUFFER_SIZE;
+					tmp[i+1]='\0';
+				}
+				/*if equal, return 1*/
+				if (strcmp((char*)tmp,(char*)string) == 0 ){
+					_rx_buffer->tail=TmpIdx;
+					return 1;// return witn 1, success
+				}
+				else{
+					_rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;// increment the source buffer position
+				}
+			}
+			/*else do nothing, wait*/
+			else
+			{
+
+			}
+
+		}
+		/*no available data wait for data or timeout*/
+		else{
+			break;
+		}
+	}
+	return 0;//return with 0, fail or timeout
+}
+/*
+again:
+	while (!IsDataAvailable())
+	{
+
+	}
+	while (Uart_peek() != string[so_far])
+	{
+		_rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;
+	}
+
+	while (Uart_peek() == string [so_far])
+	{
+		so_far++;
+		Uart_read();
+		if (so_far == len) return 1;
+		while (!IsDataAvailable());
+	}
+
+	if (so_far != len)
+	{
+		so_far = 0;
+		goto again;
+	}
+
+	if (so_far == len) return 1;
+	else return -1;
+}
+*/
+/*uint8_t Wait_forr (const char * answer, uint16_t delay)
+{
+	uint32_t timeOut = HAL_GetTick();
+	uint8_t Length = 0;
+	char tmp[256];
+
+	while (HAL_GetTick() - timeOut <= delay) {
+		Length = strlen(answer);
+		uint8_t i=0;
+		uint8_t StartIdx;
+		uint8_t SrcIdx;
+		if((_rx_buffer->tail-Length)<0){
+			StartIdx=_rx_buffer->tail + UART_BUFFER_SIZE -Length;
+		}
+		else{
+			StartIdx=_rx_buffer->tail - Length;
+		}
+
+		for(uint8_t i=0;i<Length;i++)
+		{
+			SrcIdx=(StartIdx+i)%UART_BUFFER_SIZE;
+			tmp[i]=_rx_buffer->buffer[SrcIdx];
+		}
+
+	}
+	return 0;
+}
+*/
 
 
 void Uart_isr (UART_HandleTypeDef *huart)

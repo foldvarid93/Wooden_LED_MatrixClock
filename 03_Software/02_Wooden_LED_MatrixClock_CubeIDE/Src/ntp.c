@@ -1,4 +1,4 @@
-#include "ntp.h"
+#include "application.h"
 // -------------------------------------------------------------
 
 const uint8_t NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
@@ -9,7 +9,8 @@ static const uint8_t NTP_Packet[48] = { 0xEC, 0x06, 0x00, 0xE3, 0, 0, 0, 0, 0,
 const long UTC_DELTA = ((UTC_DELTA_HOURS * NUMBEROFSECONDSPERHOUR)
 		+ (UTC_DELTA_MINUTES * NUMBEROFSECONDSPERMINUTE));
 
-const char * OK_STR = "OK\r\n";
+//const char * OK_STR = "OK\r\n";
+#define OK_STR "OK"
 extern Serial_t serial;
 extern ring_buffer *_rx_buffer;
 // =====================================================================================
@@ -142,79 +143,76 @@ void ESP8266_NTP_Init(void)
 	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_SET);
 	HAL_Delay(100);
 	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_SET);
-	HAL_Delay(100);
+	HAL_Delay(1000);
 	//
 	Ringbuf_init();
 	//
 	initSerial();
+
 	//
+	/*
+	sendATCommand("AT+RESTORE", 0);
+	HAL_Delay(1500);
+	Uart_flush();
+	sendATCommand("AT", 0);
+	if(Wait_forr((char*)"\r\nOK\r\n",1000) == 0 ){
+		Error_Handler();
+	}
+	sendATCommand("ATE0", 0);
+	if(Wait_forr((char*)"\r\nOKI\r\n",1000) == 0 ){
+		Error_Handler();
+	}
+	 */
+
+	/**/
+	if(ESP8266_NTP_ATCommand("AT+RESTORE", "ready", LONG_PAUSE) == 0){
+		Error_Handler();
+	}
+	if(ESP8266_NTP_ATCommand("AT", OK_STR, SHORT_PAUSE) == 0){
+		Error_Handler();
+	}
+	if(ESP8266_NTP_ATCommand("ATE0", OK_STR, SHORT_PAUSE) == 0){
+		Error_Handler();
+	}
+	if(ESP8266_NTP_ATCommand("AT+CWMODE=1", OK_STR, SHORT_PAUSE) == 0){
+		Error_Handler();
+	}
+	if(ESP8266_NTP_ATCommand("AT+CWQAP", OK_STR, SHORT_PAUSE) == 0){
+		Error_Handler();
+	}
+	if(ESP8266_NTP_ATCommand("AT+CWJAP=\"foldvarid93\",\"19701971\"", OK_STR,15000) == 0){
+		Error_Handler();
+	}
+	if(ESP8266_NTP_ATCommand("AT+CIPMUX=0", OK_STR, SHORT_PAUSE) == 0){
+		Error_Handler();
+	}
+	/* */
+	/*
 	ESP8266_NTP_ATCommand("AT+RESTORE", "ready", LONG_PAUSE); // reset
-	ESP8266_NTP_EmptyRX(SHORT_PAUSE);
+	ESP8266_NTP_ATCommand("AT", OK_STR, SHORT_PAUSE); // reset
 	ESP8266_NTP_ATCommand("ATE0", OK_STR, SHORT_PAUSE); // reset
-	ESP8266_NTP_ATCommand("AT", OK_STR, SHORT_PAUSE); //is all OK?
 	ESP8266_NTP_ATCommand("AT+CWMODE=1", OK_STR, SHORT_PAUSE); //Set the wireless mode
 	ESP8266_NTP_ATCommand("AT+CWQAP", OK_STR, SHORT_PAUSE); //disconnect  - it shouldn't be but just to make sure
-	ESP8266_NTP_ATCommand("AT+CWJAP=\"Foldvari-Net\",\"19701971\"", "OK",LONG_PAUSE); // connect to wifi
+
+	//ESP8266_NTP_ATCommand("AT+CWJAP=\"Foldvari-Net\",\"19701971\"", "OK",LONG_PAUSE); // connect to wifi
+	ESP8266_NTP_ATCommand("AT+CWJAP=\"foldvarid93\",\"19701971\"", OK_STR,15000); // connect to wifi
+
 	ESP8266_NTP_ATCommand("AT+CIPMUX=0", OK_STR, SHORT_PAUSE); //set the single connection mode
+	*/
 }
 
-void ESP8266_NTP_GetPacket(void)
-{
-	 unsigned long epochUnix;
-	 uint8_t  ntpHours, ntpMinutes, ntpSeconds;
-
-	 //if (HAL_GetTick() - lastTime >= 5000UL) { // change 5000UL to adjust your RTC once a day use (NUMBEROFSECONDSPERDAY * 1000UL)
-	 //now = rtc.now();
-	 epochUnix = ESP8266_NTP_EpochUnixNTP();
-	 ntpHours = (epochUnix  % NUMBEROFSECONDSPERDAY) / NUMBEROFSECONDSPERHOUR;
-	 ntpMinutes = (epochUnix % NUMBEROFSECONDSPERHOUR) / NUMBEROFSECONDSPERMINUTE;
-	 ntpSeconds = epochUnix % NUMBEROFSECONDSPERMINUTE;
-
-	 // here you should actually check if now.hour() versus ntpHours are not way off. if so you might have been unlucky and caught midnight.
-	 // I'm not doing it - left to the reader :-)
-	 //rtc.adjust(DateTime(now.year(), now.month(), now.day(), ntpHours, ntpMinutes, ntpSeconds));
-	 //now = rtc.now(); // get the adjusted time
-
-	 // print the hour, minute and second:
-	 //Serial.print("The local NTP time is ");
-	 /*
-	 Serial.print(ntpHours); // print the hour ()
-	 Serial.print(':');
-	 if ( ntpMinutes < 10 ) Serial.print('0');    // In the first 10 minutes of each hour, we'll want a leading '0'
-	 Serial.print(ntpMinutes);
-	 Serial.print(':');
-	 if (ntpSeconds < 10) Serial.print('0');    // In the first 10 seconds of each minute, we'll want a leading '0'
-	 Serial.println(ntpSeconds); // print the second
-
-	 // print the hour, minute and second:
-	 Serial.print("The RTC time is ");
-	 Serial.print(now.year(), DEC);
-	 Serial.print('/');
-	 Serial.print(now.month(), DEC);
-	 Serial.print('/');
-	 Serial.print(now.day(), DEC);
-	 Serial.print(" - ");
-	 Serial.print(now.hour(), DEC);
-	 Serial.print(':');
-	 Serial.print(now.minute(), DEC);
-	 Serial.print(':');
-	 Serial.print(now.second(), DEC);
-	 Serial.println();
-
-	 lastTime = HAL_GetTick();
-	 */
-	// }
-}
-RTC_DATA ESP8266_NTP_GetDateTime(void)
+RTC_DataType ESP8266_NTP_GetDateTime(void)
 {
 	/*Locals*/
-	RTC_DATA DateTime={0,0,0,0,0,0,0};
+	RTC_DataType DateTime={0,0,0,0,0,0,0};
 	const uint8_t NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
 	uint8_t packetBuffer[ NTP_PACKET_SIZE];
 	/**/
-	  ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"pool.ntp.org\",123", OK_STR, SHORT_PAUSE); // reset
+	  if((ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"pool.ntp.org\",123", OK_STR, 1000)) == 0 ){//if connection failed -> error
+		  Error_Handler();
+	  }
 	  //serial.println("AT+CIPSTART=\"UDP\",\"hu.pool.ntp.org\",123");
-	  HAL_Delay(500);
+
 	  memset(packetBuffer, 0, NTP_PACKET_SIZE);
 
 	 // Initialize values needed to form NTP request
@@ -232,18 +230,40 @@ RTC_DATA ESP8266_NTP_GetDateTime(void)
 	  packetBuffer[15] = 52;
 	  /**/
 	  //serial.println("AT+CIPSEND=48");
-	  HAL_Delay(500);
-	  ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE); // reset
-	  //serial.println(NTP_PACKET_SIZE);
-	  Uart_flush();
-	  /**/
-	  UartPrintCharArray((char*)packetBuffer,NTP_PACKET_SIZE);
-	  if((Wait_for ((char*)OK_STR)) == 0){
+
+	  if(ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE) == 0){
 		  Error_Handler();
 	  }
-	  HAL_Delay(200);
-
+	  //ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE); // reset
+	  //serial.println(NTP_PACKET_SIZE);
+	  //Uart_flush();
+	  /**/
+	  UartPrintCharArray((char*)packetBuffer,NTP_PACKET_SIZE);
+	  if((waitATAnswer(OK_STR, SHORT_PAUSE)) == 0){
+	  //if((Wait_for((char*)"\r\nOK\r\n")) == 0){
+		  Error_Handler();
+	  }
 	  memset(packetBuffer, 0, NTP_PACKET_SIZE);
+
+	  int i = 0;
+	  if (waitATAnswer("+IPD,48:",1000) == 1){
+		  while (serial.available() > 0) {
+			  uint8_t ch = serial.read();
+			  if (i < NTP_PACKET_SIZE)
+			  {
+				  packetBuffer[i] = ch;
+			  }
+			  i++;
+			  if ( ( i < NTP_PACKET_SIZE ) && ( serial.available() == 0 ) )
+			  {
+				  Error_Handler();
+			  }
+		  }
+	  }
+	  else{
+		  Error_Handler();
+	  }
+/*
 	  if (serial.find("+IPD,48:"))
 	  {
 		  int i = 0;
@@ -264,6 +284,7 @@ RTC_DATA ESP8266_NTP_GetDateTime(void)
 			  }
 		  }
 	  }
+	  */
 	   //the timestamp starts at byte 40 of the received packet and is four bytes,
 	  // or two words, long. First, esxtract the two words:
 	  uint32_t secsSince1900 = packetBuffer[40] << (24) | packetBuffer[41]<<16 | packetBuffer[42]<<8 | packetBuffer[43];
@@ -302,8 +323,11 @@ RTC_DATA ESP8266_NTP_GetDateTime(void)
 	  //dbgSerial.println(epoch % 60); // print the second
 	  DateTime.sec=(epoch % 60);
 	  //dbgSerial.println(" ");
-	  HAL_Delay(500);
-	  ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE); // reset
+	  //HAL_Delay(500);
+	  if((ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE)) == 0){
+		  Error_Handler();
+	  }
+	  //ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE); // reset
 	  //serial.println("AT+CIPCLOSE");
 	  return DateTime;
 }

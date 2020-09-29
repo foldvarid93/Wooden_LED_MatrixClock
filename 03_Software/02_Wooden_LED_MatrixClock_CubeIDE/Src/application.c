@@ -511,12 +511,13 @@ void Init_Application(void)
 
 void Run_Application(void)
 {
+	RTC_DataType dat;
 	char Array[0xFF];
 	while(1)
 	{
 		//ESP8266_NTP_GetPacket();
 		//ntpupdate();
-		ESP8266_NTP_GetDateTime();
+		dat = ESP8266_NTP_GetDateTime();
 		HAL_Delay(2000);
 		//RemoteXY_Handler();
 		if(RemoteXY.button_1==1)
