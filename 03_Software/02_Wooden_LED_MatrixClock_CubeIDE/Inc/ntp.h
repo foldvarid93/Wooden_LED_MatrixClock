@@ -30,6 +30,6 @@ unsigned long ESP8266_NTP_EpochUnixNTP(void);
 
 void ESP8266_NTP_Init(void);
 
-RTC_DataType ESP8266_NTP_GetDateTime(void);
+HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime);
 // =====================================================================================
 #endif

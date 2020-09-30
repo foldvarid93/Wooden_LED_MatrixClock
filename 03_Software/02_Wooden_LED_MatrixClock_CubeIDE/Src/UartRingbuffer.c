@@ -299,13 +299,12 @@ again:
 
 int Wait_forr (char *string, int delay)
 {
-	int so_far =0;
 	char tmp[256];
 	int len = strlen (string);
 	uint8_t Diff=0;
 	uint8_t TmpIdx=0;
 	uint32_t timeOut = HAL_GetTick();//save start timestamp
-
+	uint8_t StateMachineStatus=0;
 	while (HAL_GetTick() - timeOut <= delay) {
 		/*if new data available*/
 		if(IsDataAvailable()){
@@ -322,26 +321,49 @@ int Wait_forr (char *string, int delay)
 			/*if enough caracter arrived to check*/
 			if( Diff >= len)
 			{
-				/*seek the first matching character*/
-				while (Uart_peek() != string[so_far])
+				if(StateMachineStatus == 0)
 				{
-					_rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;
+					/*seek the first matching character*/
+					/*
+					while (Uart_peek() != string[so_far])
+					{
+						_rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;
+					}
+					*/
+					if(Uart_peek() != string[0])
+					{
+						_rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;
+					}
+					else
+					{
+						StateMachineStatus=1;//go to the state 1
+					}
 				}
-				TmpIdx=_rx_buffer->tail;
-				/*if the first character mach, continue*/
-				for(uint8_t i=0;i<len;i++)
+				else if(StateMachineStatus == 1)
 				{
-					tmp[i]=_rx_buffer->buffer[TmpIdx];
-					TmpIdx = (TmpIdx + 1) % UART_BUFFER_SIZE;
-					tmp[i+1]='\0';
+					TmpIdx=_rx_buffer->tail;
+					/*if the first character mach, continue*/
+					for(uint8_t i=0;i<len;i++)
+					{
+						tmp[i]=_rx_buffer->buffer[TmpIdx];
+						TmpIdx = (TmpIdx + 1) % UART_BUFFER_SIZE;
+						tmp[i+1]='\0';
+					}
+					/*if equal, return 1*/
+					if (strcmp((char*)tmp,(char*)string) == 0 ){
+						_rx_buffer->tail=TmpIdx;
+						return 1;// return witn 1, success
+					}
+					else{
+						_rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;// increment the source buffer position
+					}
 				}
-				/*if equal, return 1*/
-				if (strcmp((char*)tmp,(char*)string) == 0 ){
-					_rx_buffer->tail=TmpIdx;
-					return 1;// return witn 1, success
-				}
+
 				else{
-					_rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;// increment the source buffer position
+					while(1)
+					{
+						asm("nop");//debug nop
+					}
 				}
 			}
 			/*else do nothing, wait*/

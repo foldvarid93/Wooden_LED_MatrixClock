@@ -214,17 +214,22 @@ void ESP8266_NTP_Init(void)
 	*/
 }
 
-RTC_DataType ESP8266_NTP_GetDateTime(void)
+HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 {
 	/*Locals*/
-	RTC_DataType DateTime={0,0,0,0,0,0,0};
+	//RTC_DataType DateTime={0,0,0,0,0,0,0};
 	const uint8_t NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
 	uint8_t packetBuffer[ NTP_PACKET_SIZE];
 	/**/
+	Uart_flush();
 	  if((ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"pool.ntp.org\",123", OK_STR, 1000)) == 0 ){//if connection failed -> error
-		  while(1){
-			  asm("nop");//debugnop
+		  return HAL_ERROR;
+		  /*
+		   * while(1){
+
+			  //asm("nop");//debugnop
 		  }
+		  */
 	  }
 	  //serial.println("AT+CIPSTART=\"UDP\",\"hu.pool.ntp.org\",123");
 
@@ -247,9 +252,13 @@ RTC_DataType ESP8266_NTP_GetDateTime(void)
 	  //serial.println("AT+CIPSEND=48");
 
 	  if(ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE) == 0){
-		  while(1){
-			  asm("nop");//debugnop
+		  return HAL_ERROR;
+		  /*
+		   * while(1){
+
+			  //asm("nop");//debugnop
 		  }
+		  */
 	  }
 	  //ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE); // reset
 	  //serial.println(NTP_PACKET_SIZE);
@@ -266,6 +275,7 @@ RTC_DataType ESP8266_NTP_GetDateTime(void)
 	  */
 	  memset(packetBuffer, 0, NTP_PACKET_SIZE);
 	  int i = 0;
+	  HAL_Delay(1000);
 	  //if (waitATAnswer("+IPD,48:",1000) == 1){
 	  if (Wait_forr("+IPD,48:",1000) == 1){
 		  while (1){
@@ -283,37 +293,25 @@ RTC_DataType ESP8266_NTP_GetDateTime(void)
 			  i++;
 			  if ( ( i < NTP_PACKET_SIZE ) && ( serial.available() == 0 ) )
 			  {
-				  Error_Handler();
+				  return HAL_ERROR;
+				  /*
+				   * while(1){
+
+					  //asm("nop");//debugnop
+				  }
+				  */
 			  }
 		  }
 	  }
 	  else{
-		  while(1){
-			  asm("nop");//debugnop
+		  return HAL_ERROR;
+		  /*
+		   * while(1){
+
+			  //asm("nop");//debugnop
 		  }
+		  */
 	  }
-/*
-	  if (serial.find("+IPD,48:"))
-	  {
-		  int i = 0;
-		  for(i=0;i<10;i++){
-			  serial.read();
-		  }
-		  i=0;
-		  while (serial.available() > 0) {
-			  uint8_t ch = serial.read();
-			  if (i < NTP_PACKET_SIZE)
-			  {
-				  packetBuffer[i] = ch;
-			  }
-			  i++;
-			  if ( ( i < NTP_PACKET_SIZE ) && ( serial.available() == 0 ) )
-			  {
-				  Error_Handler();
-			  }
-		  }
-	  }
-	  */
 	   //the timestamp starts at byte 40 of the received packet and is four bytes,
 	  // or two words, long. First, esxtract the two words:
 	  uint32_t secsSince1900 = packetBuffer[40] << (24) | packetBuffer[41]<<16 | packetBuffer[42]<<8 | packetBuffer[43];
@@ -336,29 +334,34 @@ RTC_DataType ESP8266_NTP_GetDateTime(void)
 	  // print the hour, minute and second:
 	  //dbgSerial.print("The UTC time is "); // UTC is the time at Greenwich Meridian (GMT)
 	  //dbgSerial.print((epoch % 86400L) / 3600); // print the hour (86400 equals secs per day)
-	  DateTime.hour=((epoch % 86400L) / 3600);
+	  DateTime->hour=((epoch % 86400L) / 3600);
 	  //dbgSerial.print(':');
 	  //if ( ((epoch % 3600) / 60) < 10 ) {
 	    // In the first 10 minutes of each hour, we'll want a leading '0'
 	    //dbgSerial.print('0');
 	  //}
 	  //dbgSerial.print((epoch % 3600) / 60); // print the minute (3600 equals secs per minute)
-	  DateTime.min=((epoch % 3600) / 60);
+	  DateTime->min=((epoch % 3600) / 60);
 	  //dbgSerial.print(':');
 	  //if ( (epoch % 60) < 10 ) {
 	    // In the first 10 seconds of each minute, we'll want a leading '0'
 	    //dbgSerial.print('0');
 	 // }
 	  //dbgSerial.println(epoch % 60); // print the second
-	  DateTime.sec=(epoch % 60);
+	  DateTime->sec=(epoch % 60);
 	  //dbgSerial.println(" ");
 	  //HAL_Delay(500);
 	  if((ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE)) == 0){
-		  while(1){
-			  asm("nop");//debugnop
+		  return HAL_ERROR;
+		  /*
+		   * while(1){
+
+			  //asm("nop");//debugnop
 		  }
+		  */
 	  }
 	  //ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE); // reset
 	  //serial.println("AT+CIPCLOSE");
-	  return DateTime;
+	  //return DateTime;
+	  return HAL_OK;
 }

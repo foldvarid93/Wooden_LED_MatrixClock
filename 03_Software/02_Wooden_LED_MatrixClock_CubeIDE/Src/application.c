@@ -455,10 +455,37 @@ uint8_t BitSwapping(uint8_t ch){
 	if (ch&0B10000000) retval|=0B00000001;
 	return ~retval;
 }
-void RTCWrite(RTC_TimeTypeDef Time){
-	Time.Hours=16;
-	Time.Minutes=37;
+void RTCWrite(void){
+	RTC_TimeTypeDef Time;
+	Time.Hours=0;
+	Time.Minutes=0;
+	Time.Seconds=0;
 	HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+}
+HAL_StatusTypeDef RTC_NTPSync(void){
+	RTC_DataType DateTime={0,0,0,0,0,0,0};
+	RTC_TimeTypeDef HAL_Time;
+	RTC_DateTypeDef HAL_Date;
+	uint8_t Attempt=10;
+	/**/
+	while(Attempt){
+		if(ESP8266_NTP_GetDateTime(&DateTime) == HAL_OK){
+			HAL_Time.Hours = DateTime.hour;
+			HAL_Time.Minutes = DateTime.min;
+			HAL_Time.Seconds = DateTime.sec;
+			HAL_Date.Year = DateTime.year;
+			HAL_Date.Month = DateTime.month;
+			HAL_Date.Date = DateTime.date;
+			if(HAL_RTC_SetTime(&hrtc,&HAL_Time,RTC_FORMAT_BIN) != HAL_OK){
+				return HAL_ERROR;
+			}
+			if(HAL_RTC_SetDate(&hrtc,&HAL_Date,RTC_FORMAT_BIN) !=1){
+				return HAL_ERROR;
+			}
+		}
+		Attempt--;
+	}
+	return HAL_ERROR;
 }
 /* ESP8266 Functions Start ---------------------------------------------------------*/
 void Init_ESP8266(void)
@@ -507,18 +534,21 @@ void Init_Application(void)
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
 	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
+	RTCWrite();
 }
 
 void Run_Application(void)
 {
-	RTC_DataType dat;
 	char Array[0xFF];
+	HAL_Delay(5000);
+	RTC_NTPSync();
 	while(1)
 	{
 		//ESP8266_NTP_GetPacket();
 		//ntpupdate();
-		dat = ESP8266_NTP_GetDateTime();
-		HAL_Delay(2000);
+		//dat = ESP8266_NTP_GetDateTime();
+
+		//RTC_NTPSync();
 		//RemoteXY_Handler();
 		if(RemoteXY.button_1==1)
 		{
