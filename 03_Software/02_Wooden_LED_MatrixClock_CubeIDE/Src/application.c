@@ -479,7 +479,7 @@ HAL_StatusTypeDef RTC_NTPSync(void){
 			if(HAL_RTC_SetTime(&hrtc,&HAL_Time,RTC_FORMAT_BIN) != HAL_OK){
 				return HAL_ERROR;
 			}
-			if(HAL_RTC_SetDate(&hrtc,&HAL_Date,RTC_FORMAT_BIN) !=1){
+			if(HAL_RTC_SetDate(&hrtc,&HAL_Date,RTC_FORMAT_BIN) != HAL_OK){
 				return HAL_ERROR;
 			}
 		}
