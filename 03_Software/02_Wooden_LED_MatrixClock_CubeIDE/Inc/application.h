@@ -132,7 +132,7 @@ void SendTextToDisplay(char *Text);
 void time_out(void);
 void Init_Application(void);
 void Run_Application(void);
-void Init_ESP8266(void);
+void ESP8266_RemoteXY_Init(void);
 void RTCWrite(void);
 HAL_StatusTypeDef RTC_NTPSync(void);
 /***********************************************///functions declaration end

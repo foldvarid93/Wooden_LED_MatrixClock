@@ -488,7 +488,7 @@ HAL_StatusTypeDef RTC_NTPSync(void){
 	return HAL_ERROR;
 }
 /* ESP8266 Functions Start ---------------------------------------------------------*/
-void Init_ESP8266(void)
+void ESP8266_RemoteXY_Init(void)
 {
 	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_RESET);
@@ -517,7 +517,7 @@ void Init_Application(void)
 	Init_MAX7219();
 	//HAL_UART_Receive_IT(&huart2,UartBuff,5);
 	/**/
-	//Init_ESP8266();
+	//ESP8266_RemoteXY_Init();
 	/**/
 	if(ESP8266_NTP_Init() != HAL_OK)
 	{
@@ -544,14 +544,11 @@ void Run_Application(void)
 	char Array[0xFF];
 	HAL_Delay(5000);
 	/**/
-	RTC_NTPSync();
+	if(RTC_NTPSync() !=HAL_OK){
+
+	}
 	while(1)
 	{
-		//ESP8266_NTP_GetPacket();
-		//ntpupdate();
-		//dat = ESP8266_NTP_GetDateTime();
-
-		//RTC_NTPSync();
 		//RemoteXY_Handler();
 		if(RemoteXY.button_1==1)
 		{

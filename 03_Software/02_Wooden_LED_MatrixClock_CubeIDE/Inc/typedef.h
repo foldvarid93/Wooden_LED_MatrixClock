@@ -5,10 +5,10 @@ typedef struct RTC_DataType{
 	uint8_t		sec;//0-59
 	uint8_t		min;//0-59
 	uint8_t		hour;//0-24
-	uint8_t		day;//0-7
-	uint8_t		date;//0-31
-	uint8_t		month;//0-12
-	uint16_t		year;//0-65536
+	uint8_t		day;//1-7
+	uint8_t		date;//1-31
+	uint8_t		month;//1-12
+	uint8_t		year;//0-100
 }RTC_DataType;
 // =====================================================================================
 typedef struct TimeType{

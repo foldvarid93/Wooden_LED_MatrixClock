@@ -87,7 +87,12 @@ int Get_after (char *string, uint8_t numberofchars, char *buffertosave);
 * USAGE: while (!(Wait_for("some string")));
 */
 int Wait_for (char *string);
-int Wait_forr (char *string, int delay);
+
+/* Wait until a paricular string is detected in the Rx Buffer
+* Return 1 on success and 0 otherwise
+* USAGE: while (!(Wait_for("some string", uint32_t Timeout)));
+*/
+int Wait_for_timeout (char *string, int Timeout);
 
 
 /* the ISR for the uart. put it in the IRQ handler */

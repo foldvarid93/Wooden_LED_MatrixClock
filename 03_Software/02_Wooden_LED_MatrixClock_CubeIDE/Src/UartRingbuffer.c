@@ -297,7 +297,7 @@ again:
 	else return -1;
 }
 
-int Wait_forr (char *string, int delay)
+int Wait_for_timeout (char *string, int Timeout)
 {
 	char tmp[256];
 	int len = strlen (string);
@@ -305,7 +305,7 @@ int Wait_forr (char *string, int delay)
 	uint8_t TmpIdx=0;
 	uint32_t timeOut = HAL_GetTick();//save start timestamp
 	uint8_t StateMachineStatus=0;
-	while (HAL_GetTick() - timeOut <= delay) {
+	while (HAL_GetTick() - timeOut <= Timeout) {
 		/*if new data available*/
 		if(IsDataAvailable()){
 			/*check the tail and head index*/
