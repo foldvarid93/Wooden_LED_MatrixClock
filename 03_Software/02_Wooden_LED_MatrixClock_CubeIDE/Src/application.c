@@ -519,9 +519,11 @@ void Init_Application(void)
 	/**/
 	//Init_ESP8266();
 	/**/
-	ESP8266_NTP_Init();
-	/**/
+	if(ESP8266_NTP_Init() != HAL_OK)
+	{
+		asm("nop");
 
+	}
 	/**/
 	FirstRun=1;
 	UpdateTime=0;
@@ -541,6 +543,7 @@ void Run_Application(void)
 {
 	char Array[0xFF];
 	HAL_Delay(5000);
+	/**/
 	RTC_NTPSync();
 	while(1)
 	{

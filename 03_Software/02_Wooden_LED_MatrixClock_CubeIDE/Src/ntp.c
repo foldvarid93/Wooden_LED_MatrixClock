@@ -1,11 +1,6 @@
 #include "application.h"
 // -------------------------------------------------------------
-
 const uint8_t NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
-static const uint8_t NTP_Packet[48] = { 0xEC, 0x06, 0x00, 0xE3, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
 const long UTC_DELTA = ((UTC_DELTA_HOURS * NUMBEROFSECONDSPERHOUR)
 		+ (UTC_DELTA_MINUTES * NUMBEROFSECONDSPERMINUTE));
 
@@ -14,62 +9,6 @@ const long UTC_DELTA = ((UTC_DELTA_HOURS * NUMBEROFSECONDSPERHOUR)
 extern Serial_t serial;
 extern ring_buffer *_rx_buffer;
 // =====================================================================================
-
-// --------------------------------------
-// ESP8266_NTP_EmptyRX waits for duration ms
-// and get rid of anything arriving
-// on the ESP Serial port during that delay
-// --------------------------------------
-
-void ESP8266_NTP_EmptyRX(unsigned long duration)
-{
-	unsigned long currentTime;
-	currentTime = HAL_GetTick();
-	while (HAL_GetTick() - currentTime <= duration) {
-		if (serial.available() > 0)
-			serial.read();
-	}
-}
-
-// --------------------------------------
-// ESP8266_NTP_WaitForString wait max for duration ms
-// while checking if endMarker string is received
-// on the ESP Serial port
-// returns a bool stating if the marker
-// was found
-// --------------------------------------
-
-bool ESP8266_NTP_WaitForString(const char * endMarker, unsigned long duration)
-{
-	int localBufferSize = strlen(endMarker); // we won't need an \0 at the end
-	char localBuffer[localBufferSize];
-	int index = 0;
-	bool endMarkerFound = false;
-	unsigned long currentTime;
-
-	memset(localBuffer, '\0', localBufferSize); // clear buffer
-
-	currentTime = HAL_GetTick();
-	while (HAL_GetTick() - currentTime <= duration) {
-		if (serial.available() > 0) {
-			if (index == localBufferSize)
-				index = 0;
-			localBuffer[index] = (uint8_t) serial.read();
-			endMarkerFound = true;
-			for (int i = 0; i < localBufferSize; i++) {
-				if (localBuffer[(index + 1 + i) % localBufferSize]
-						!= endMarker[i]) {
-					endMarkerFound = false;
-					break;
-				}
-			}
-			index++;
-		}
-		if (endMarkerFound)
-			break;
-	}
-	return endMarkerFound;
-}
 
 // --------------------------------------
 // ESP8266_NTP_ATCommand executes an AT commmand
@@ -86,132 +25,50 @@ bool ESP8266_NTP_ATCommand(const char * command, const char * endMarker,unsigned
 	return (waitATAnswer(endMarker, duration));
 	//return ESP8266_NTP_WaitForString(endMarker, duration);
 }
-
-// --------------------------------------
-// ESP8266_NTP_EpochUnixNTP returns the UNIX time
-// number of seconds sice Jan 1 1970
-// adjusted for timezoneDeltaFromUTC
-// --------------------------------------
-void sendNTPPacket(const char * Packet, uint8_t Length)
-{
-	for (uint8_t i = 0; i < Length; i++) {
-		serial.write(*(Packet+i));
-	}
-}
-
-unsigned long ESP8266_NTP_EpochUnixNTP(void)
-{
-	unsigned long secsSince1900 = 0UL;
-	unsigned long epochUnix;
-
-	// AT+CIPSTART="UDP","fr.pool.ntp.org",123
-	ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"pool.ntp.org\",123", OK_STR,LONG_PAUSE);
-	ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE); //send 48 (NTP_PACKET_SIZE) bytes
-	ESP8266_NTP_EmptyRX(1000UL); // empty the buffer (we get a > character)
-	sendNTPPacket((char*)NTP_Packet, NTP_PACKET_SIZE);
-	//sendATCommand((char *)NTP_Packet);
-	//serial.write((const uint8_t) *NTP_Packet); // the first 4 bytes matters, then we don't care, whatever is in the memory will do
-
-	// skip  AT command answer ("Recv 48 bytes\r\n\r\nSEND OK\r\n\r\n+IPD,48:")
-	ESP8266_NTP_WaitForString(":", SHORT_PAUSE);
-
-	// read the NTP packet, extract the TRANSMIT TIMESTAMP in Seconds from bytes 40,41,42,43
-	for (int i = 0; i < NTP_PACKET_SIZE; i++) {
-		while (!serial.available())
-			;
-		int c = serial.read();
-		if ((i >= 40) && (i < 44))
-			secsSince1900 = (secsSince1900 << 8)
-					+ (unsigned long) ((uint8_t) (c & (int) 0x00FF)); // Read the integer part of sending time
-		else if (i == 44)
-			secsSince1900 += (((uint8_t) c) > SECONDROUNDINGTHRESHOLD ? 1 : 0);
-	}
-
-	// subtract seventy years:
-	epochUnix = secsSince1900 - SEVENTYYEARS;
-
-	ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE); // close connection
-	return epochUnix + UTC_DELTA;
-}
-
 // =====================================================================================
-void ESP8266_NTP_Init(void)
+HAL_StatusTypeDef ESP8266_NTP_Init(void)
 {
-	//ESP8266 HW reset and enabling
+	/*ESP8266 HW reset and enabling*/
 	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_SET);
 	HAL_Delay(100);
 	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_SET);
 	HAL_Delay(1000);
-	//
-	Ringbuf_init();
-	//
-	initSerial();
-
-	//
-	/*
-	sendATCommand("AT+RESTORE", 0);
-	HAL_Delay(1500);
-	Uart_flush();
-	sendATCommand("AT", 0);
-	if(Wait_forr((char*)"\r\nOK\r\n",1000) == 0 ){
-		Error_Handler();
-	}
-	sendATCommand("ATE0", 0);
-	if(Wait_forr((char*)"\r\nOKI\r\n",1000) == 0 ){
-		Error_Handler();
-	}
-	 */
-
 	/**/
-	if(ESP8266_NTP_ATCommand("AT+RESTORE", "ready", LONG_PAUSE) == 0){
-		  while(1){
-			  asm("nop");//debugnop
-		  }
+	Ringbuf_init();
+	/**/
+	initSerial();
+	/**/
+	if(ESP8266_NTP_ATCommand("AT+RESTORE", "ready", LONG_PAUSE) == 0)
+	{
+		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT", OK_STR, SHORT_PAUSE) == 0){
-		Error_Handler();		  while(1){
-			  asm("nop");//debugnop
-		  }	}
-	if(ESP8266_NTP_ATCommand("ATE0", OK_STR, SHORT_PAUSE) == 0){
-		  while(1){
-			  asm("nop");//debugnop
-		  }
+	if(ESP8266_NTP_ATCommand("AT", OK_STR, SHORT_PAUSE) == 0)
+	{
+		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT+CWMODE=1", OK_STR, SHORT_PAUSE) == 0){
-		  while(1){
-			  asm("nop");//debugnop
-		  }
+	if(ESP8266_NTP_ATCommand("ATE0", OK_STR, SHORT_PAUSE) == 0)
+	{
+		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT+CWQAP", OK_STR, SHORT_PAUSE) == 0){
-		  while(1){
-			  asm("nop");//debugnop
-		  }
+	if(ESP8266_NTP_ATCommand("AT+CWMODE=1", OK_STR, SHORT_PAUSE) == 0)
+	{
+		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT+CWJAP=\"foldvarid93\",\"19701971\"", OK_STR,15000) == 0){
-		  while(1){
-			  asm("nop");//debugnop
-		  }
+	if(ESP8266_NTP_ATCommand("AT+CWQAP", OK_STR, SHORT_PAUSE) == 0)
+	{
+		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT+CIPMUX=0", OK_STR, SHORT_PAUSE) == 0){
-		  while(1){
-			  asm("nop");//debugnop
-		  }
+	if(ESP8266_NTP_ATCommand("AT+CWJAP=\"foldvarid93\",\"19701971\"", OK_STR,15000) == 0)
+	{
+		  return HAL_ERROR;
 	}
-	/* */
-	/*
-	ESP8266_NTP_ATCommand("AT+RESTORE", "ready", LONG_PAUSE); // reset
-	ESP8266_NTP_ATCommand("AT", OK_STR, SHORT_PAUSE); // reset
-	ESP8266_NTP_ATCommand("ATE0", OK_STR, SHORT_PAUSE); // reset
-	ESP8266_NTP_ATCommand("AT+CWMODE=1", OK_STR, SHORT_PAUSE); //Set the wireless mode
-	ESP8266_NTP_ATCommand("AT+CWQAP", OK_STR, SHORT_PAUSE); //disconnect  - it shouldn't be but just to make sure
-
-	//ESP8266_NTP_ATCommand("AT+CWJAP=\"Foldvari-Net\",\"19701971\"", "OK",LONG_PAUSE); // connect to wifi
-	ESP8266_NTP_ATCommand("AT+CWJAP=\"foldvarid93\",\"19701971\"", OK_STR,15000); // connect to wifi
-
-	ESP8266_NTP_ATCommand("AT+CIPMUX=0", OK_STR, SHORT_PAUSE); //set the single connection mode
-	*/
+	if(ESP8266_NTP_ATCommand("AT+CIPMUX=0", OK_STR, SHORT_PAUSE) == 0)
+	{
+		  return HAL_ERROR;
+	}
+	return HAL_OK;
 }
 
 HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
@@ -276,15 +133,53 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 	  else{
 		  return HAL_ERROR;
 	  }
-	  /**/
-	  uint32_t secsSince1900 = packetBuffer[40] << (24) | packetBuffer[41]<<16 | packetBuffer[42]<<8 | packetBuffer[43];
+	  /*UTC time: 1900 jan 1, monday, 0:00:00*/
+	  uint32_t UTCTime_Sec = packetBuffer[40] << (24) | packetBuffer[41]<<16 | packetBuffer[42]<<8 | packetBuffer[43];
 
 	  /*subtract seventy years*/
-	  unsigned long epoch = secsSince1900 - seventyYears + UTCOffset;
-	  /**/
-	  DateTime->hour=((epoch % 86400L) / 3600);
-	  DateTime->min=((epoch % 3600) / 60);
-	  DateTime->sec=(epoch % 60);
+	  unsigned long UNIXTimeHungary_Sec = UTCTime_Sec - seventyYears + UTCOffset_Sec;
+	  /*Year*/
+	  uint32_t tmp = UTCTime_Sec + UTCOffset_Sec;//
+	  //DateTime->year = 1900 + (tmp / AvgYearSeconds);
+	  DateTime->year = (tmp / AvgYearSeconds) - 100;
+	  /*Month*/
+	  /*31, 28(29), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31*/
+	  uint32_t tmp2 = tmp % AvgYearSeconds;
+	  uint8_t index = 0;
+	  const uint8_t MonthDays[12]={31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	  while(index <= 12)
+	  {
+		  if ( ((int32_t)(tmp2 - (MonthDays[index] * DaySeconds))) >= 0 ){
+			  tmp2 = tmp2 - (MonthDays[index] * DaySeconds);
+			  index++;
+		  }
+		  else{
+			  DateTime->month = index + 1;// Because January is start from 1 not 0
+			  break;
+		  }
+	  }
+	  //TODO:
+	  if((DateTime->year % 4 == 0))//if leap year
+	  {
+
+	  }
+	  else//ordinary year
+	  {
+
+	  }
+	  /*Date*/
+	  tmp2 /= DaySeconds;
+	  DateTime->date= tmp2 + 2; //Because +1 for indexing, and +1 for the current day
+	  /*Weekday*/
+	  tmp2 = tmp / DaySeconds;
+	  tmp2 = tmp2 % 7;
+	  DateTime->day = tmp2 + 1; // Because Monday is start from 1 not 0
+	  /*Hour*/
+	  DateTime->hour=((UNIXTimeHungary_Sec % 86400L) / 3600);
+	  /*Minute*/
+	  DateTime->min=((UNIXTimeHungary_Sec % 3600) / 60);
+	  /*Second*/
+	  DateTime->sec=(UNIXTimeHungary_Sec % 60);
 	  /**/
 	  if((ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE)) == 0){
 		  return HAL_ERROR;
