@@ -10,7 +10,7 @@
 CRemoteXY remotexy;
 
 Serial_t serial = { .read = NULL, .write = NULL, .available = NULL , .find = NULL, .println = NULL};
-
+/*config field*/
 uint8_t RemoteXY_CONF[] = { 255, 48, 0, 0, 0, 66, 0, 10, 66, 1, 1, 1, 26, 63,
 		12, 12, 36, 8, 83, 101, 116, 0, 7, 4, 2, 26, 59, 7, 2, 27, 38, 36, 129,
 		0, 20, 34, 24, 6, 8, 78, 101, 116, 119, 111, 114, 107, 0, 129, 0, 17,

@@ -486,6 +486,7 @@ HAL_StatusTypeDef RTC_NTPSync(void){
 			if(HAL_RTC_SetDate(&hrtc,&HAL_Date,RTC_FORMAT_BIN) != HAL_OK){
 				return HAL_ERROR;
 			}
+			return HAL_OK;
 		}
 		Attempt--;
 	}
@@ -513,14 +514,15 @@ HAL_StatusTypeDef Init_Application(void)
 	Init_MAX7219();
 	//HAL_UART_Receive_IT(&huart2,UartBuff,5);
 	/**/
+#define REMOTEXYx
+#ifdef REMOTEXY
 	ESP8266_RemoteXY_InitAndStart();
-	/**/
-	/*
+#else
 	if(ESP8266_NTP_Init() != HAL_OK)
 	{
 		asm("nop");
 	}
-	*/
+#endif
 	/**/
 	FirstRun=1;
 	UpdateTime=0;
@@ -544,14 +546,21 @@ void Run_Application(void)
 {
 	char Array[0xFF];
 	/**/
+#ifndef REMOTEXY
+	//HAL_Delay(5000);
+	if(RTC_NTPSync() !=HAL_OK){
+		while(1)
+		{
 
-/*HAL_Delay(5000);
- * if(RTC_NTPSync() !=HAL_OK){
-
-	}*/
+		}
+	}
+#endif
+	/**/
 	while(1)
 	{
+#ifdef REMOTEXY
 		ESP8266_RemoteXY_Handler();
+#endif
 		if(RemoteXY.button_1==1)
 		{
 			//Uart_sendstring("SSID: ", &huart2);

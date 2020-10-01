@@ -138,22 +138,26 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 	  /*subtract seventy years*/
 	  uint32_t UNIXTimeHungary_Sec = UTCTime_Sec - SEVENTYYEARS + NUMBEROFSECONDS_UTCOFFSET;
 	  /*Year*/
-	  uint32_t tmp = UTCTime_Sec + NUMBEROFSECONDS_UTCOFFSET;//
-	  //DateTime->year = 1900 + (tmp / NUMBEROFSECONDSPERYEAR);
+	  uint32_t tmp = UTCTime_Sec + NUMBEROFSECONDS_UTCOFFSET;
 	  DateTime->year = (tmp / NUMBEROFSECONDS_YEAR) - 100;
-	  /*Month*/
+
+	   /*Month*/
 	  /*31, 28(29), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31*/
-	  uint32_t tmp2 = tmp % NUMBEROFSECONDS_YEAR;
-	  uint8_t index = 0;
 	  const uint8_t MonthDays[12]={31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	  while(index <= 12)
+	  uint32_t tmp2 = tmp % NUMBEROFSECONDS_YEAR;
+	  uint32_t tmp3 = (tmp2 /NUMBEROFSECONDS_DAY) + 1;//add 1 because current day
+	  uint8_t index = 0;
+	  DateTime->month = 1;//start at januar=1
+
+	  while(index<=12)
 	  {
-		  if ( ((int32_t)(tmp2 - (MonthDays[index] * NUMBEROFSECONDS_DAY))) >= 0 ){
-			  tmp2 = tmp2 - (MonthDays[index] * NUMBEROFSECONDS_DAY);
+		  if( ((int32_t)(tmp3-(MonthDays[index]))) >=0 )
+		  {
+			  tmp3 = tmp3 - MonthDays[index];
+			  DateTime->month++;
 			  index++;
 		  }
-		  else{
-			  DateTime->month = index + 1;// Because January is start from 1 not 0
+		  else {
 			  break;
 		  }
 	  }
@@ -167,12 +171,12 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 
 	  }
 	  /*Date*/
-	  tmp2 = tmp2 / NUMBEROFSECONDS_DAY;
-	  DateTime->date= tmp2 + 2; //Because +1 for indexing, and +1 for the current day
+	  DateTime->date=1 + tmp3;
 	  /*Weekday*/
 	  tmp2 = tmp / NUMBEROFSECONDS_DAY;
 	  tmp2 = tmp2 % 7;
 	  DateTime->day = tmp2 + 1; // Because Monday is start from 1 not 0
+
 	  /*Hour*/
 	  DateTime->hour=((UNIXTimeHungary_Sec % NUMBEROFSECONDS_DAY) / NUMBEROFSECONDS_HOUR);
 	  /*Minute*/
