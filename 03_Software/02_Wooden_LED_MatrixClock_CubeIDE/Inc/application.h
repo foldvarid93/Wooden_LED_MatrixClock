@@ -131,9 +131,9 @@ void FormatTimeToText(void);
 void CreateFrameFromTime(void);
 void SendTextToDisplay(char *Text);
 void time_out(void);
-void Init_Application(void);
+HAL_StatusTypeDef Init_Application(void);
 void Run_Application(void);
-void RTCWrite(void);
+HAL_StatusTypeDef RTCWrite(void);
 HAL_StatusTypeDef RTC_NTPSync(void);
 /***********************************************///functions declaration end
 #endif

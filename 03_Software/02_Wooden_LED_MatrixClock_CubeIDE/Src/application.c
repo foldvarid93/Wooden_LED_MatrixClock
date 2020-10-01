@@ -455,12 +455,16 @@ uint8_t BitSwapping(uint8_t ch){
 	if (ch&0B10000000) retval|=0B00000001;
 	return ~retval;
 }
-void RTCWrite(void){
+HAL_StatusTypeDef RTCWrite(void){
 	RTC_TimeTypeDef Time;
 	Time.Hours=0;
 	Time.Minutes=0;
 	Time.Seconds=0;
-	HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
+	if(HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN) != HAL_OK)
+	{
+		return HAL_ERROR;
+	}
+	return HAL_OK;
 }
 HAL_StatusTypeDef RTC_NTPSync(void){
 	RTC_DataType DateTime={0,0,0,0,0,0,0};
@@ -492,12 +496,13 @@ HAL_StatusTypeDef RTC_NTPSync(void){
 /* ESP8266 Functions End ---------------------------------------------------------*/
 
 /* Application Main Functions Start ---------------------------------------------------------*/
-void Init_Application(void)
+HAL_StatusTypeDef Init_Application(void)
 {
 	/**/
 	HAL_FLASH_Unlock();
-	if (EE_Init() != EE_OK) {
-		Error_Handler();
+	if (EE_Init() != HAL_OK)
+	{
+		return HAL_ERROR;
 	}
 	/*
 	uint8_t Arr[]="Hello";
@@ -514,7 +519,6 @@ void Init_Application(void)
 	if(ESP8266_NTP_Init() != HAL_OK)
 	{
 		asm("nop");
-
 	}
 	*/
 	/**/
@@ -529,7 +533,11 @@ void Init_Application(void)
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
 	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
-	RTCWrite();
+	if(RTCWrite() != HAL_OK)
+	{
+		return HAL_ERROR;
+	}
+	return HAL_OK;
 }
 
 void Run_Application(void)
