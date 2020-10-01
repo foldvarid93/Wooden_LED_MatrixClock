@@ -1,7 +1,17 @@
-#include "application.h"
-// -------------------------------------------------------------
+/***************************************************************************************
+ * Includes
+ **************************************************************************************/
+//#include "application.h"
+#include "ntp.h"
+/***************************************************************************************
+ * Variables
+ **************************************************************************************/
+/*globals*/
 const uint8_t NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
+
+/*externs*/
 extern Serial_t serial;
+
 extern ring_buffer *_rx_buffer;
 /***************************************************************************************
  * Function definitions
@@ -9,9 +19,9 @@ extern ring_buffer *_rx_buffer;
 /*Sending AT command and wait */
 HAL_StatusTypeDef ESP8266_NTP_ATCommand(const char * Command, const char * Respond, uint32_t Timeout)
 {
-	sendATCommand(Command, 0);
+	ESP8266_SendATCommand(Command, 0);
 
-	if((waitATAnswer(Respond, Timeout)) == 1){
+	if((ESP8266_WaitATAnswer(Respond, Timeout)) == 1){
 		return HAL_OK;
 	}
 	return HAL_ERROR;
@@ -30,7 +40,7 @@ HAL_StatusTypeDef ESP8266_NTP_Init(void)
 	/**/
 	Ringbuf_init();
 	/**/
-	initSerial();
+	ESP8266_Serial_Init();
 	/**/
 	if(ESP8266_NTP_ATCommand("AT+RESTORE", "ready", LONG_PAUSE) != HAL_OK)
 	{
@@ -147,7 +157,7 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 			  break;
 		  }
 	  }
-	  //TODO:
+	  //TODO:Leap year handling
 	  if((DateTime->year % 4 == 0))//if leap year
 	  {
 

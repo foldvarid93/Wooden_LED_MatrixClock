@@ -488,16 +488,7 @@ HAL_StatusTypeDef RTC_NTPSync(void){
 	return HAL_ERROR;
 }
 /* ESP8266 Functions Start ---------------------------------------------------------*/
-void ESP8266_RemoteXY_Init(void)
-{
-	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_SET);
-	HAL_Delay(100);
-	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_SET);
-	Ringbuf_init();
-	RemoteXY_Init();
-}
+
 /* ESP8266 Functions End ---------------------------------------------------------*/
 
 /* Application Main Functions Start ---------------------------------------------------------*/
@@ -517,13 +508,15 @@ void Init_Application(void)
 	Init_MAX7219();
 	//HAL_UART_Receive_IT(&huart2,UartBuff,5);
 	/**/
-	//ESP8266_RemoteXY_Init();
+	ESP8266_RemoteXY_InitAndStart();
 	/**/
+	/*
 	if(ESP8266_NTP_Init() != HAL_OK)
 	{
 		asm("nop");
 
 	}
+	*/
 	/**/
 	FirstRun=1;
 	UpdateTime=0;
@@ -542,14 +535,15 @@ void Init_Application(void)
 void Run_Application(void)
 {
 	char Array[0xFF];
-	HAL_Delay(5000);
 	/**/
-	if(RTC_NTPSync() !=HAL_OK){
 
-	}
+/*HAL_Delay(5000);
+ * if(RTC_NTPSync() !=HAL_OK){
+
+	}*/
 	while(1)
 	{
-		//RemoteXY_Handler();
+		ESP8266_RemoteXY_Handler();
 		if(RemoteXY.button_1==1)
 		{
 			//Uart_sendstring("SSID: ", &huart2);

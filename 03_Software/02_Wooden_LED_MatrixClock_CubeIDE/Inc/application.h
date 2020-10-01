@@ -1,6 +1,7 @@
 #ifndef _APPLICATION_H_
 #define	_APPLICATION_H_
 /***********************************************///includes begin
+/*stm32 libraries*/
 #include "stm32f4xx_hal.h"
 #include "adc.h"
 #include "i2c.h"
@@ -9,14 +10,14 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-/**/
+/*user libraries*/
 #include "characters.h"
 #include "remotexy.h"
 #include "UartRingbuffer.h"
 #include "eeprom.h"
 #include "ntp.h"
 #include "typedef.h"
-/*std*/
+/*std libraries*/
 #include <inttypes.h>
 #include <string.h>
 #include <stdarg.h>
@@ -132,7 +133,6 @@ void SendTextToDisplay(char *Text);
 void time_out(void);
 void Init_Application(void);
 void Run_Application(void);
-void ESP8266_RemoteXY_Init(void);
 void RTCWrite(void);
 HAL_StatusTypeDef RTC_NTPSync(void);
 /***********************************************///functions declaration end
