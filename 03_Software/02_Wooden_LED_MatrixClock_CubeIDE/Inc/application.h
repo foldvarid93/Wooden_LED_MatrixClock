@@ -128,7 +128,6 @@ void BinToTensAndSingles(uint8_t binary, uint8_t *tens, uint8_t *singles);
 void ConvertRTCToDateAndTime(RTC_DataType *RTC_DATA,TimeType *Time_Data, DateType *Date_Data);
 void FormatDateToText(void);
 void FormatTimeToText(void);
-void CreateFrameFromTime(void);
 void SendTextToDisplay(char *Text);
 void time_out(void);
 HAL_StatusTypeDef Init_Application(void);

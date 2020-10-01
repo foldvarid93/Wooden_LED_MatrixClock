@@ -71,16 +71,6 @@ void TimeAnimation(uint8_t* Dest,uint8_t* Source){
 		}
 		Source[i]<<=1;
 	}
-/*	if(Iteration==1){
-		Old<<=1;
-	}
-	if(b&0x01){
-		a|=0x80;
-	}
-	else{
-		a&=0x7F;
-	}
-	return a;*/
 }
 char concat(char b, char a){
 	a>>=1;
@@ -92,8 +82,9 @@ char concat(char b, char a){
 	}
 	return a;
 }
-void time_out(void){
-#define StartIdx 28
+void time_out(void)
+{
+#define StartIdx 			28
 #define HourTensStartIdx 	StartIdx
 #define HourSinglesStartIdx StartIdx+6
 #define HourMinDoubleDot 	HourSinglesStartIdx+6
@@ -228,133 +219,6 @@ void time_out(void){
 			Flip=0;
 		}
 	}
-/*
-	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
-	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
-
-	time[0].hour_tens=Time_Data.Hours / 10;
-	time[0].hour_singles=Time_Data.Hours % 10;
-	time[0].min_tens=Time_Data.Minutes / 10;
-	time[0].min_singles=Time_Data.Minutes % 10;
-	time[0].sec_tens=Time_Data.Seconds / 10;
-	time[0].sec_singles=Time_Data.Seconds % 10;
-
-	if(time[0].sec_singles!=time[1].sec_singles){
-		TimeDiffIndicator[5]=1;
-		for(uint8_t i=0;i<5;i++){
-			NewTimeDataArray[i + 30] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
-		}
-	}
-	else {
-		TimeDiffIndicator[5]=0;
-	}
-	if(time[0].sec_tens!=time[1].sec_tens){
-		TimeDiffIndicator[4]=1;
-		for(uint8_t i=0;i<5;i++){
-			NewTimeDataArray[i + 24] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
-		}
-	}
-	else {
-		TimeDiffIndicator[4]=0;
-	}
-	if(time[0].min_singles!=time[1].min_singles){
-		TimeDiffIndicator[3]=1;
-		for(uint8_t i=0;i<5;i++){
-			NewTimeDataArray[i + 18] = BitSwapping(characters[time[0].min_singles + '0'][i]);
-		}
-	}
-	else {
-		TimeDiffIndicator[3]=0;
-	}
-	if(time[0].min_tens!=time[1].min_tens){
-		TimeDiffIndicator[2]=1;
-		for(uint8_t i=0;i<5;i++){
-			NewTimeDataArray[i + 12] = BitSwapping(characters[time[0].min_tens + '0'][i]);
-		}
-	}
-	else {
-		TimeDiffIndicator[2]=0;
-	}
-	if(time[0].hour_singles!=time[1].hour_singles){
-		TimeDiffIndicator[1]=1;
-		for(uint8_t i=0;i<5;i++){
-			NewTimeDataArray[i + 6] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
-		}
-	}
-	else {
-		TimeDiffIndicator[1]=0;
-	}
-	if(time[0].hour_tens!=time[1].hour_tens){
-		TimeDiffIndicator[0]=1;
-		for(uint8_t i=0;i<5;i++){
-			NewTimeDataArray[i] = BitSwapping(characters[time[0].hour_tens + '0'][i]);
-		}
-	}
-	else {
-		TimeDiffIndicator[0]=0;
-	}
-	for(uint8_t i=0;i<8;i++){
-		if (TimeDiffIndicator[0]){
-			TimeAnimation(&DisplayData[HourTensStartIdx],&NewTimeDataArray[0]);
-		}
-		if (TimeDiffIndicator[1]){
-			TimeAnimation(&DisplayData[HourSinglesStartIdx],&NewTimeDataArray[6]);
-		}
-		if (TimeDiffIndicator[2]){
-			TimeAnimation(&DisplayData[MinTensStartIdx],&NewTimeDataArray[12]);
-		}
-		if(TimeDiffIndicator[3]){
-			TimeAnimation(&DisplayData[MinSinglesStartIdx],&NewTimeDataArray[18]);
-		}
-		if(TimeDiffIndicator[4]){
-			TimeAnimation(&DisplayData[SecTensStartIdx],&NewTimeDataArray[24]);
-		}
-		if(TimeDiffIndicator[5]){
-			TimeAnimation(&DisplayData[SecSinglesStartIdx],&NewTimeDataArray[30]);
-		}
-		SendFrameToDisplay();
-	}
-
-	time[1]=time[0];*/
-}
-void CreateFrameFromTime(void){
-	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
-	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
-
-	uint8_t hour_ten_new = (Time_Data.Hours / 10);//newDataTime.hour() / 10;
-	uint8_t hour_single_new = (Time_Data.Hours % 10);//newDataTime.hour() % 10;
-	uint8_t min_ten_new = (Time_Data.Minutes / 10);//newDataTime.minute() / 10;
-	uint8_t min_single_new = (Time_Data.Minutes % 10);//newDataTime.minute() % 10;
-	uint8_t sec_ten_new = (Time_Data.Seconds / 10);//newDataTime.second() / 10;
-	uint8_t sec_single_new = (Time_Data.Seconds % 10);//newDataTime.second() % 10;
-	for(uint8_t i=0;i<96;i++){
-		DisplayData[i]=0;
-	}
-	for (uint8_t i = 0; i < 5; i++) {
-		if (hour_ten_new == 0) {
-			DisplayData[i] = 0;
-		} else {
-			DisplayData[i] = BitSwapping(characters[hour_ten_new + '0'][i]);
-		}
-		DisplayData[i + 5] = BitSwapping(characters[hour_single_new + '0'][i]);
-		DisplayData[i + 13] = BitSwapping(characters[min_ten_new + '0'][i]);
-		DisplayData[i + 18] = BitSwapping(characters[min_single_new + '0'][i]);
-		DisplayData[i + 26] = BitSwapping(characters[sec_ten_new + '0'][i]);
-		DisplayData[i + 31] = BitSwapping(characters[sec_single_new + '0'][i]);
-	}
-	DisplayData[10] = 0;
-	if(Point){
-		DisplayData[11] = 0x22;
-		DisplayData[24] = 0x22;
-	}
-	else{
-		DisplayData[11] = 0;
-		DisplayData[24] = 0;
-	}
-	DisplayData[12] = 0;
-	DisplayData[23] = 0;
-	DisplayData[25] = 0;
-	SendFrameToDisplay();
 }
 /*********************************/				//Time functions end
 /*********************************/				//Text functions begin
@@ -609,7 +473,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	Point=!Point;
 	UpdateTime=1;
-	time_out();
+	//time_out();
 	Flip=1;
 	if(Mode==Time){
 		time_out();//CreateFrameFromTime();
@@ -657,7 +521,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			if (StartFrom == ((TextLength * 6) - 24)) {
 				ScrollText = false;
 				Mode=Time;
-				CreateFrameFromTime();
+				FirstRun=1;
+				time_out();
+				//CreateFrameFromTime();
 			}
 			else {
 				SendToDisplay(StartFrom);
