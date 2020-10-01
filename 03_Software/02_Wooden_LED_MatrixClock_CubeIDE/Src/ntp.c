@@ -143,31 +143,40 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 
 	   /*Month*/
 	  /*31, 28(29), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31*/
-	  const uint8_t MonthDays[12]={31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	  const uint8_t MonthDays[12]={31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	  uint32_t tmp2 = tmp % NUMBEROFSECONDS_YEAR;
 	  uint32_t tmp3 = (tmp2 /NUMBEROFSECONDS_DAY) + 1;//add 1 because current day
 	  uint8_t index = 0;
+	  uint8_t LeapYearIndex = 0;//no leap year
+	  if((DateTime->year % 4) == 0)
+	  {
+		  LeapYearIndex = 1;
+	  }
 	  DateTime->month = 1;//start at januar=1
 
-	  while(index<=12)
+	  while(index<12)
 	  {
-		  if( ((int32_t)(tmp3-(MonthDays[index]))) >=0 )
+		  if(index == 1)//if subtract februar
 		  {
-			  tmp3 = tmp3 - MonthDays[index];
-			  DateTime->month++;
-			  index++;
+			  if( ((int32_t)(tmp3-(MonthDays[index]+LeapYearIndex))) >= 0 )
+			  {
+				  tmp3 = tmp3 - (MonthDays[index]+LeapYearIndex);
+				  DateTime->month++;
+				  index++;
+			  }
 		  }
-		  else {
-			  break;
+		  else
+		  {
+			  if( ((int32_t)(tmp3-(MonthDays[index]))) >= 0 )
+			  {
+				  tmp3 = tmp3 - MonthDays[index];
+				  DateTime->month++;
+				  index++;
+			  }
+			  else {
+				  break;
+			  }
 		  }
-	  }
-	  //TODO:Leap year handling
-	  if((DateTime->year % 4 == 0))//if leap year
-	  {
-
-	  }
-	  else//ordinary year
-	  {
 
 	  }
 	  /*Date*/
