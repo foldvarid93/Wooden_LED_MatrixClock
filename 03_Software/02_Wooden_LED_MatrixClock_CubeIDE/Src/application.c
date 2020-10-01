@@ -5,26 +5,26 @@
 bool FlashWriteEnabled=true;
 uint16_t VirtAddVarTab;//[NB_OF_VAR] = {0x0001};
 /*********************************///
-const uint8_t	DateText[] ={"A mai dÃ¡tum: "};
+const uint8_t	DateText[] ={"A mai dátum: "};
 const uint8_t	WeekDays[7][10]={
-								{"hÃ©tfÅ‘"},
+								{"hétfõ"},
 								{"kedd"},
 								{"szerda"},
-								{"csÃ¼tÃ¶rtÃ¶k"},
-								{"pÃ©ntek"},
+								{"csütörtök"},
+								{"péntek"},
 								{"szombat"},
-								{"vasÃ¡rnap"}};
+								{"vasárnap"}};
 const uint8_t	Months[12][12]={
-								{"januÃ¡r"},
-								{"februÃ¡r"},
-								{"mÃ¡rcius"},
-								{"Ã¡prilis"},
-								{"mÃ¡jus"},
-								{"jÃºnius"},
-								{"jÃºlius"},
+								{"január"},
+								{"február"},
+								{"március"},
+								{"április"},
+								{"május"},
+								{"június"},
+								{"július"},
 								{"augusztus"},
 								{"szeptember"},
-								{"oktÃ³ber"},
+								{"október"},
 								{"november"},
 								{"december"}};
 /*********************************/				//Date functions begin
@@ -32,31 +32,31 @@ void CreateDateData(void){
 	uint8_t	i=0;
 	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
 	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
-	for(i=0;i<4;i++){							//16 szï¿½kï¿½z
+	for(i=0;i<4;i++){							//16 sz?k?z
 		TextArray[i]=' ';
 	}
-	for(uint8_t j=0;DateText[j]!='\0';i++,j++){	//A mai dï¿½tum:
+	for(uint8_t j=0;DateText[j]!='\0';i++,j++){	//A mai d?tum:
 		TextArray[i]=DateText[j];
 	}
 	TextArray[i++]='2';
 	TextArray[i++]='0';
 	TextArray[i++]=(Date_Data.Year/10)+'0';
-	TextArray[i++]=(Date_Data.Year%10)+'0';	//ï¿½vszï¿½m
+	TextArray[i++]=(Date_Data.Year%10)+'0';	//?vsz?m
 	TextArray[i++]='.';							//pont
 	TextArray[i++]=Date_Data.Month/10+'0';
-	TextArray[i++]=Date_Data.Month%10+'0';	//hï¿½nap
+	TextArray[i++]=Date_Data.Month%10+'0';	//h?nap
 	TextArray[i++]='.';							//pont
 	TextArray[i++]=Date_Data.Date/10+'0';
 	TextArray[i++]=Date_Data.Date%10+'0';	//nap
 	TextArray[i++]='.';							//pont
-	TextArray[i++]=',';							//vesszï¿½
+	TextArray[i++]=',';							//vessz?
 	for(uint8_t j=0;WeekDays[Date_Data.WeekDay-1][j]!='\0';i++,j++){
-		TextArray[i]=WeekDays[Date_Data.WeekDay-1][j];		//a hï¿½t napja
+		TextArray[i]=WeekDays[Date_Data.WeekDay-1][j];		//a h?t napja
 	}
-	for(uint8_t j=0;j<4;i++,j++){				//16 szï¿½kï¿½z
+	for(uint8_t j=0;j<4;i++,j++){				//16 sz?k?z
 		TextArray[i]=' ';
 	}
-	TextArray[i]='\0';							//lezï¿½rï¿½ nulla
+	TextArray[i]='\0';							//lez?r? nulla
 }
 /*********************************/				//Date functions end
 /*********************************/				//Time functions begin
@@ -327,6 +327,9 @@ void CreateFrameFromTime(void){
 	uint8_t min_single_new = (Time_Data.Minutes % 10);//newDataTime.minute() % 10;
 	uint8_t sec_ten_new = (Time_Data.Seconds / 10);//newDataTime.second() / 10;
 	uint8_t sec_single_new = (Time_Data.Seconds % 10);//newDataTime.second() % 10;
+	for(uint8_t i=0;i<96;i++){
+		DisplayData[i]=0;
+	}
 	for (uint8_t i = 0; i < 5; i++) {
 		if (hour_ten_new == 0) {
 			DisplayData[i] = 0;
@@ -468,8 +471,8 @@ HAL_StatusTypeDef RTCWrite(void){
 }
 HAL_StatusTypeDef RTC_NTPSync(void){
 	RTC_DataType DateTime={0,0,0,0,0,0,0};
-	RTC_TimeTypeDef HAL_Time;
-	RTC_DateTypeDef HAL_Date;
+	RTC_TimeTypeDef HAL_Time={0,0,0,0,0,0,RTC_DAYLIGHTSAVING_NONE,RTC_STOREOPERATION_RESET};
+	RTC_DateTypeDef HAL_Date={0,0,0,0};
 	uint8_t Attempt=10;
 	/**/
 	while(Attempt){
@@ -480,6 +483,7 @@ HAL_StatusTypeDef RTC_NTPSync(void){
 			HAL_Date.Year = DateTime.year;
 			HAL_Date.Month = DateTime.month;
 			HAL_Date.Date = DateTime.date;
+			HAL_Date.WeekDay = DateTime.day;
 			if(HAL_RTC_SetTime(&hrtc,&HAL_Time,RTC_FORMAT_BIN) != HAL_OK){
 				return HAL_ERROR;
 			}
@@ -522,7 +526,15 @@ HAL_StatusTypeDef Init_Application(void)
 	{
 		asm("nop");
 	}
+	if(RTC_NTPSync() !=HAL_OK)
+	{
+		while(1)
+		{
+			asm("nop");
+		}
+	}
 #endif
+	HAL_RTC_MspInit(&hrtc);
 	/**/
 	FirstRun=1;
 	UpdateTime=0;
@@ -535,26 +547,18 @@ HAL_StatusTypeDef Init_Application(void)
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
 	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
+#ifdef RTCW
 	if(RTCWrite() != HAL_OK)
 	{
 		return HAL_ERROR;
 	}
+#endif
 	return HAL_OK;
 }
 
 void Run_Application(void)
 {
 	char Array[0xFF];
-	/**/
-#ifndef REMOTEXY
-	//HAL_Delay(5000);
-	if(RTC_NTPSync() !=HAL_OK){
-		while(1)
-		{
-
-		}
-	}
-#endif
 	/**/
 	while(1)
 	{
@@ -608,15 +612,15 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	time_out();
 	Flip=1;
 	if(Mode==Time){
-		//time_out();//CreateFrameFromTime();
+		time_out();//CreateFrameFromTime();
 		seconds++;
 	}
-/*	if(seconds==10){
+	if(seconds==10){
 		CreateDateData();
 		CreateDisplayDataArray(TextArray);
 		Mode=Date;
 		seconds=0;
-	}*/
+	}
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
