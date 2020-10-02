@@ -270,7 +270,7 @@ void Init_MAX7219(void){
 	SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
 	SPI_Send(REG_DECODE, NO_DECODE);
 	SPI_Send(REG_SCANLIMIT, DISP0_7);
-	SPI_Send(REG_INTENSITY, INTENSITY_3);
+	SPI_Send(REG_INTENSITY, INTENSITY_1);
 }
 void SPI_Send(uint8_t ADDR, uint8_t CMD){
 	uint8_t tmp[24];
@@ -360,10 +360,6 @@ HAL_StatusTypeDef RTC_NTPSync(void){
 	}
 	return HAL_ERROR;
 }
-/* ESP8266 Functions Start ---------------------------------------------------------*/
-
-/* ESP8266 Functions End ---------------------------------------------------------*/
-
 /* Application Main Functions Start ---------------------------------------------------------*/
 HAL_StatusTypeDef Init_Application(void)
 {
@@ -471,19 +467,17 @@ void Run_Application(void)
 /* Interrupt Callbacks Start ---------------------------------------------------------*/
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
-	Point=!Point;
-	UpdateTime=1;
-	//time_out();
-	Flip=1;
 	if(Mode==Time){
-		time_out();//CreateFrameFromTime();
+		Point=!Point;
+		UpdateTime=1;
+		Flip=1;
 		seconds++;
-	}
-	if(seconds==10){
-		CreateDateData();
-		CreateDisplayDataArray(TextArray);
-		Mode=Date;
-		seconds=0;
+		if(seconds==10){
+			CreateDateData();
+			CreateDisplayDataArray(TextArray);
+			Mode=Date;
+			seconds=0;
+		}
 	}
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
@@ -513,25 +507,30 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	UNUSED(htim);
+	/*timer3 interrupt*/
 	if(htim->Instance==TIM3){
-		if(Flip==1){
-			time_out();
-		}
-		if (ScrollText) {
-			if (StartFrom == ((TextLength * 6) - 24)) {
-				ScrollText = false;
-				Mode=Time;
-				FirstRun=1;
+		if(Mode == Time){
+			if(Flip==1){
 				time_out();
-				//CreateFrameFromTime();
 			}
-			else {
-				SendToDisplay(StartFrom);
-				StartFrom++;
+		}
+		if(Mode==Date){
+			if (ScrollText) {
+				if (StartFrom == ((TextLength * 6) - 24)) {
+					ScrollText = false;
+					Mode=Time;
+					FirstRun=1;
+				}
+				else {
+					SendToDisplay(StartFrom);
+					StartFrom++;
+				}
 			}
 		}
 	}
-	if(htim->Instance==TIM4){
+	/*timer4 interrupt*/
+	if(htim->Instance==TIM4)
+	{
 	}
 }
 void HAL_SYSTICK_Callback(void)
