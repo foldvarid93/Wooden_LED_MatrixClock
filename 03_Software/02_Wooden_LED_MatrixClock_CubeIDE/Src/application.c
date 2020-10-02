@@ -245,7 +245,7 @@ void SendToDisplay(uint16_t from) {
 	  }
   }
   //
-  SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
+  //SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
   for(uint8_t i=0;i<8;i++){
 	  HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
 	  HAL_SPI_Transmit(&hspi2,&tmp[i*24],24,50);
@@ -261,7 +261,7 @@ void SendToDisplay(uint16_t from) {
     HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
   }
   */
-  SPI_Send(REG_SHTDWN, NORMAL_MODE);
+  //SPI_Send(REG_SHTDWN, NORMAL_MODE);
   asm("nop");
 }
 /*********************************/				//Text functions end
@@ -270,7 +270,7 @@ void Init_MAX7219(void){
 	SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
 	SPI_Send(REG_DECODE, NO_DECODE);
 	SPI_Send(REG_SCANLIMIT, DISP0_7);
-	SPI_Send(REG_INTENSITY, INTENSITY_1);
+	SPI_Send(REG_INTENSITY, INTENSITY_7);
 }
 void SPI_Send(uint8_t ADDR, uint8_t CMD){
 	uint8_t tmp[24];
@@ -384,14 +384,11 @@ HAL_StatusTypeDef Init_Application(void)
 #else
 	if(ESP8266_NTP_Init() != HAL_OK)
 	{
-		asm("nop");
+		HAL_NVIC_SystemReset();
 	}
 	if(RTC_NTPSync() !=HAL_OK)
 	{
-		while(1)
-		{
-			asm("nop");
-		}
+		HAL_NVIC_SystemReset();
 	}
 #endif
 	HAL_RTC_MspInit(&hrtc);

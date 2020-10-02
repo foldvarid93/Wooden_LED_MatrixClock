@@ -55,7 +55,7 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pin = SPI2_CS_Pin|ESP8266_RST_Pin|ESP8266_EN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
