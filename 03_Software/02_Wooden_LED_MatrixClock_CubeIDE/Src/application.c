@@ -245,10 +245,14 @@ void SendToDisplay(uint16_t from) {
 	  }
   }
   //
-  //SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
+  SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
   for(uint8_t i=0;i<8;i++){
-	  HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	  //HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
 	  HAL_SPI_Transmit(&hspi2,&tmp[i*24],24,50);
+	  HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	  for(uint8_t i=0;i<10;i++){
+		  asm("nop");
+	  }
 	  HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
   }
   /*
@@ -261,7 +265,7 @@ void SendToDisplay(uint16_t from) {
     HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
   }
   */
-  //SPI_Send(REG_SHTDWN, NORMAL_MODE);
+  SPI_Send(REG_SHTDWN, NORMAL_MODE);
   asm("nop");
 }
 /*********************************/				//Text functions end
@@ -278,8 +282,12 @@ void SPI_Send(uint8_t ADDR, uint8_t CMD){
 		tmp[2*i]=ADDR;
 		tmp[(2*i)+1]=CMD;
 	}
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi2,tmp,24,50);
+	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	  for(uint8_t i=0;i<10;i++){
+		  asm("nop");
+	  }
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
 }
 void SendFrameToDisplay(void){
@@ -298,16 +306,31 @@ void SendFrameToDisplay(void){
 			tmp3[i-1][(2*j)+1]=DisplayData[DispLength-(8*j)-9+i];
 		}
 	}
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi2,tmp1,24,100);
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
-	for(uint8_t i=8;i>0;i--){
-		HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_RESET);
-		HAL_SPI_Transmit(&hspi2, &tmp3[i-1][0], 24, 100);
-		HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_SET);
-	}
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	  for(uint8_t i=0;i<10;i++){
+		  asm("nop");
+	  }
+	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+	//HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+	for(uint8_t i=8;i>0;i--){
+		//HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&hspi2, &tmp3[i-1][0], 24, 100);
+		HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+		  for(uint8_t i=0;i<10;i++){
+			  asm("nop");
+		  }
+		HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+		//HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_SET);
+	}
+	//HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi2,tmp2,24,100);
+	//HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	  for(uint8_t i=0;i<10;i++){
+		  asm("nop");
+	  }
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
 }
 uint8_t BitSwapping(uint8_t ch){
@@ -364,6 +387,8 @@ HAL_StatusTypeDef RTC_NTPSync(void){
 HAL_StatusTypeDef Init_Application(void)
 {
 	/**/
+	Init_MAX7219();
+	/**/
 	HAL_FLASH_Unlock();
 	if (EE_Init() != HAL_OK)
 	{
@@ -375,7 +400,7 @@ HAL_StatusTypeDef Init_Application(void)
 		Error_Handler();
 	}
 	*/
-	Init_MAX7219();
+
 	//HAL_UART_Receive_IT(&huart2,UartBuff,5);
 	/**/
 #define REMOTEXYx
