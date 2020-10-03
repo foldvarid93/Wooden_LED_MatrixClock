@@ -6,6 +6,7 @@
 #include "esp8266.h"
 #include "stdbool.h"
 #include "typedef.h"
+#include "stdio.h"
 /***************************************************************************************
  * Defines
  **************************************************************************************/
@@ -28,7 +29,7 @@
 
 HAL_StatusTypeDef ESP8266_NTP_ATCommand(const char * Command, const char * Respond, uint32_t Timeout);
 
-HAL_StatusTypeDef ESP8266_NTP_Init(void);
+HAL_StatusTypeDef ESP8266_NTP_Init(const char * SSID, const char * PassWord);
 
 HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime);
 /**************************************************************************************/

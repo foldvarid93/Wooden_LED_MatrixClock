@@ -28,8 +28,10 @@ HAL_StatusTypeDef ESP8266_NTP_ATCommand(const char * Command, const char * Respo
 }
 
 /*Init ESP8266 for NTP communication*/
-HAL_StatusTypeDef ESP8266_NTP_Init(void)
+HAL_StatusTypeDef ESP8266_NTP_Init(const char * SSID, const char * PassWord)
 {
+	char TmpBuff[100];
+	sprintf(TmpBuff,"AT+CWJAP=\"%s\",\"%s\"",SSID,PassWord);
 	/*ESP8266 HW reset and enabling*/
 	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_RESET);
@@ -62,7 +64,7 @@ HAL_StatusTypeDef ESP8266_NTP_Init(void)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT+CWJAP=\"foldvarid93\",\"19701971\"", OK_STR,15000) != HAL_OK)
+	if(ESP8266_NTP_ATCommand((char*)TmpBuff, OK_STR,15000) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}

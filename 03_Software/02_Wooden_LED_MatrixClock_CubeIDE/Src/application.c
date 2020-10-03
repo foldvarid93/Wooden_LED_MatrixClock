@@ -345,43 +345,57 @@ uint8_t BitSwapping(uint8_t ch){
 	if (ch&0B10000000) retval|=0B00000001;
 	return ~retval;
 }
-HAL_StatusTypeDef RTCWrite(void){
-	RTC_TimeTypeDef Time;
-	Time.Hours=0;
-	Time.Minutes=0;
-	Time.Seconds=0;
-	if(HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN) != HAL_OK)
-	{
-		return HAL_ERROR;
-	}
-	return HAL_OK;
-}
 HAL_StatusTypeDef RTC_NTPSync(void){
 	RTC_DataType DateTime={0,0,0,0,0,0,0};
 	RTC_TimeTypeDef HAL_Time={0,0,0,0,0,0,RTC_DAYLIGHTSAVING_NONE,RTC_STOREOPERATION_RESET};
 	RTC_DateTypeDef HAL_Date={0,0,0,0};
-	uint8_t Attempt=10;
-	/**/
-	while(Attempt){
-		if(ESP8266_NTP_GetDateTime(&DateTime) == HAL_OK){
-			HAL_Time.Hours = DateTime.hour;
-			HAL_Time.Minutes = DateTime.min;
-			HAL_Time.Seconds = DateTime.sec;
-			HAL_Date.Year = DateTime.year;
-			HAL_Date.Month = DateTime.month;
-			HAL_Date.Date = DateTime.date;
-			HAL_Date.WeekDay = DateTime.day;
-			if(HAL_RTC_SetTime(&hrtc,&HAL_Time,RTC_FORMAT_BIN) != HAL_OK){
-				return HAL_ERROR;
+	uint8_t Attempt=0;
+	/*Try to connect AP*/
+	while(1)
+	{
+		Attempt++;
+		if(Attempt<10)
+		{
+			if(ESP8266_NTP_Init("foldvarid93", "19701971") == HAL_OK)
+			{
+				break;
 			}
-			if(HAL_RTC_SetDate(&hrtc,&HAL_Date,RTC_FORMAT_BIN) != HAL_OK){
-				return HAL_ERROR;
-			}
-			return HAL_OK;
 		}
-		Attempt--;
+		else
+		{
+			return HAL_ERROR;
+		}
 	}
-	return HAL_ERROR;
+	/*Try to get NTP packet*/
+	Attempt=0;
+	while(1)
+	{
+		Attempt++;
+		if(Attempt<10)
+		{
+			if(ESP8266_NTP_GetDateTime(&DateTime) == HAL_OK)
+			{
+				HAL_Time.Hours = DateTime.hour;
+				HAL_Time.Minutes = DateTime.min;
+				HAL_Time.Seconds = DateTime.sec;
+				HAL_Date.Year = DateTime.year;
+				HAL_Date.Month = DateTime.month;
+				HAL_Date.Date = DateTime.date;
+				HAL_Date.WeekDay = DateTime.day;
+				if(HAL_RTC_SetTime(&hrtc,&HAL_Time,RTC_FORMAT_BIN) == HAL_OK)
+				{
+					if(HAL_RTC_SetDate(&hrtc,&HAL_Date,RTC_FORMAT_BIN) == HAL_OK)
+					{
+						return HAL_OK;
+					}
+				}
+			}
+		}
+		else
+		{
+			return HAL_ERROR;
+		}
+	}
 }
 /* Application Main Functions Start ---------------------------------------------------------*/
 HAL_StatusTypeDef Init_Application(void)
@@ -402,20 +416,30 @@ HAL_StatusTypeDef Init_Application(void)
 	*/
 
 	//HAL_UART_Receive_IT(&huart2,UartBuff,5);
-	/**/
-#define REMOTEXYx
-#ifdef REMOTEXY
+
+	/*RemoteXY*/
+	uint32_t RemoteXY_Timeout=30000;
+	uint32_t StartTime=HAL_GetTick();
+
 	ESP8266_RemoteXY_InitAndStart();
-#else
-	if(ESP8266_NTP_Init() != HAL_OK)
+	while((HAL_GetTick()-StartTime) <= RemoteXY_Timeout)
 	{
-		HAL_NVIC_SystemReset();
+		ESP8266_RemoteXY_Handler();
+		if(ESP8266_RemoteXY_IsConnected() == 1)
+		{
+			break;
+		}
 	}
+	while(ESP8266_RemoteXY_IsConnected() == 1)
+	{
+		ESP8266_RemoteXY_Handler();
+	}
+	/*NTP sync*/
 	if(RTC_NTPSync() !=HAL_OK)
 	{
-		HAL_NVIC_SystemReset();
+		//NTP_CONN=0;
+		//HAL_NVIC_SystemReset();
 	}
-#endif
 	HAL_RTC_MspInit(&hrtc);
 	/**/
 	FirstRun=1;
@@ -429,12 +453,6 @@ HAL_StatusTypeDef Init_Application(void)
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
 	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
-#ifdef RTCW
-	if(RTCWrite() != HAL_OK)
-	{
-		return HAL_ERROR;
-	}
-#endif
 	return HAL_OK;
 }
 
