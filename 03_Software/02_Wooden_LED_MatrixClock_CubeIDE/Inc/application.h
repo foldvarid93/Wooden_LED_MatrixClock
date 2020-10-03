@@ -85,27 +85,22 @@
 #define NOP					0x00
 /***********************************************///MAX7219 define constants end
 /***********************************************///constants declarations begin
-RTC_DataType				RTC_Data;							//sec,min,hour,day,date,month,year
+RTC_DataType			RTC_Data;							//sec,min,hour,day,date,month,year
 RTC_TimeTypeDef	 		Time_Data;							//id�t t�rol� strukt�rap�ld�ny
-//RTC_TimeTypeDef			time[2];
-TimeType					time[2];
+//RTC_TimeTypeDef		time[2];
+TimeType				time[2];
 RTC_DateTypeDef			Date_Data;							//d�tumot t�rol� strukt�rap�ld�ny
 uint8_t					DisplayData[96];					//kijelz� oszlopainak adatai
 uint8_t					NewTimeDataArray[36];
 bool 					TimeDiffIndicator[6];
-bool					Point;
 bool					ScrollText;
 bool 					ScrollEnd;
-bool 					Flip;
-uint8_t 				FlipCounter;
-uint8_t 				StartFrom;
 uint8_t					TextLength;
 uint8_t 				TextArray[256];
 uint8_t 				DisplayDataArray[1536];
 uint8_t 				UartBuff[5];						//HH:MM form�tumhoz el�g 5 byte
 uint8_t 				TimeData[4];						//ebben van t�rolva az id�
-uint8_t 				seconds;
-enum 					mode{Time, Date} Mode;
+enum 					mode{Time, Date , Text};
 extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v sz�vegesen
 extern const uint8_t	Months[12][12];						//jan,feb.....dec sz�vegesen
 AppConfig_Type 			AppCfg;

@@ -193,7 +193,7 @@ void time_out(void)
 		time[1]=time[0];
 		AppCfg.UpdateTime=0;
 	}
-	if(Flip==1){
+	if(AppCfg.TimeAnimation==1){
 		if (TimeDiffIndicator[0]){
 			TimeAnimation(&DisplayData[HourTensStartIdx],&NewTimeDataArray[0]);
 		}
@@ -213,10 +213,10 @@ void time_out(void)
 			TimeAnimation(&DisplayData[SecSinglesStartIdx],&NewTimeDataArray[30]);
 		}
 		SendFrameToDisplay();
-		FlipCounter++;
-		if(FlipCounter==8){
-			FlipCounter=0;
-			Flip=0;
+		AppCfg.FlipCounter++;
+		if(AppCfg.FlipCounter==8){
+			AppCfg.FlipCounter=0;
+			AppCfg.TimeAnimation=0;
 		}
 	}
 }
@@ -230,7 +230,7 @@ void CreateDisplayDataArray(uint8_t *Text) {
       DisplayDataArray[(i * 6) + j] = BitSwapping(characters[Text[i]][j]);
     }
   }
-  StartFrom = 0;
+  AppCfg.FirstColumn = 0;
   ScrollEnd = false;
   ScrollText = true;
 }
@@ -462,11 +462,11 @@ HAL_StatusTypeDef Init_Application(void)
 	/**/
 	AppCfg.FirstRun=1;
 	AppCfg.UpdateTime=0;
-	Flip=0;
-	FlipCounter=0;
-	Point=false;
-	seconds=0;
-	Mode=Time;
+	AppCfg.TimeAnimation=0;
+	AppCfg.FlipCounter=0;
+	AppCfg.Point=false;
+	AppCfg.ScrollDateSecCounter=0;
+	AppCfg.DisplayMode=Time;
 	/**/
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
@@ -486,16 +486,16 @@ void Run_Application(void)
 /* Interrupt Callbacks Start ---------------------------------------------------------*/
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
-	if(Mode==Time){
-		Point=!Point;
+	if(AppCfg.DisplayMode==Time){
+		AppCfg.Point=!AppCfg.Point;
 		AppCfg.UpdateTime=1;
-		Flip=1;
-		seconds++;
-		if(seconds==10){
+		AppCfg.TimeAnimation=1;
+		AppCfg.ScrollDateSecCounter++;
+		if(AppCfg.ScrollDateSecCounter==10){
 			CreateDateData();
 			CreateDisplayDataArray(TextArray);
-			Mode=Date;
-			seconds=0;
+			AppCfg.DisplayMode=Date;
+			AppCfg.ScrollDateSecCounter=0;
 		}
 	}
 }
@@ -528,21 +528,21 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	UNUSED(htim);
 	/*timer3 interrupt*/
 	if(htim->Instance==TIM3){
-		if(Mode == Time){
-			if(Flip==1){
+		if(AppCfg.DisplayMode == Time){
+			if(AppCfg.TimeAnimation==1){
 				time_out();
 			}
 		}
-		if(Mode==Date){
+		if(AppCfg.DisplayMode==Date){
 			if (ScrollText) {
-				if (StartFrom == ((TextLength * 6) - 24)) {
+				if (AppCfg.FirstColumn == ((TextLength * 6) - 24)) {
 					ScrollText = false;
-					Mode=Time;
+					AppCfg.DisplayMode=Time;
 					AppCfg.FirstRun=1;
 				}
 				else {
-					SendToDisplay(StartFrom);
-					StartFrom++;
+					SendToDisplay(AppCfg.FirstColumn);
+					AppCfg.FirstColumn++;
 				}
 			}
 		}
