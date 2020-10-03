@@ -28,7 +28,7 @@ HAL_StatusTypeDef ESP8266_NTP_ATCommand(const char * Command, const char * Respo
 }
 
 /*Init ESP8266 for NTP communication*/
-HAL_StatusTypeDef ESP8266_NTP_Init(const char * SSID, const char * PassWord)
+HAL_StatusTypeDef ESP8266_NTP_Init(const uint8_t * SSID, const uint8_t * PassWord)
 {
 	char TmpBuff[100];
 	sprintf(TmpBuff,"AT+CWJAP=\"%s\",\"%s\"",SSID,PassWord);

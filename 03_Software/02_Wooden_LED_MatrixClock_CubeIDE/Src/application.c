@@ -94,7 +94,7 @@ void time_out(void)
 #define SecTensStartIdx 	MinSecDoubleDot+2
 #define SecSinglesStartIdx 	SecTensStartIdx+6
 
-	if(FirstRun==1){
+	if(AppCfg.FirstRun==1){
 		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
 		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
 
@@ -123,9 +123,9 @@ void time_out(void)
 		SendFrameToDisplay();
 
 		time[1]=time[0];
-		FirstRun=0;
+		AppCfg.FirstRun=0;
 	}
-	if(UpdateTime==1){
+	if(AppCfg.UpdateTime==1){
 		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
 		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
 
@@ -191,7 +191,7 @@ void time_out(void)
 			TimeDiffIndicator[0]=0;
 		}
 		time[1]=time[0];
-		UpdateTime=0;
+		AppCfg.UpdateTime=0;
 	}
 	if(Flip==1){
 		if (TimeDiffIndicator[0]){
@@ -345,7 +345,9 @@ uint8_t BitSwapping(uint8_t ch){
 	if (ch&0B10000000) retval|=0B00000001;
 	return ~retval;
 }
-HAL_StatusTypeDef RTC_NTPSync(void){
+/**/
+HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
+{
 	RTC_DataType DateTime={0,0,0,0,0,0,0};
 	RTC_TimeTypeDef HAL_Time={0,0,0,0,0,0,RTC_DAYLIGHTSAVING_NONE,RTC_STOREOPERATION_RESET};
 	RTC_DateTypeDef HAL_Date={0,0,0,0};
@@ -356,7 +358,7 @@ HAL_StatusTypeDef RTC_NTPSync(void){
 		Attempt++;
 		if(Attempt<10)
 		{
-			if(ESP8266_NTP_Init("foldvarid93", "19701971") == HAL_OK)
+			if(ESP8266_NTP_Init(SSID, PassWord) == HAL_OK)
 			{
 				break;
 			}
@@ -397,6 +399,41 @@ HAL_StatusTypeDef RTC_NTPSync(void){
 		}
 	}
 }
+/**/
+void RemoteXY_InitAndRun(void)
+{
+	/*locals*/
+	uint32_t RemoteXY_Timeout=30000;
+	uint32_t StartTime=HAL_GetTick();
+	/**/
+	ESP8266_RemoteXY_InitAndStart();
+	/*wait for connection timeout: 30sec*/
+	while((HAL_GetTick()-StartTime) <= RemoteXY_Timeout)
+	{
+		ESP8266_RemoteXY_Handler();
+		if(ESP8266_RemoteXY_IsConnected() == 1)
+		{
+			break;
+		}
+	}
+	/*while connected: run application*/
+	while(ESP8266_RemoteXY_IsConnected() == 1)
+	{
+		/*run application handler*/
+		ESP8266_RemoteXY_Handler();
+		/*if app sent data process and store*/
+		if(RemoteXY.button_1==1)
+		{
+			if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.edit_1)) != EE_OK) {
+				Error_Handler();
+			}
+			if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.edit_2)) != EE_OK) {
+				Error_Handler();
+			}
+			RemoteXY.button_1=0;
+		}
+	}
+}
 /* Application Main Functions Start ---------------------------------------------------------*/
 HAL_StatusTypeDef Init_Application(void)
 {
@@ -408,42 +445,23 @@ HAL_StatusTypeDef Init_Application(void)
 	{
 		return HAL_ERROR;
 	}
-	/*
-	uint8_t Arr[]="Hello";
-	if (EE_WriteCharArray(0x0100, &Arr) != EE_OK) {
-		Error_Handler();
-	}
-	*/
-
-	//HAL_UART_Receive_IT(&huart2,UartBuff,5);
-
 	/*RemoteXY*/
-	uint32_t RemoteXY_Timeout=30000;
-	uint32_t StartTime=HAL_GetTick();
+	RemoteXY_InitAndRun();
 
-	ESP8266_RemoteXY_InitAndStart();
-	while((HAL_GetTick()-StartTime) <= RemoteXY_Timeout)
+	/*read eeprom SSID and PassWord*/
+	EE_ReadCharArray(VirtAddr_SSID,(uint8_t*)(AppCfg.SSID));
+	EE_ReadCharArray(VirtAddr_PassWord,(uint8_t*)(AppCfg.PassWord));
+
+	/*RTC sync from NTP*/
+	if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
 	{
-		ESP8266_RemoteXY_Handler();
-		if(ESP8266_RemoteXY_IsConnected() == 1)
-		{
-			break;
-		}
-	}
-	while(ESP8266_RemoteXY_IsConnected() == 1)
-	{
-		ESP8266_RemoteXY_Handler();
-	}
-	/*NTP sync*/
-	if(RTC_NTPSync() !=HAL_OK)
-	{
-		//NTP_CONN=0;
 		//HAL_NVIC_SystemReset();
 	}
+	/**/
 	HAL_RTC_MspInit(&hrtc);
 	/**/
-	FirstRun=1;
-	UpdateTime=0;
+	AppCfg.FirstRun=1;
+	AppCfg.UpdateTime=0;
 	Flip=0;
 	FlipCounter=0;
 	Point=false;
@@ -458,50 +476,11 @@ HAL_StatusTypeDef Init_Application(void)
 
 void Run_Application(void)
 {
-	char Array[0xFF];
 	/**/
 	while(1)
 	{
-#ifdef REMOTEXY
-		ESP8266_RemoteXY_Handler();
-#endif
-		if(RemoteXY.button_1==1)
-		{
-			//Uart_sendstring("SSID: ", &huart2);
-			//Uart_sendstring(strcat(RemoteXY.edit_1,"\n"), &huart2);
-			//Uart_sendstring("PASS: ", &huart2);
-			//Uart_sendstring(strcat(RemoteXY.edit_2,"\n"), &huart2);
-			/**/
-			if('0'<=RemoteXY.edit_2[0]&&RemoteXY.edit_2[0]<='9' &&'0'<=RemoteXY.edit_2[1]&&RemoteXY.edit_2[1]<='9'&&RemoteXY.edit_2[2]==':'&&
-					'0'<=RemoteXY.edit_2[3]&&RemoteXY.edit_2[3]<='9'&&'0'<=RemoteXY.edit_2[4]&&RemoteXY.edit_2[4]<='9')
-			{
-				RTC_TimeTypeDef Time;
-				RTC_DateTypeDef Date;
-				Time.Hours=(RemoteXY.edit_2[0]-'0')*10+(RemoteXY.edit_2[1]-'0');
-				Time.Minutes=(RemoteXY.edit_2[3]-'0')*10+(RemoteXY.edit_2[4]-'0');
-				Time.Seconds=0;
-				Time.SubSeconds=0;
-				Time.TimeFormat=RTC_HOURFORMAT12_AM;
-				Time.DayLightSaving=RTC_DAYLIGHTSAVING_NONE;
-				HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
-				HAL_RTC_GetDate(&hrtc,&Date,RTC_FORMAT_BIN);
-				HAL_RTC_GetTime(&hrtc,&Time,RTC_FORMAT_BIN);
-			}
-			strcpy(Array, "SSID: ");
-			strcat(Array,RemoteXY.edit_1);
-			if (EE_WriteCharArray(0x0100, (uint8_t*)Array) != EE_OK) {
-				Error_Handler();
-			}
-			strcpy(Array, "PASS: ");
-			strcat(Array,RemoteXY.edit_2);
-			if (EE_WriteCharArray(0x0200, (uint8_t*)Array) != EE_OK) {
-				Error_Handler();
-			}
-			/**/
-		    RemoteXY.button_1=0;
-		}
-	}
 
+	}
 }
 /* Application Main Functions End ---------------------------------------------------------*/
 /* Interrupt Callbacks Start ---------------------------------------------------------*/
@@ -509,7 +488,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	if(Mode==Time){
 		Point=!Point;
-		UpdateTime=1;
+		AppCfg.UpdateTime=1;
 		Flip=1;
 		seconds++;
 		if(seconds==10){
@@ -559,7 +538,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				if (StartFrom == ((TextLength * 6) - 24)) {
 					ScrollText = false;
 					Mode=Time;
-					FirstRun=1;
+					AppCfg.FirstRun=1;
 				}
 				else {
 					SendToDisplay(StartFrom);

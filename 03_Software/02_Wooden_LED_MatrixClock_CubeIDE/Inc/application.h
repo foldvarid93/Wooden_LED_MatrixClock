@@ -96,8 +96,6 @@ bool 					TimeDiffIndicator[6];
 bool					Point;
 bool					ScrollText;
 bool 					ScrollEnd;
-bool 					FirstRun;
-bool 					UpdateTime;
 bool 					Flip;
 uint8_t 				FlipCounter;
 uint8_t 				StartFrom;
@@ -110,6 +108,7 @@ uint8_t 				seconds;
 enum 					mode{Time, Date} Mode;
 extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v sz�vegesen
 extern const uint8_t	Months[12][12];						//jan,feb.....dec sz�vegesen
+AppConfig_Type 			AppCfg;
 /***********************************************///constants declarations end
 /***********************************************///functions declaration begin
 void Init_MAX7219(void);
@@ -133,6 +132,6 @@ void time_out(void);
 HAL_StatusTypeDef Init_Application(void);
 void Run_Application(void);
 HAL_StatusTypeDef RTCWrite(void);
-HAL_StatusTypeDef RTC_NTPSync(void);
+HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord);
 /***********************************************///functions declaration end
 #endif

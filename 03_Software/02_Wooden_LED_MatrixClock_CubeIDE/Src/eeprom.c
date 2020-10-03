@@ -409,20 +409,84 @@ uint16_t EE_WriteCharArray(uint16_t VirtAddress, uint8_t *Data)
   *           - NO_VALID_PAGE: if no valid page was found
   *           - Flash error code: on write Flash error
   */
-uint16_t EE_ReadCharArray(uint16_t VirtAddress, uint16_t Data)
+uint16_t EE_ReadCharArray(uint16_t VirtAddress, uint8_t *Data)
 {
-	uint8_t Length;
-	char Array[256];
+	uint16_t Length;
 	uint16_t ReadStatus = 1;
-	if ((EE_ReadVariable(VirtAddress, (uint16_t*) &Length)) == HAL_OK) {
-		for(uint8_t i=1;i<Length+1;i++){
-			EE_ReadVariable(VirtAddress+i, (uint16_t*) Array);
+	uint16_t i;
+
+	if ((EE_ReadVariable(VirtAddress, (uint16_t*) &Length)) == HAL_OK)
+	{
+		for(i=0 ; i<Length ; i++)
+		{
+			EE_ReadByte((VirtAddress+i+1), (uint8_t*)(Data+i));
 		}
+		*(Data+i) = '\0';
 	}
-	else{
+	else
+	{
 		return ReadStatus;
 	}
 	return ReadStatus=0;
+}
+
+/**
+  * @brief  Returns the last stored variable data, if found, which correspond to
+  *   the passed virtual address
+  * @param  VirtAddress: Variable virtual address
+  * @param  Data: Global variable contains the read variable value
+  * @retval Success or error status:
+  *           - 0: if variable was found
+  *           - 1: if the variable was not found
+  *           - NO_VALID_PAGE: if no valid page was found.
+  */
+uint16_t EE_ReadByte(uint16_t VirtAddress, uint8_t* Data)
+{
+  uint16_t ValidPage = PAGE0;
+  uint16_t AddressValue = 0x5555, ReadStatus = 1;
+  uint32_t Address = EEPROM_START_ADDRESS, PageStartAddress = EEPROM_START_ADDRESS;
+
+  /* Get active Page for read operation */
+  ValidPage = EE_FindValidPage(READ_FROM_VALID_PAGE);
+
+  /* Check if there is no valid page */
+  if (ValidPage == NO_VALID_PAGE)
+  {
+    return  NO_VALID_PAGE;
+  }
+
+  /* Get the valid Page start Address */
+  PageStartAddress = (uint32_t)(EEPROM_START_ADDRESS + (uint32_t)(ValidPage * PAGE_SIZE));
+
+  /* Get the valid Page end Address */
+  Address = (uint32_t)((EEPROM_START_ADDRESS - 2) + (uint32_t)((1 + ValidPage) * PAGE_SIZE));
+
+  /* Check each active page address starting from end */
+  while (Address > (PageStartAddress + 2))
+  {
+    /* Get the current location content to be compared with virtual address */
+    AddressValue = (*(__IO uint16_t*)Address);
+
+    /* Compare the read address with the virtual address */
+    if (AddressValue == VirtAddress)
+    {
+      /* Get content of Address-2 which is variable value */
+      *Data = (*(__IO uint8_t*)(Address - 2));
+
+      /* In case variable value is read, reset ReadStatus flag */
+      ReadStatus = 0;
+
+      break;
+    }
+    else
+    {
+      /* Next address location */
+      Address = Address - 4;
+    }
+  }
+
+  /* Return ReadStatus value: (0: variable exist, 1: variable doesn't exist) */
+  return ReadStatus;
 }
 
 /**
