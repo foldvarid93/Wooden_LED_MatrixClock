@@ -106,10 +106,11 @@ extern const uint8_t	Months[12][12];						//jan,feb.....dec sz�vegesen
 AppConfig_Type 			AppCfg;
 /***********************************************///constants declarations end
 /***********************************************///functions declaration begin
-void Init_MAX7219(void);
+void MAX7219_Init(void);
 void CreateDateData(void);
 void CreateDisplayDataArray(uint8_t* Text);
 void SendToDisplay(uint16_t from);
+void MAX7219_LoadPuse(void);
 void SPI_Send(uint8_t ADDR, uint8_t CMD);
 void SendFrameToDisplay(void);
 void TestData(void);

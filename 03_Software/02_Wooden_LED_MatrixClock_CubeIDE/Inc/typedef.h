@@ -52,13 +52,15 @@ typedef struct AppConfig_Type{
 	uint8_t 	TimeAnimation;//0 or 1
 	/*normal variables*/
 	uint8_t 	Connected;
-	uint8_t		FirstRun;
+	bool		FirstRun;
 	uint8_t 	UpdateTime;
 	uint8_t		FlipCounter;
 	uint8_t		Point;
 	uint16_t	ScrollDateSecCounter;
 	uint8_t 	DisplayMode;
 	uint8_t 	FirstColumn;
+	bool 		DisplayDateDone;
+	bool 		DisplayTextDone;
 }AppConfig_Type;
 // =====================================================================================
 typedef struct RTC_DataType{

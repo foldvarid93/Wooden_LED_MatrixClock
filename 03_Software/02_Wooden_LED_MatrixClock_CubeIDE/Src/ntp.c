@@ -64,7 +64,7 @@ HAL_StatusTypeDef ESP8266_NTP_Init(const uint8_t * SSID, const uint8_t * PassWor
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand((char*)TmpBuff, OK_STR,15000) != HAL_OK)
+	if(ESP8266_NTP_ATCommand((char*)TmpBuff, OK_STR,10000) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}

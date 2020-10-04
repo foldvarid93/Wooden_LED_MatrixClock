@@ -94,7 +94,8 @@ void time_out(void)
 #define SecTensStartIdx 	MinSecDoubleDot+2
 #define SecSinglesStartIdx 	SecTensStartIdx+6
 
-	if(AppCfg.FirstRun==1){
+	if(AppCfg.FirstRun==1)
+	{
 		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
 		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
 
@@ -125,7 +126,8 @@ void time_out(void)
 		time[1]=time[0];
 		AppCfg.FirstRun=0;
 	}
-	if(AppCfg.UpdateTime==1){
+	if(AppCfg.UpdateTime==1)
+	{
 		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
 		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
 
@@ -244,96 +246,81 @@ void SendToDisplay(uint16_t from) {
 		  tmp[192-((i*24)+(2*j)+1)]=DisplayDataArray[from+(j*8)+i];
 	  }
   }
-  //
+  /**/
   SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
   for(uint8_t i=0;i<8;i++){
-	  //HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
 	  HAL_SPI_Transmit(&hspi2,&tmp[i*24],24,50);
-	  HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	  for(uint8_t i=0;i<10;i++){
-		  asm("nop");
-	  }
-	  HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+		MAX7219_LoadPuse();
   }
-  /*
-  for (uint8_t i = 1; i < 9; i++) {
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-    for (uint8_t j = 0; j < DispCount; j++) {
-    	HAL_SPI_Transmit(&hspi2,&i,1,50);
-    	HAL_SPI_Transmit(&hspi2,&(DisplayDataArray[from + ((DispCount - j) * 8) + (i - 1)]),1,50); //data
-    }
-    HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
-  }
-  */
   SPI_Send(REG_SHTDWN, NORMAL_MODE);
   asm("nop");
 }
 /*********************************/				//Text functions end
-void Init_MAX7219(void){
+/**/
+void MAX7219_Init(void)
+{
 	SPI_Send(REG_NO_OP, NOP);
 	SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
 	SPI_Send(REG_DECODE, NO_DECODE);
 	SPI_Send(REG_SCANLIMIT, DISP0_7);
 	SPI_Send(REG_INTENSITY, INTENSITY_7);
 }
-void SPI_Send(uint8_t ADDR, uint8_t CMD){
+/**/
+void MAX7219_LoadPuse(void){
+	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	for(uint8_t i=0;i<10;i++){
+		asm("nop");
+	}
+	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+}
+/**/
+void SPI_Send(uint8_t ADDR, uint8_t CMD)
+{
 	uint8_t tmp[24];
 	for(uint8_t i=0;i<DispNum;i++){
 		tmp[2*i]=ADDR;
 		tmp[(2*i)+1]=CMD;
 	}
-	//HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	/**/
 	HAL_SPI_Transmit(&hspi2,tmp,24,50);
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	  for(uint8_t i=0;i<10;i++){
-		  asm("nop");
-	  }
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+	MAX7219_LoadPuse();
 }
-void SendFrameToDisplay(void){
+/**/
+void SendFrameToDisplay(void)
+{
+	/*locals*/
 	uint8_t tmp1[24];
 	uint8_t tmp2[24];
 	uint8_t tmp3[8][24];
+	/**/
 	for(uint8_t i=0;i<DispNum;i++){
 		tmp1[2*i]=REG_SHTDWN;
 		tmp1[(2*i)+1]=SHUTDOWN_MODE;
 		tmp2[2*i]=REG_SHTDWN;
 		tmp2[(2*i)+1]=NORMAL_MODE;
 	}
+	/**/
 	for(uint8_t i=8;i>0;i--){
 		for(uint8_t j=0;j<DispNum;j++){
 			tmp3[i-1][2*j]=i;
 			tmp3[i-1][(2*j)+1]=DisplayData[DispLength-(8*j)-9+i];
 		}
 	}
-	//HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	/*Shutdown drivers*/
 	HAL_SPI_Transmit(&hspi2,tmp1,24,100);
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	  for(uint8_t i=0;i<10;i++){
-		  asm("nop");
-	  }
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
-	//HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+	MAX7219_LoadPuse();
+	/*Send out data*/
 	for(uint8_t i=8;i>0;i--){
-		//HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_RESET);
 		HAL_SPI_Transmit(&hspi2, &tmp3[i-1][0], 24, 100);
-		HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-		  for(uint8_t i=0;i<10;i++){
-			  asm("nop");
-		  }
-		HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
-		//HAL_GPIO_WritePin(MAX7219_CS_PORT, MAX7219_CS_PIN, GPIO_PIN_SET);
+		MAX7219_LoadPuse();
 	}
-	//HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
+	/*Turn back on display*/
 	HAL_SPI_Transmit(&hspi2,tmp2,24,100);
-	//HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	  for(uint8_t i=0;i<10;i++){
-		  asm("nop");
-	  }
-	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
+	MAX7219_LoadPuse();
 }
-uint8_t BitSwapping(uint8_t ch){
+/**/
+uint8_t BitSwapping(uint8_t ch)
+{
 	uint8_t retval=0x00;
 	if (ch&0B00000001) retval|=0B10000000;
 	if (ch&0B00000010) retval|=0B01000000;
@@ -352,11 +339,12 @@ HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
 	RTC_TimeTypeDef HAL_Time={0,0,0,0,0,0,RTC_DAYLIGHTSAVING_NONE,RTC_STOREOPERATION_RESET};
 	RTC_DateTypeDef HAL_Date={0,0,0,0};
 	uint8_t Attempt=0;
+#define NumberOfAttepmts 	3
 	/*Try to connect AP*/
 	while(1)
 	{
 		Attempt++;
-		if(Attempt<10)
+		if(Attempt<NumberOfAttepmts)
 		{
 			if(ESP8266_NTP_Init(SSID, PassWord) == HAL_OK)
 			{
@@ -373,7 +361,7 @@ HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
 	while(1)
 	{
 		Attempt++;
-		if(Attempt<10)
+		if(Attempt<NumberOfAttepmts)
 		{
 			if(ESP8266_NTP_GetDateTime(&DateTime) == HAL_OK)
 			{
@@ -402,8 +390,9 @@ HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
 /**/
 void RemoteXY_InitAndRun(void)
 {
+	/*defines*/
+#define	RemoteXY_Timeout 15000
 	/*locals*/
-	uint32_t RemoteXY_Timeout=30000;
 	uint32_t StartTime=HAL_GetTick();
 	/**/
 	ESP8266_RemoteXY_InitAndStart();
@@ -438,7 +427,7 @@ void RemoteXY_InitAndRun(void)
 HAL_StatusTypeDef Init_Application(void)
 {
 	/**/
-	Init_MAX7219();
+	MAX7219_Init();
 	/**/
 	HAL_FLASH_Unlock();
 	if (EE_Init() != HAL_OK)
@@ -486,70 +475,90 @@ void Run_Application(void)
 /* Interrupt Callbacks Start ---------------------------------------------------------*/
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
-	if(AppCfg.DisplayMode==Time){
+	if(AppCfg.DisplayMode==Time)
+	{
 		AppCfg.Point=!AppCfg.Point;
 		AppCfg.UpdateTime=1;
 		AppCfg.TimeAnimation=1;
 		AppCfg.ScrollDateSecCounter++;
-		if(AppCfg.ScrollDateSecCounter==10){
+		if(AppCfg.ScrollDateSecCounter==10)
+		{
 			CreateDateData();
 			CreateDisplayDataArray(TextArray);
 			AppCfg.DisplayMode=Date;
 			AppCfg.ScrollDateSecCounter=0;
 		}
 	}
-}
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	if (huart->Instance == USART2)	{
-		if('0'<=UartBuff[0]&&UartBuff[0]<='9' &&'0'<=UartBuff[1]&&UartBuff[1]<='9'&&UartBuff[2]==':'&&
-				'0'<=UartBuff[3]&&UartBuff[3]<='9'&&'0'<=UartBuff[4]&&UartBuff[4]<='9')
-		{
-			RTC_TimeTypeDef Time;
-			RTC_DateTypeDef Date;
-			Time.Hours=(UartBuff[0]-'0')*10+(UartBuff[1]-'0');
-			Time.Minutes=(UartBuff[3]-'0')*10+(UartBuff[4]-'0');
-			Time.DayLightSaving=RTC_DAYLIGHTSAVING_NONE;
-			HAL_RTC_SetTime(&hrtc,&Time,RTC_FORMAT_BIN);
-			HAL_RTC_GetDate(&hrtc,&Date,RTC_FORMAT_BIN);
-			HAL_RTC_GetTime(&hrtc,&Time,RTC_FORMAT_BIN);
-		}
-		HAL_UART_Receive_IT(&huart2,UartBuff,5);
+
+	if(AppCfg.DisplayDateDone == true)
+	{
+		AppCfg.DisplayMode = Time;
+		AppCfg.FirstRun = 1;
+		time_out();
+		AppCfg.DisplayDateDone = false;
 	}
-}
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-{
-	if(huart->ErrorCode == HAL_UART_ERROR_ORE){
-		HAL_UART_Receive_IT(&huart2,UartBuff,5);
+
+	if(AppCfg.DisplayTextDone == true)
+	{
+		AppCfg.DisplayMode = Time;
+		AppCfg.FirstRun = 1;
+		time_out();
+		AppCfg.DisplayTextDone = false;
 	}
 }
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	UNUSED(htim);
 	/*timer3 interrupt*/
-	if(htim->Instance==TIM3){
-		if(AppCfg.DisplayMode == Time){
-			if(AppCfg.TimeAnimation==1){
-				time_out();
-			}
+	if(htim->Instance==TIM3)
+	{
+		/**/
+		if(AppCfg.DisplayMode == Time)
+		{
+			time_out();
 		}
-		if(AppCfg.DisplayMode==Date){
-			if (ScrollText) {
-				if (AppCfg.FirstColumn == ((TextLength * 6) - 24)) {
+		/**/
+		if(AppCfg.DisplayMode == Date)
+		{
+			if (ScrollText)
+			{
+				if (AppCfg.FirstColumn == ((TextLength * 6) - 24))
+				{
 					ScrollText = false;
-					AppCfg.DisplayMode=Time;
-					AppCfg.FirstRun=1;
+					AppCfg.DisplayDateDone = true;
 				}
-				else {
+				else
+				{
 					SendToDisplay(AppCfg.FirstColumn);
 					AppCfg.FirstColumn++;
 				}
 			}
 		}
+		/**/
+		if(AppCfg.DisplayMode == Text)
+		{
+
+			AppCfg.DisplayTextDone = true;
+		}
 	}
 	/*timer4 interrupt*/
 	if(htim->Instance==TIM4)
 	{
+
+	}
+}
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (huart->Instance == USART2)
+	{
+		//HAL_UART_Receive_IT(&huart2,UartBuff,5);
+	}
+}
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->ErrorCode == HAL_UART_ERROR_ORE)
+	{
+		//HAL_UART_Receive_IT(&huart2,UartBuff,5);
 	}
 }
 void HAL_SYSTICK_Callback(void)
