@@ -23,26 +23,8 @@ typedef struct AppConfig_Type{
 #define VirtAddr_TimeAnimation				(VirtAddr_ScrollDateIntervalInSec + SizeOf_ScrollDateIntervalInSec)
 #define SizeOf_TimeAnimation				(0x0001)
 	/**/
-#define VirtAddr_Connected					(VirtAddr_TimeAnimation + SizeOf_TimeAnimation)
-#define SizeOf_Connected					(0x0001)
-	/**/
-#define VirtAddr_FirstRun					(VirtAddr_Connected + SizeOf_Connected)
-#define SizeOf_FirstRun						(0x0001)
-	/**/
-#define VirtAddr_UpdateTime					(VirtAddr_FirstRun + SizeOf_FirstRun)
-#define SizeOf_UpdateTime					(0x0001)
-	/**/
-#define VirtAddr_FlipCounter				(VirtAddr_UpdateTime + SizeOf_UpdateTime)
-#define SizeOf_FlipCounter					(0x0001)
-	/**/
-#define VirtAddr_Point						(VirtAddr_FlipCounter + SizeOf_FlipCounter)
-#define SizeOf_Point						(0x0001)
-	/**/
-#define VirtAddr_ScrollDateSecCounter		(VirtAddr_Point + SizeOf_Point)
-#define SizeOf_ScrollDateSecCounter			(0x0002)
-	/**/
-#define VirtAddr_DisplayMode				(VirtAddr_ScrollDateSecCounter + SizeOf_ScrollDateSecCounter)
-#define SizeOf_DisplayMode					(0x0001)
+#define SizeOf_CharacterOnDisplay			(0x0006)
+#define SizeOf_DisplayColumnDataArray		(SizeOf_CharacterOnDisplay * SizeOf_ScrollText)
 	/*read out from eeprom elements*/
 	uint8_t 	SSID[SizeOf_SSID];
 	uint8_t		PassWord[SizeOf_PassWord];
@@ -51,16 +33,26 @@ typedef struct AppConfig_Type{
 	uint16_t	ScrollDateIntervalInSec;//0-65536 sec
 	uint8_t 	TimeAnimation;//0 or 1
 	/*normal variables*/
+	uint8_t		DisplayTextArray[SizeOf_ScrollText];
+	uint8_t 	DisplayDataArray[SizeOf_DisplayColumnDataArray];
 	uint8_t 	Connected;
 	bool		FirstRun;
 	uint8_t 	UpdateTime;
 	uint8_t		FlipCounter;
 	uint8_t		Point;
 	uint16_t	ScrollDateSecCounter;
+	uint16_t	ScrollTextSecCounter;
 	uint8_t 	DisplayMode;
-	uint8_t 	FirstColumn;
+	uint16_t 	FirstColumn;
 	bool 		DisplayDateDone;
 	bool 		DisplayTextDone;
+	bool 		TextScrolling;
+	uint8_t 	TextLength;
+	bool		TextScrollEnd;
+	uint8_t		NewTimeDataArray[36];
+	bool 		TimeDiffIndicator[6];
+	uint8_t		DisplayData[96];
+
 }AppConfig_Type;
 // =====================================================================================
 typedef struct RTC_DataType{

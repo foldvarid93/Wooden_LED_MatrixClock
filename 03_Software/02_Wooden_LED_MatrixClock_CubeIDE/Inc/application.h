@@ -85,21 +85,9 @@
 #define NOP					0x00
 /***********************************************///MAX7219 define constants end
 /***********************************************///constants declarations begin
-RTC_DataType			RTC_Data;							//sec,min,hour,day,date,month,year
 RTC_TimeTypeDef	 		Time_Data;							//id�t t�rol� strukt�rap�ld�ny
-//RTC_TimeTypeDef		time[2];
-TimeType				time[2];
 RTC_DateTypeDef			Date_Data;							//d�tumot t�rol� strukt�rap�ld�ny
-uint8_t					DisplayData[96];					//kijelz� oszlopainak adatai
-uint8_t					NewTimeDataArray[36];
-bool 					TimeDiffIndicator[6];
-bool					ScrollText;
-bool 					ScrollEnd;
-uint8_t					TextLength;
-uint8_t 				TextArray[256];
-uint8_t 				DisplayDataArray[1536];
-uint8_t 				UartBuff[5];						//HH:MM form�tumhoz el�g 5 byte
-uint8_t 				TimeData[4];						//ebben van t�rolva az id�
+TimeType				time[2];
 enum 					mode{Time, Date , Text};
 extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v sz�vegesen
 extern const uint8_t	Months[12][12];						//jan,feb.....dec sz�vegesen
@@ -108,7 +96,7 @@ AppConfig_Type 			AppCfg;
 /***********************************************///functions declaration begin
 void MAX7219_Init(void);
 void CreateDateData(void);
-void CreateDisplayDataArray(uint8_t* Text);
+void CreateDisplayDataArray(void);
 void SendToDisplay(uint16_t from);
 void MAX7219_LoadPuse(void);
 void SPI_Send(uint8_t ADDR, uint8_t CMD);

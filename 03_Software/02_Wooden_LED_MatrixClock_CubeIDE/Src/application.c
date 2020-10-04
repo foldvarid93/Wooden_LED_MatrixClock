@@ -33,30 +33,31 @@ void CreateDateData(void){
 	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
 	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
 	for(i=0;i<4;i++){							//16 sz?k?z
-		TextArray[i]=' ';
+		AppCfg.DisplayTextArray[i]=' ';
 	}
 	for(uint8_t j=0;DateText[j]!='\0';i++,j++){	//A mai d?tum:
-		TextArray[i]=DateText[j];
+		AppCfg.DisplayTextArray[i]=DateText[j];
 	}
-	TextArray[i++]='2';
-	TextArray[i++]='0';
-	TextArray[i++]=(Date_Data.Year/10)+'0';
-	TextArray[i++]=(Date_Data.Year%10)+'0';	//?vsz?m
-	TextArray[i++]='.';							//pont
-	TextArray[i++]=Date_Data.Month/10+'0';
-	TextArray[i++]=Date_Data.Month%10+'0';	//h?nap
-	TextArray[i++]='.';							//pont
-	TextArray[i++]=Date_Data.Date/10+'0';
-	TextArray[i++]=Date_Data.Date%10+'0';	//nap
-	TextArray[i++]='.';							//pont
-	TextArray[i++]=',';							//vessz?
+	AppCfg.DisplayTextArray[i++]='2';
+	AppCfg.DisplayTextArray[i++]='0';
+	AppCfg.DisplayTextArray[i++]=(Date_Data.Year/10)+'0';
+	AppCfg.DisplayTextArray[i++]=(Date_Data.Year%10)+'0';	//?vsz?m
+	AppCfg.DisplayTextArray[i++]='.';							//pont
+	AppCfg.DisplayTextArray[i++]=Date_Data.Month/10+'0';
+	AppCfg.DisplayTextArray[i++]=Date_Data.Month%10+'0';	//h?nap
+	AppCfg.DisplayTextArray[i++]='.';							//pont
+	AppCfg.DisplayTextArray[i++]=Date_Data.Date/10+'0';
+	AppCfg.DisplayTextArray[i++]=Date_Data.Date%10+'0';	//nap
+	AppCfg.DisplayTextArray[i++]='.';							//pont
+	AppCfg.DisplayTextArray[i++]=',';							//vessz?
 	for(uint8_t j=0;WeekDays[Date_Data.WeekDay-1][j]!='\0';i++,j++){
-		TextArray[i]=WeekDays[Date_Data.WeekDay-1][j];		//a h?t napja
+		AppCfg.DisplayTextArray[i]=WeekDays[Date_Data.WeekDay-1][j];		//a h?t napja
 	}
 	for(uint8_t j=0;j<4;i++,j++){				//16 sz?k?z
-		TextArray[i]=' ';
+		AppCfg.DisplayTextArray[i]=' ';
 	}
-	TextArray[i]='\0';							//lez?r? nulla
+	AppCfg.DisplayTextArray[i]='\0';			//lez?r? nulla
+	/**/
 }
 /*********************************/				//Date functions end
 /*********************************/				//Time functions begin
@@ -108,18 +109,18 @@ void time_out(void)
 
 		for (uint8_t i = 0; i < 5; i++) {
 			if (time[0].hour_tens == 0) {
-				DisplayData[i+HourTensStartIdx] = 0;
+				AppCfg.DisplayData[i+HourTensStartIdx] = 0;
 			} else {
-				DisplayData[i+HourTensStartIdx] = BitSwapping(characters[time[0].hour_tens+ '0'][i]);
+				AppCfg.DisplayData[i+HourTensStartIdx] = BitSwapping(characters[time[0].hour_tens+ '0'][i]);
 			}
-			DisplayData[i + HourSinglesStartIdx] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
-			DisplayData[i + MinTensStartIdx] = BitSwapping(characters[time[0].min_tens + '0'][i]);
-			DisplayData[i + MinSinglesStartIdx] = BitSwapping(characters[time[0].min_singles + '0'][i]);
-			DisplayData[i + SecTensStartIdx] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
-			DisplayData[i + SecSinglesStartIdx] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
+			AppCfg.DisplayData[i + HourSinglesStartIdx] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
+			AppCfg.DisplayData[i + MinTensStartIdx] = BitSwapping(characters[time[0].min_tens + '0'][i]);
+			AppCfg.DisplayData[i + MinSinglesStartIdx] = BitSwapping(characters[time[0].min_singles + '0'][i]);
+			AppCfg.DisplayData[i + SecTensStartIdx] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
+			AppCfg.DisplayData[i + SecSinglesStartIdx] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
 		}
-		DisplayData[HourMinDoubleDot] = 0x22;
-		DisplayData[MinSecDoubleDot] = 0x22;
+		AppCfg.DisplayData[HourMinDoubleDot] = 0x22;
+		AppCfg.DisplayData[MinSecDoubleDot] = 0x22;
 
 		SendFrameToDisplay();
 
@@ -139,80 +140,80 @@ void time_out(void)
 		time[0].sec_singles=Time_Data.Seconds % 10;
 
 		if(time[0].sec_singles!=time[1].sec_singles){
-			TimeDiffIndicator[5]=1;
+			AppCfg.TimeDiffIndicator[5]=1;
 			for(uint8_t i=0;i<5;i++){
-				NewTimeDataArray[i + 30] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
+				AppCfg.NewTimeDataArray[i + 30] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
 			}
 		}
 		else {
-			TimeDiffIndicator[5]=0;
+			AppCfg.TimeDiffIndicator[5]=0;
 		}
 		if(time[0].sec_tens!=time[1].sec_tens){
-			TimeDiffIndicator[4]=1;
+			AppCfg.TimeDiffIndicator[4]=1;
 			for(uint8_t i=0;i<5;i++){
-				NewTimeDataArray[i + 24] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
+				AppCfg.NewTimeDataArray[i + 24] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
 			}
 		}
 		else {
-			TimeDiffIndicator[4]=0;
+			AppCfg.TimeDiffIndicator[4]=0;
 		}
 		if(time[0].min_singles!=time[1].min_singles){
-			TimeDiffIndicator[3]=1;
+			AppCfg.TimeDiffIndicator[3]=1;
 			for(uint8_t i=0;i<5;i++){
-				NewTimeDataArray[i + 18] = BitSwapping(characters[time[0].min_singles + '0'][i]);
+				AppCfg.NewTimeDataArray[i + 18] = BitSwapping(characters[time[0].min_singles + '0'][i]);
 			}
 		}
 		else {
-			TimeDiffIndicator[3]=0;
+			AppCfg.TimeDiffIndicator[3]=0;
 		}
 		if(time[0].min_tens!=time[1].min_tens){
-			TimeDiffIndicator[2]=1;
+			AppCfg.TimeDiffIndicator[2]=1;
 			for(uint8_t i=0;i<5;i++){
-				NewTimeDataArray[i + 12] = BitSwapping(characters[time[0].min_tens + '0'][i]);
+				AppCfg.NewTimeDataArray[i + 12] = BitSwapping(characters[time[0].min_tens + '0'][i]);
 			}
 		}
 		else {
-			TimeDiffIndicator[2]=0;
+			AppCfg.TimeDiffIndicator[2]=0;
 		}
 		if(time[0].hour_singles!=time[1].hour_singles){
-			TimeDiffIndicator[1]=1;
+			AppCfg.TimeDiffIndicator[1]=1;
 			for(uint8_t i=0;i<5;i++){
-				NewTimeDataArray[i + 6] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
+				AppCfg.NewTimeDataArray[i + 6] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
 			}
 		}
 		else {
-			TimeDiffIndicator[1]=0;
+			AppCfg.TimeDiffIndicator[1]=0;
 		}
 		if(time[0].hour_tens!=time[1].hour_tens){
-			TimeDiffIndicator[0]=1;
+			AppCfg.TimeDiffIndicator[0]=1;
 			for(uint8_t i=0;i<5;i++){
-				NewTimeDataArray[i] = BitSwapping(characters[time[0].hour_tens + '0'][i]);
+				AppCfg.NewTimeDataArray[i] = BitSwapping(characters[time[0].hour_tens + '0'][i]);
 			}
 		}
 		else {
-			TimeDiffIndicator[0]=0;
+			AppCfg.TimeDiffIndicator[0]=0;
 		}
 		time[1]=time[0];
 		AppCfg.UpdateTime=0;
 	}
 	if(AppCfg.TimeAnimation==1){
-		if (TimeDiffIndicator[0]){
-			TimeAnimation(&DisplayData[HourTensStartIdx],&NewTimeDataArray[0]);
+		if (AppCfg.TimeDiffIndicator[0]){
+			TimeAnimation(&AppCfg.DisplayData[HourTensStartIdx],&AppCfg.NewTimeDataArray[0]);
 		}
-		if (TimeDiffIndicator[1]){
-			TimeAnimation(&DisplayData[HourSinglesStartIdx],&NewTimeDataArray[6]);
+		if (AppCfg.TimeDiffIndicator[1]){
+			TimeAnimation(&AppCfg.DisplayData[HourSinglesStartIdx],&AppCfg.NewTimeDataArray[6]);
 		}
-		if (TimeDiffIndicator[2]){
-			TimeAnimation(&DisplayData[MinTensStartIdx],&NewTimeDataArray[12]);
+		if (AppCfg.TimeDiffIndicator[2]){
+			TimeAnimation(&AppCfg.DisplayData[MinTensStartIdx],&AppCfg.NewTimeDataArray[12]);
 		}
-		if(TimeDiffIndicator[3]){
-			TimeAnimation(&DisplayData[MinSinglesStartIdx],&NewTimeDataArray[18]);
+		if(AppCfg.TimeDiffIndicator[3]){
+			TimeAnimation(&AppCfg.DisplayData[MinSinglesStartIdx],&AppCfg.NewTimeDataArray[18]);
 		}
-		if(TimeDiffIndicator[4]){
-			TimeAnimation(&DisplayData[SecTensStartIdx],&NewTimeDataArray[24]);
+		if(AppCfg.TimeDiffIndicator[4]){
+			TimeAnimation(&AppCfg.DisplayData[SecTensStartIdx],&AppCfg.NewTimeDataArray[24]);
 		}
-		if(TimeDiffIndicator[5]){
-			TimeAnimation(&DisplayData[SecSinglesStartIdx],&NewTimeDataArray[30]);
+		if(AppCfg.TimeDiffIndicator[5]){
+			TimeAnimation(&AppCfg.DisplayData[SecSinglesStartIdx],&AppCfg.NewTimeDataArray[30]);
 		}
 		SendFrameToDisplay();
 		AppCfg.FlipCounter++;
@@ -224,18 +225,31 @@ void time_out(void)
 }
 /*********************************/				//Time functions end
 /*********************************/				//Text functions begin
-void CreateDisplayDataArray(uint8_t *Text) {
-  ScrollText = false;
-  TextLength = strlen((const char*)Text);
-  for (uint8_t i = 0; i < TextLength; i++) {
-    for (uint8_t j = 0; j < 6; j++) {
-      DisplayDataArray[(i * 6) + j] = BitSwapping(characters[Text[i]][j]);
-    }
-  }
-  AppCfg.FirstColumn = 0;
-  ScrollEnd = false;
-  ScrollText = true;
+void CreateDisplayDataArray()
+{
+	AppCfg.TextScrolling = false;
+	//strcat()
+	//strcat((char*)Text,"    ");//add some space
+	AppCfg.TextLength = strlen((const char*)AppCfg.DisplayTextArray);
+	/*set to zero*/
+	for(uint16_t k=0;k<1536;k++)
+	{
+	  AppCfg.DisplayDataArray[k]=0;
+	}
+	/*fill up with data*/
+	for (uint8_t i = 0; i < AppCfg.TextLength; i++)
+	{
+		for (uint8_t j = 0; j < 6; j++)
+		{
+		  AppCfg.DisplayDataArray[(i * 6) + j] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
+		}
+	}
+
+	AppCfg.FirstColumn = 0;
+	AppCfg.TextScrollEnd = false;
+	AppCfg.TextScrolling = true;
 }
+/**/
 void SendToDisplay(uint16_t from) {
 #define DispCount 12//
   //
@@ -243,7 +257,7 @@ void SendToDisplay(uint16_t from) {
   for(uint8_t i=0;i<8;i++){
 	  for(uint8_t j=0;j<12;j++){
 		  tmp[(i*24)+(2*j)]=8-i;
-		  tmp[192-((i*24)+(2*j)+1)]=DisplayDataArray[from+(j*8)+i];
+		  tmp[192-((i*24)+(2*j)+1)]=AppCfg.DisplayDataArray[from+(j*8)+i];
 	  }
   }
   /**/
@@ -303,7 +317,7 @@ void SendFrameToDisplay(void)
 	for(uint8_t i=8;i>0;i--){
 		for(uint8_t j=0;j<DispNum;j++){
 			tmp3[i-1][2*j]=i;
-			tmp3[i-1][(2*j)+1]=DisplayData[DispLength-(8*j)-9+i];
+			tmp3[i-1][(2*j)+1]=AppCfg.DisplayData[DispLength-(8*j)-9+i];
 		}
 	}
 	/*Shutdown drivers*/
@@ -435,14 +449,15 @@ HAL_StatusTypeDef Init_Application(void)
 		return HAL_ERROR;
 	}
 	/*RemoteXY*/
-	RemoteXY_InitAndRun();
+	//RemoteXY_InitAndRun();
 
 	/*read eeprom SSID and PassWord*/
 	EE_ReadCharArray(VirtAddr_SSID,(uint8_t*)(AppCfg.SSID));
 	EE_ReadCharArray(VirtAddr_PassWord,(uint8_t*)(AppCfg.PassWord));
+	//EE_ReadCharArray(VirtAddr_ScrollText, (uint8_t)AppCfg.ScrollText);
 
 	/*RTC sync from NTP*/
-	if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
+	//if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
 	{
 		//HAL_NVIC_SystemReset();
 	}
@@ -455,14 +470,18 @@ HAL_StatusTypeDef Init_Application(void)
 	AppCfg.FlipCounter=0;
 	AppCfg.Point=false;
 	AppCfg.ScrollDateSecCounter=0;
+	AppCfg.ScrollTextSecCounter=0;
 	AppCfg.DisplayMode=Time;
+	AppCfg.ScrollDateIntervalInSec=15;
+	AppCfg.ScrollTextIntervalInSec=10;
+	strcpy((char*)AppCfg.ScrollText, "Ez egy futószöveg reklám: 6041, Kerekegyháza Tavasz u. 25.");
 	/**/
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
 	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
 	return HAL_OK;
 }
-
+/**/
 void Run_Application(void)
 {
 	/**/
@@ -481,13 +500,29 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 		AppCfg.UpdateTime=1;
 		AppCfg.TimeAnimation=1;
 		AppCfg.ScrollDateSecCounter++;
-		if(AppCfg.ScrollDateSecCounter==10)
+		AppCfg.ScrollTextSecCounter++;
+		if(AppCfg.ScrollDateSecCounter == AppCfg.ScrollDateIntervalInSec)
 		{
 			CreateDateData();
-			CreateDisplayDataArray(TextArray);
+			CreateDisplayDataArray();
 			AppCfg.DisplayMode=Date;
 			AppCfg.ScrollDateSecCounter=0;
 		}
+		if(AppCfg.ScrollTextIntervalInSec == AppCfg.ScrollTextSecCounter)
+		{
+			strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.ScrollText);
+			CreateDisplayDataArray();
+			AppCfg.DisplayMode=Text;
+			AppCfg.ScrollTextSecCounter=0;
+		}
+	}
+	if(AppCfg.DisplayMode == Text)
+	{
+
+	}
+	if(AppCfg.DisplayMode == Date)
+	{
+
 	}
 
 	if(AppCfg.DisplayDateDone == true)
@@ -520,11 +555,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		/**/
 		if(AppCfg.DisplayMode == Date)
 		{
-			if (ScrollText)
+			if (AppCfg.TextScrolling)
 			{
-				if (AppCfg.FirstColumn == ((TextLength * 6) - 24))
+				if (AppCfg.FirstColumn == ((AppCfg.TextLength * 6) - 24))
 				{
-					ScrollText = false;
+					AppCfg.TextScrolling = false;
 					AppCfg.DisplayDateDone = true;
 				}
 				else
@@ -537,8 +572,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		/**/
 		if(AppCfg.DisplayMode == Text)
 		{
-
-			AppCfg.DisplayTextDone = true;
+			if (AppCfg.TextScrolling)
+			{
+				if (AppCfg.FirstColumn == ((AppCfg.TextLength * 6) - 24))
+				{
+					AppCfg.TextScrolling = false;
+					AppCfg.DisplayTextDone = true;
+				}
+				else
+				{
+					SendToDisplay(AppCfg.FirstColumn);
+					AppCfg.FirstColumn++;
+				}
+			}
 		}
 	}
 	/*timer4 interrupt*/
