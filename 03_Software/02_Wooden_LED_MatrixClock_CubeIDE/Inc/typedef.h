@@ -44,6 +44,7 @@ typedef struct AppConfig_Type{
 	uint16_t	ScrollTextSecCounter;
 	uint8_t 	DisplayMode;
 	uint16_t 	FirstColumn;
+	uint16_t	LastColumn;
 	bool 		DisplayDateDone;
 	bool 		DisplayTextDone;
 	bool 		TextScrolling;
@@ -52,6 +53,7 @@ typedef struct AppConfig_Type{
 	uint8_t		NewTimeDataArray[36];
 	bool 		TimeDiffIndicator[6];
 	uint8_t		DisplayData[96];
+	bool		TextScrollingMode;
 
 }AppConfig_Type;
 // =====================================================================================

@@ -28,7 +28,9 @@ const uint8_t	Months[12][12]={
 								{"november"},
 								{"december"}};
 /*********************************/				//Date functions begin
-void CreateDateData(void){
+/**/
+void CreateDateData(void)
+{
 	uint8_t	i=0;
 	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
 	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
@@ -61,7 +63,9 @@ void CreateDateData(void){
 }
 /*********************************/				//Date functions end
 /*********************************/				//Time functions begin
-void TimeAnimation(uint8_t* Dest,uint8_t* Source){
+/**/
+void TimeAnimation(uint8_t* Dest,uint8_t* Source)
+{
 	for(uint8_t i=0;i<6;i++){
 		(Dest[i])<<=1;
 		if ((Source[i])&0x80){
@@ -73,7 +77,9 @@ void TimeAnimation(uint8_t* Dest,uint8_t* Source){
 		Source[i]<<=1;
 	}
 }
-char concat(char b, char a){
+/**/
+char concat(char b, char a)
+{
 	a>>=1;
 	if(b&0x01){
 		a|=0x80;
@@ -83,6 +89,7 @@ char concat(char b, char a){
 	}
 	return a;
 }
+/**/
 void time_out(void)
 {
 #define StartIdx 			28
@@ -223,34 +230,52 @@ void time_out(void)
 		}
 	}
 }
-/*********************************/				//Time functions end
-/*********************************/				//Text functions begin
-void CreateDisplayDataArray()
+/**/
+void CreateDisplayDataArray(void)
 {
 	AppCfg.TextScrolling = false;
-	//strcat()
-	//strcat((char*)Text,"    ");//add some space
 	AppCfg.TextLength = strlen((const char*)AppCfg.DisplayTextArray);
 	/*set to zero*/
 	for(uint16_t k=0;k<1536;k++)
 	{
 	  AppCfg.DisplayDataArray[k]=0;
 	}
+	/**/
+	uint16_t StartIndx;
+	if(AppCfg.TextScrollingMode == true)
+	{
+		StartIndx = 96;
+	}
+	else
+	{
+		StartIndx = 0;
+	}
 	/*fill up with data*/
-	for (uint8_t i = 0; i < AppCfg.TextLength; i++)
+	for (uint8_t i=0; i < AppCfg.TextLength; i++)
 	{
 		for (uint8_t j = 0; j < 6; j++)
 		{
-		  AppCfg.DisplayDataArray[(i * 6) + j] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
+		  AppCfg.DisplayDataArray[StartIndx] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
+		  StartIndx++;
 		}
 	}
-
+	/**/
+	if(AppCfg.TextScrollingMode == true)
+	{
+		AppCfg.LastColumn = StartIndx + 96;
+	}
+	else
+	{
+		AppCfg.LastColumn = StartIndx;
+	}
+	/**/
 	AppCfg.FirstColumn = 0;
 	AppCfg.TextScrollEnd = false;
 	AppCfg.TextScrolling = true;
 }
 /**/
-void SendToDisplay(uint16_t from) {
+void SendToDisplay(uint16_t from)
+{
 #define DispCount 12//
   //
   uint8_t tmp[192];
@@ -269,7 +294,6 @@ void SendToDisplay(uint16_t from) {
   SPI_Send(REG_SHTDWN, NORMAL_MODE);
   asm("nop");
 }
-/*********************************/				//Text functions end
 /**/
 void MAX7219_Init(void)
 {
@@ -280,7 +304,8 @@ void MAX7219_Init(void)
 	SPI_Send(REG_INTENSITY, INTENSITY_7);
 }
 /**/
-void MAX7219_LoadPuse(void){
+void MAX7219_LoadPuse(void)
+{
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
 	for(uint8_t i=0;i<10;i++){
 		asm("nop");
@@ -474,6 +499,7 @@ HAL_StatusTypeDef Init_Application(void)
 	AppCfg.DisplayMode=Time;
 	AppCfg.ScrollDateIntervalInSec=15;
 	AppCfg.ScrollTextIntervalInSec=10;
+	AppCfg.TextScrollingMode=true;
 	strcpy((char*)AppCfg.ScrollText, "Ez egy futószöveg reklám: 6041, Kerekegyháza Tavasz u. 25.");
 	/**/
 	HAL_TIM_Base_Start_IT(&htim3);
@@ -484,7 +510,6 @@ HAL_StatusTypeDef Init_Application(void)
 /**/
 void Run_Application(void)
 {
-	/**/
 	while(1)
 	{
 
@@ -492,6 +517,7 @@ void Run_Application(void)
 }
 /* Application Main Functions End ---------------------------------------------------------*/
 /* Interrupt Callbacks Start ---------------------------------------------------------*/
+/**/
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	if(AppCfg.DisplayMode==Time)
@@ -541,6 +567,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 		AppCfg.DisplayTextDone = false;
 	}
 }
+/**/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	UNUSED(htim);
@@ -553,31 +580,23 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			time_out();
 		}
 		/**/
-		if(AppCfg.DisplayMode == Date)
+		if((AppCfg.DisplayMode == Text) || (AppCfg.DisplayMode == Date) )
 		{
 			if (AppCfg.TextScrolling)
 			{
-				if (AppCfg.FirstColumn == ((AppCfg.TextLength * 6) - 24))
+				if (AppCfg.FirstColumn == (AppCfg.LastColumn - 96))
 				{
 					AppCfg.TextScrolling = false;
-					AppCfg.DisplayDateDone = true;
-				}
-				else
-				{
-					SendToDisplay(AppCfg.FirstColumn);
-					AppCfg.FirstColumn++;
-				}
-			}
-		}
-		/**/
-		if(AppCfg.DisplayMode == Text)
-		{
-			if (AppCfg.TextScrolling)
-			{
-				if (AppCfg.FirstColumn == ((AppCfg.TextLength * 6) - 24))
-				{
-					AppCfg.TextScrolling = false;
-					AppCfg.DisplayTextDone = true;
+					/**/
+					if(AppCfg.DisplayMode == Text)
+					{
+						AppCfg.DisplayTextDone = true;
+					}
+					/**/
+					if(AppCfg.DisplayMode == Text)
+					{
+						AppCfg.DisplayDateDone = true;
+					}
 				}
 				else
 				{
@@ -593,6 +612,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	}
 }
+/**/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if (huart->Instance == USART2)
@@ -600,6 +620,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		//HAL_UART_Receive_IT(&huart2,UartBuff,5);
 	}
 }
+/**/
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
 	if(huart->ErrorCode == HAL_UART_ERROR_ORE)
@@ -607,6 +628,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 		//HAL_UART_Receive_IT(&huart2,UartBuff,5);
 	}
 }
+/**/
 void HAL_SYSTICK_Callback(void)
 {
 }
