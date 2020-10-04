@@ -34,10 +34,8 @@ void CreateDateData(void)
 	uint8_t	i=0;
 	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
 	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
-	for(i=0;i<4;i++){							//16 sz?k?z
-		AppCfg.DisplayTextArray[i]=' ';
-	}
-	for(uint8_t j=0;DateText[j]!='\0';i++,j++){	//A mai d?tum:
+	for(uint8_t j=0;DateText[j]!='\0';i++,j++)
+	{
 		AppCfg.DisplayTextArray[i]=DateText[j];
 	}
 	AppCfg.DisplayTextArray[i++]='2';
@@ -55,11 +53,7 @@ void CreateDateData(void)
 	for(uint8_t j=0;WeekDays[Date_Data.WeekDay-1][j]!='\0';i++,j++){
 		AppCfg.DisplayTextArray[i]=WeekDays[Date_Data.WeekDay-1][j];		//a h?t napja
 	}
-	for(uint8_t j=0;j<4;i++,j++){				//16 sz?k?z
-		AppCfg.DisplayTextArray[i]=' ';
-	}
 	AppCfg.DisplayTextArray[i]='\0';			//lez?r? nulla
-	/**/
 }
 /*********************************/				//Date functions end
 /*********************************/				//Time functions begin
@@ -224,10 +218,12 @@ void time_out(void)
 		}
 		SendFrameToDisplay();
 		AppCfg.FlipCounter++;
-		if(AppCfg.FlipCounter==8){
+		if(AppCfg.FlipCounter==8)
+		{
 			AppCfg.FlipCounter=0;
 			AppCfg.TimeAnimation=0;
 		}
+		//TODO: non flip time clock
 	}
 }
 /**/
@@ -235,16 +231,21 @@ void CreateDisplayDataArray(void)
 {
 	AppCfg.TextScrolling = false;
 	AppCfg.TextLength = strlen((const char*)AppCfg.DisplayTextArray);
+	/**/
+	if(AppCfg.TextLength >= (SizeOf_ScrollText - SizeOf_WhiteSpaces))
+	{
+		AppCfg.ScrollingMode = JustText;
+	}
 	/*set to zero*/
 	for(uint16_t k=0;k<1536;k++)
 	{
-	  AppCfg.DisplayDataArray[k]=0;
+	  AppCfg.DisplayTextColumnArray[k]=0;
 	}
 	/**/
 	uint16_t StartIndx;
-	if(AppCfg.TextScrollingMode == true)
+	if(AppCfg.ScrollingMode == WallToWall)
 	{
-		StartIndx = 96;
+		StartIndx = NumberOf_DisplayColumn;
 	}
 	else
 	{
@@ -255,18 +256,19 @@ void CreateDisplayDataArray(void)
 	{
 		for (uint8_t j = 0; j < 6; j++)
 		{
-		  AppCfg.DisplayDataArray[StartIndx] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
+		  AppCfg.DisplayTextColumnArray[StartIndx] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
 		  StartIndx++;
 		}
 	}
 	/**/
-	if(AppCfg.TextScrollingMode == true)
+	if(AppCfg.ScrollingMode == WallToWall)
 	{
-		AppCfg.LastColumn = StartIndx + 96;
+		AppCfg.LastColumn = StartIndx + NumberOf_DisplayColumn;
 	}
 	else
 	{
 		AppCfg.LastColumn = StartIndx;
+		AppCfg.TimeStamp = HAL_GetTick();
 	}
 	/**/
 	AppCfg.FirstColumn = 0;
@@ -276,21 +278,22 @@ void CreateDisplayDataArray(void)
 /**/
 void SendToDisplay(uint16_t from)
 {
-#define DispCount 12//
-  //
+  /**/
   uint8_t tmp[192];
   for(uint8_t i=0;i<8;i++){
-	  for(uint8_t j=0;j<12;j++){
+	  for(uint8_t j=0;j<NumberOf_Display;j++){
 		  tmp[(i*24)+(2*j)]=8-i;
-		  tmp[192-((i*24)+(2*j)+1)]=AppCfg.DisplayDataArray[from+(j*8)+i];
+		  tmp[192-((i*24)+(2*j)+1)]=AppCfg.DisplayTextColumnArray[from+(j*8)+i];
 	  }
   }
   /**/
   SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
+  /**/
   for(uint8_t i=0;i<8;i++){
 	  HAL_SPI_Transmit(&hspi2,&tmp[i*24],24,50);
 		MAX7219_LoadPuse();
   }
+  /**/
   SPI_Send(REG_SHTDWN, NORMAL_MODE);
   asm("nop");
 }
@@ -497,10 +500,19 @@ HAL_StatusTypeDef Init_Application(void)
 	AppCfg.ScrollDateSecCounter=0;
 	AppCfg.ScrollTextSecCounter=0;
 	AppCfg.DisplayMode=Time;
-	AppCfg.ScrollDateIntervalInSec=15;
-	AppCfg.ScrollTextIntervalInSec=10;
-	AppCfg.TextScrollingMode=true;
-	strcpy((char*)AppCfg.ScrollText, "Ez egy futószöveg reklám: 6041, Kerekegyháza Tavasz u. 25.");
+	AppCfg.ScrollDateIntervalInSec=10;
+	AppCfg.ScrollTextIntervalInSec=15;
+	AppCfg.TextScrollingMode=WallToWall;
+	AppCfg.DateScrollingMode=WallToWall;
+	char tmp[256];
+	uint8_t z;
+	for(uint8_t i=0;i<0xff;i++){
+		z=(('A'+i)%'A')+'A';
+		tmp[i]=z;
+	}
+	tmp[0xFF]='\0';
+	strcpy((char*)AppCfg.ScrollText, tmp);
+	//strcpy((char*)AppCfg.ScrollText, "6041, Kerekegyháza Tavasz u. 25.");
 	/**/
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
@@ -529,6 +541,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 		AppCfg.ScrollTextSecCounter++;
 		if(AppCfg.ScrollDateSecCounter == AppCfg.ScrollDateIntervalInSec)
 		{
+			AppCfg.ScrollingMode=AppCfg.DateScrollingMode;
 			CreateDateData();
 			CreateDisplayDataArray();
 			AppCfg.DisplayMode=Date;
@@ -537,10 +550,12 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 		if(AppCfg.ScrollTextIntervalInSec == AppCfg.ScrollTextSecCounter)
 		{
 			strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.ScrollText);
+			AppCfg.ScrollingMode=AppCfg.TextScrollingMode;
 			CreateDisplayDataArray();
 			AppCfg.DisplayMode=Text;
 			AppCfg.ScrollTextSecCounter=0;
 		}
+		//TODO: Text and Date display periodically
 	}
 	if(AppCfg.DisplayMode == Text)
 	{
@@ -582,27 +597,68 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		/**/
 		if((AppCfg.DisplayMode == Text) || (AppCfg.DisplayMode == Date) )
 		{
-			if (AppCfg.TextScrolling)
+			if (AppCfg.TextScrolling == true)
 			{
 				if (AppCfg.FirstColumn == (AppCfg.LastColumn - 96))
 				{
-					AppCfg.TextScrolling = false;
+					//AppCfg.TextScrolling = false;
 					/**/
-					if(AppCfg.DisplayMode == Text)
+					if(AppCfg.ScrollingMode == JustText)
 					{
-						AppCfg.DisplayTextDone = true;
+						if((HAL_GetTick()-AppCfg.TimeStamp)<1500)
+						{
+							/*wait*/
+						}
+						else{
+							if(AppCfg.DisplayMode == Text)
+							{
+								AppCfg.DisplayTextDone = true;
+							}
+							/**/
+							if(AppCfg.DisplayMode == Date)
+							{
+								AppCfg.DisplayDateDone = true;
+							}
+						}
+
 					}
-					/**/
-					if(AppCfg.DisplayMode == Text)
+					else
 					{
-						AppCfg.DisplayDateDone = true;
+						if(AppCfg.DisplayMode == Text)
+						{
+							AppCfg.DisplayTextDone = true;
+						}
+						/**/
+						if(AppCfg.DisplayMode == Date)
+						{
+							AppCfg.DisplayDateDone = true;
+						}
 					}
 				}
 				else
 				{
 					SendToDisplay(AppCfg.FirstColumn);
-					AppCfg.FirstColumn++;
+					if((AppCfg.ScrollingMode == JustText)&&(AppCfg.FirstColumn == 0))
+					{
+						if((HAL_GetTick()-AppCfg.TimeStamp)<1500)
+						{
+							/*wait*/
+						}
+						else
+						{
+							AppCfg.FirstColumn++;
+						}
+
+					}
+					else{
+						AppCfg.FirstColumn++;
+						AppCfg.TimeStamp=HAL_GetTick();
+					}
 				}
+			}
+			else//textscrolling false
+			{
+
 			}
 		}
 	}

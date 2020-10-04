@@ -23,8 +23,16 @@ typedef struct AppConfig_Type{
 #define VirtAddr_TimeAnimation				(VirtAddr_ScrollDateIntervalInSec + SizeOf_ScrollDateIntervalInSec)
 #define SizeOf_TimeAnimation				(0x0001)
 	/**/
+#define VirtAddr_TextScrollingMode			(VirtAddr_TimeAnimation + SizeOf_TimeAnimation)
+#define SizeOf_TextScrollingMode			(0x0001)
+	/**/
 #define SizeOf_CharacterOnDisplay			(0x0006)
-#define SizeOf_DisplayColumnDataArray		(SizeOf_CharacterOnDisplay * SizeOf_ScrollText)
+#define SizeOf_DisplayTextColumnArray		(SizeOf_CharacterOnDisplay * SizeOf_ScrollText)
+#define SizeOf_WhiteSpaces					(2* NumberOf_DisplayColumn/SizeOf_CharacterOnDisplay)
+#define NumberOf_ColumnOfOneDisplay			(8)
+#define NumberOf_Display					(12)
+#define NumberOf_DisplayColumn				(NumberOf_Display * NumberOf_ColumnOfOneDisplay)
+
 	/*read out from eeprom elements*/
 	uint8_t 	SSID[SizeOf_SSID];
 	uint8_t		PassWord[SizeOf_PassWord];
@@ -32,9 +40,11 @@ typedef struct AppConfig_Type{
 	uint16_t	ScrollTextIntervalInSec;//0-65536 sec
 	uint16_t	ScrollDateIntervalInSec;//0-65536 sec
 	uint8_t 	TimeAnimation;//0 or 1
+	uint8_t		TextScrollingMode;//0 or 1
+	uint8_t		DateScrollingMode;//0 or 1
 	/*normal variables*/
 	uint8_t		DisplayTextArray[SizeOf_ScrollText];
-	uint8_t 	DisplayDataArray[SizeOf_DisplayColumnDataArray];
+	uint8_t 	DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];
 	uint8_t 	Connected;
 	bool		FirstRun;
 	uint8_t 	UpdateTime;
@@ -50,11 +60,11 @@ typedef struct AppConfig_Type{
 	bool 		TextScrolling;
 	uint8_t 	TextLength;
 	bool		TextScrollEnd;
+	uint8_t		ScrollingMode;
 	uint8_t		NewTimeDataArray[36];
 	bool 		TimeDiffIndicator[6];
-	uint8_t		DisplayData[96];
-	bool		TextScrollingMode;
-
+	uint8_t		DisplayData[NumberOf_DisplayColumn];
+	uint32_t	TimeStamp;
 }AppConfig_Type;
 // =====================================================================================
 typedef struct RTC_DataType{
