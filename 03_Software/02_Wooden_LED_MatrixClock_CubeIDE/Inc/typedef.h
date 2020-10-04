@@ -27,7 +27,7 @@ typedef struct AppConfig_Type{
 #define SizeOf_TextScrollingMode			(0x0001)
 	/**/
 #define SizeOf_CharacterOnDisplay			(0x0006)
-#define SizeOf_DisplayTextColumnArray		(SizeOf_CharacterOnDisplay * SizeOf_ScrollText)
+#define SizeOf_DisplayTextColumnArray		((SizeOf_CharacterOnDisplay * SizeOf_ScrollText)+(2*NumberOf_DisplayColumn))
 #define SizeOf_WhiteSpaces					(2* NumberOf_DisplayColumn/SizeOf_CharacterOnDisplay)
 #define NumberOf_ColumnOfOneDisplay			(8)
 #define NumberOf_Display					(12)

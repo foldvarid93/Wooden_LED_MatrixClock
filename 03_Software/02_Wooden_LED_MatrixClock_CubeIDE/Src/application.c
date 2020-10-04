@@ -232,19 +232,23 @@ void CreateDisplayDataArray(void)
 	AppCfg.TextScrolling = false;
 	AppCfg.TextLength = strlen((const char*)AppCfg.DisplayTextArray);
 	/**/
-	if(AppCfg.TextLength >= (SizeOf_ScrollText - SizeOf_WhiteSpaces))
+/*	if(AppCfg.TextLength >= (SizeOf_ScrollText - SizeOf_WhiteSpaces))
 	{
 		AppCfg.ScrollingMode = JustText;
-	}
+	}*/
 	/*set to zero*/
-	for(uint16_t k=0;k<1536;k++)
+/*	for(uint16_t k=0;k<SizeOf_DisplayTextColumnArray;k++)
 	{
 	  AppCfg.DisplayTextColumnArray[k]=0;
-	}
+	}*/
 	/**/
 	uint16_t StartIndx;
 	if(AppCfg.ScrollingMode == WallToWall)
 	{
+		for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
+		{
+			AppCfg.DisplayTextColumnArray[i]=0;
+		}
 		StartIndx = NumberOf_DisplayColumn;
 	}
 	else
@@ -263,6 +267,10 @@ void CreateDisplayDataArray(void)
 	/**/
 	if(AppCfg.ScrollingMode == WallToWall)
 	{
+		for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
+		{
+			AppCfg.DisplayTextColumnArray[StartIndx+i]=0;
+		}
 		AppCfg.LastColumn = StartIndx + NumberOf_DisplayColumn;
 	}
 	else
@@ -352,7 +360,8 @@ void SendFrameToDisplay(void)
 	HAL_SPI_Transmit(&hspi2,tmp1,24,100);
 	MAX7219_LoadPuse();
 	/*Send out data*/
-	for(uint8_t i=8;i>0;i--){
+	for(uint8_t i=NumberOf_ColumnOfOneDisplay ; i>0 ; i--)
+	{
 		HAL_SPI_Transmit(&hspi2, &tmp3[i-1][0], 24, 100);
 		MAX7219_LoadPuse();
 	}
@@ -504,6 +513,7 @@ HAL_StatusTypeDef Init_Application(void)
 	AppCfg.ScrollTextIntervalInSec=15;
 	AppCfg.TextScrollingMode=WallToWall;
 	AppCfg.DateScrollingMode=WallToWall;
+	/*
 	char tmp[256];
 	uint8_t z;
 	for(uint8_t i=0;i<0xff;i++){
@@ -512,7 +522,8 @@ HAL_StatusTypeDef Init_Application(void)
 	}
 	tmp[0xFF]='\0';
 	strcpy((char*)AppCfg.ScrollText, tmp);
-	//strcpy((char*)AppCfg.ScrollText, "6041, Kerekegyháza Tavasz u. 25.");
+	*/
+	strcpy((char*)AppCfg.ScrollText, "6041, Kerekegyháza Tavasz u. 25.");
 	/**/
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
