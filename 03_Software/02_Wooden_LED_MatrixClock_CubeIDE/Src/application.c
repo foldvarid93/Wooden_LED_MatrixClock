@@ -479,7 +479,7 @@ HAL_StatusTypeDef Init_Application(void)
 		return HAL_ERROR;
 	}
 	/*RemoteXY*/
-	RemoteXY_InitAndRun();
+	//RemoteXY_InitAndRun();
 
 	/*read eeprom SSID and PassWord*/
 	EE_ReadCharArray(VirtAddr_SSID,(uint8_t*)(AppCfg.SSID));
@@ -526,8 +526,24 @@ HAL_StatusTypeDef Init_Application(void)
 /**/
 void Run_Application(void)
 {
+	ESP8266_RemoteXY_InitAndStart();
 	while(1)
 	{
+		ESP8266_RemoteXY_Handler();
+		if(RemoteXY.Btn_SSID_Send == 1)
+		{
+			if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.TextBox_SSID)) != EE_OK) {
+				Error_Handler();
+			}
+			RemoteXY.Btn_SSID_Send = 0;
+		}
+		if(RemoteXY.Btn_Pw_Send == 1)
+		{
+			if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.TextBox_PassWord)) != EE_OK) {
+				Error_Handler();
+			}
+			RemoteXY.Btn_Pw_Send = 0;
+		}
 
 	}
 }

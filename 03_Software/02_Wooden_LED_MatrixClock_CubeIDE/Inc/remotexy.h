@@ -51,7 +51,7 @@ struct {
   uint8_t select_1; // =0 if select position A, =1 if position B, =2 if position C, ...
   char TextBox_SSID[51];  // string UTF8 end zero
   char TextBox_PassWord[51];  // string UTF8 end zero
-  char TextBox_TextMessage[256];  // string UTF8 end zero
+  char TextBox_TextMessage[255];  // string UTF8 end zero
   uint8_t Btn_SSID_Send; // =1 if button pressed, else =0
   uint8_t Btn_Pw_Send; // =1 if button pressed, else =0
   uint8_t Btn_Text_Send; // =1 if button pressed, else =0
