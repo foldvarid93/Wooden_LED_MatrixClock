@@ -456,14 +456,11 @@ void RemoteXY_InitAndRun(void)
 			if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.TextBox_SSID)) != EE_OK) {
 				Error_Handler();
 			}
-			RemoteXY.Btn_SSID_Send = 0;
-		}
-		if(RemoteXY.Btn_Pw_Send == 1)
-		{
+
 			if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.TextBox_PassWord)) != EE_OK) {
 				Error_Handler();
 			}
-			RemoteXY.Btn_Pw_Send = 0;
+			RemoteXY.Btn_SSID_Send = 0;
 		}
 	}
 }
@@ -487,7 +484,7 @@ HAL_StatusTypeDef Init_Application(void)
 	//EE_ReadCharArray(VirtAddr_ScrollText, (uint8_t)AppCfg.ScrollText);
 
 	/*RTC sync from NTP*/
-	if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
+	//if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
 	{
 		//HAL_NVIC_SystemReset();
 	}
@@ -535,14 +532,10 @@ void Run_Application(void)
 			if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.TextBox_SSID)) != EE_OK) {
 				Error_Handler();
 			}
-			RemoteXY.Btn_SSID_Send = 0;
-		}
-		if(RemoteXY.Btn_Pw_Send == 1)
-		{
 			if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.TextBox_PassWord)) != EE_OK) {
 				Error_Handler();
 			}
-			RemoteXY.Btn_Pw_Send = 0;
+			RemoteXY.Btn_SSID_Send = 0;
 		}
 
 	}
