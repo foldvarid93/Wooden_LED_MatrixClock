@@ -95,28 +95,44 @@ extern const uint8_t	Months[12][12];						//jan,feb.....dec sz�vegesen
 AppConfig_Type 			AppCfg;
 /***********************************************///constants declarations end
 /***********************************************///functions declaration begin
-void MAX7219_Init(void);
+/**/
 void CreateDateData(void);
-void CreateDisplayDataArray(void);
+/**/
+void Rotate(uint8_t* Dest,uint8_t* Source);
+/**/
+void UpdateTimeOnDisplay(void);
+/**/
+void TextToColumnDataArray(void);
+/**/
 void SendToDisplay(uint16_t from);
+/**/
+void MAX7219_Init(void);
+/**/
 void MAX7219_LoadPuse(void);
-void SPI_Send(uint8_t ADDR, uint8_t CMD);
-void SendFrameToDisplay(void);
-void TestData(void);
-void TestText(uint8_t ch);
+/**/
+void MAX7219_Send(uint8_t ADDR, uint8_t CMD);
+/**/
+void SendTimeToDisplay(void);
+/**/
 uint8_t BitSwapping(uint8_t ch);
-void ClearDisplay(void);
-void ClearDisplayFromTo(uint8_t from, uint8_t to);
-void RTC_Read(void);
-void BinToTensAndSingles(uint8_t binary, uint8_t *tens, uint8_t *singles);
-void ConvertRTCToDateAndTime(RTC_DataType *RTC_DATA,TimeType *Time_Data, DateType *Date_Data);
-void FormatDateToText(void);
-void FormatTimeToText(void);
-void SendTextToDisplay(char *Text);
-void time_out(void);
-HAL_StatusTypeDef Init_Application(void);
-void Run_Application(void);
-HAL_StatusTypeDef RTCWrite(void);
+/**/
 HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord);
+/**/
+void RemoteXY_InitAndRun(void);
+/**/
+HAL_StatusTypeDef Init_Application(void);
+/**/
+void Run_Application(void);
+/**/
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc);
+/**/
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
+/**/
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+/**/
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);
+/**/
+void HAL_SYSTICK_Callback(void);
+
 /***********************************************///functions declaration end
 #endif

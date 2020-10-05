@@ -59,7 +59,6 @@ typedef struct AppConfig_Type{
 	bool 		DisplayTextDone;
 	bool 		TextScrolling;
 	uint8_t 	TextLength;
-	bool		TextScrollEnd;
 	uint8_t		ScrollingMode;
 	uint8_t		NewTimeDataArray[36];
 	bool 		TimeDiffIndicator[6];

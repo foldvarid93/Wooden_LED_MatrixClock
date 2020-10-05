@@ -58,7 +58,7 @@ void CreateDateData(void)
 /*********************************/				//Date functions end
 /*********************************/				//Time functions begin
 /**/
-void TimeAnimation(uint8_t* Dest,uint8_t* Source)
+void Rotate(uint8_t* Dest,uint8_t* Source)
 {
 	for(uint8_t i=0;i<6;i++){
 		(Dest[i])<<=1;
@@ -72,19 +72,7 @@ void TimeAnimation(uint8_t* Dest,uint8_t* Source)
 	}
 }
 /**/
-char concat(char b, char a)
-{
-	a>>=1;
-	if(b&0x01){
-		a|=0x80;
-	}
-	else{
-		a&=0x7F;
-	}
-	return a;
-}
-/**/
-void time_out(void)
+void UpdateTimeOnDisplay(void)
 {
 #define StartIdx 			28
 #define HourTensStartIdx 	StartIdx
@@ -95,8 +83,11 @@ void time_out(void)
 #define MinSecDoubleDot 	MinSinglesStartIdx+6
 #define SecTensStartIdx 	MinSecDoubleDot+2
 #define SecSinglesStartIdx 	SecTensStartIdx+6
-
-	if(AppCfg.FirstRun==1)
+	if(AppCfg.FirstRun == 1)
+	{
+		AppCfg.UpdateTime = 1;
+	}
+	if(AppCfg.UpdateTime == 1)
 	{
 		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
 		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
@@ -108,141 +99,140 @@ void time_out(void)
 		time[0].sec_tens=Time_Data.Seconds / 10;
 		time[0].sec_singles=Time_Data.Seconds % 10;
 
-		for (uint8_t i = 0; i < 5; i++) {
-			if (time[0].hour_tens == 0) {
-				AppCfg.DisplayData[i+HourTensStartIdx] = 0;
-			} else {
-				AppCfg.DisplayData[i+HourTensStartIdx] = BitSwapping(characters[time[0].hour_tens+ '0'][i]);
+		AppCfg.Point=!AppCfg.Point;
+		/**/
+		if((AppCfg.TimeAnimation == 0)||(AppCfg.FirstRun == 1))
+		{
+			for (uint8_t i = 0; i < 5; i++)
+			{
+				if (time[0].hour_tens == 0)
+				{
+					AppCfg.DisplayData[i+HourTensStartIdx] = 0;
+				}
+				else
+				{
+					AppCfg.DisplayData[i+HourTensStartIdx] = BitSwapping(characters[time[0].hour_tens+ '0'][i]);
+				}
+				AppCfg.DisplayData[i + HourSinglesStartIdx] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
+				AppCfg.DisplayData[i + MinTensStartIdx] = BitSwapping(characters[time[0].min_tens + '0'][i]);
+				AppCfg.DisplayData[i + MinSinglesStartIdx] = BitSwapping(characters[time[0].min_singles + '0'][i]);
+				AppCfg.DisplayData[i + SecTensStartIdx] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
+				AppCfg.DisplayData[i + SecSinglesStartIdx] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
 			}
-			AppCfg.DisplayData[i + HourSinglesStartIdx] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
-			AppCfg.DisplayData[i + MinTensStartIdx] = BitSwapping(characters[time[0].min_tens + '0'][i]);
-			AppCfg.DisplayData[i + MinSinglesStartIdx] = BitSwapping(characters[time[0].min_singles + '0'][i]);
-			AppCfg.DisplayData[i + SecTensStartIdx] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
-			AppCfg.DisplayData[i + SecSinglesStartIdx] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
+			/**/
+			if(AppCfg.Point == 1)
+			{
+				AppCfg.DisplayData[HourMinDoubleDot] = 0x22;
+				AppCfg.DisplayData[MinSecDoubleDot] = 0x22;
+			}
+			else
+			{
+				AppCfg.DisplayData[HourMinDoubleDot] = 0;
+				AppCfg.DisplayData[MinSecDoubleDot] = 0;
+			}
+			/**/
+			SendTimeToDisplay();
+			/**/
+			if(AppCfg.FirstRun == 1)
+			{
+				AppCfg.FirstRun = 0;
+			}
 		}
-		AppCfg.DisplayData[HourMinDoubleDot] = 0x22;
-		AppCfg.DisplayData[MinSecDoubleDot] = 0x22;
-
-		SendFrameToDisplay();
-
+		/**/
+		else
+		{
+			if(time[0].sec_singles!=time[1].sec_singles){
+				AppCfg.TimeDiffIndicator[5]=1;
+				for(uint8_t i=0;i<5;i++){
+					AppCfg.NewTimeDataArray[i + 30] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
+				}
+			}
+			else {
+				AppCfg.TimeDiffIndicator[5]=0;
+			}
+			if(time[0].sec_tens!=time[1].sec_tens){
+				AppCfg.TimeDiffIndicator[4]=1;
+				for(uint8_t i=0;i<5;i++){
+					AppCfg.NewTimeDataArray[i + 24] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
+				}
+			}
+			else {
+				AppCfg.TimeDiffIndicator[4]=0;
+			}
+			if(time[0].min_singles!=time[1].min_singles){
+				AppCfg.TimeDiffIndicator[3]=1;
+				for(uint8_t i=0;i<5;i++){
+					AppCfg.NewTimeDataArray[i + 18] = BitSwapping(characters[time[0].min_singles + '0'][i]);
+				}
+			}
+			else {
+				AppCfg.TimeDiffIndicator[3]=0;
+			}
+			if(time[0].min_tens!=time[1].min_tens){
+				AppCfg.TimeDiffIndicator[2]=1;
+				for(uint8_t i=0;i<5;i++){
+					AppCfg.NewTimeDataArray[i + 12] = BitSwapping(characters[time[0].min_tens + '0'][i]);
+				}
+			}
+			else {
+				AppCfg.TimeDiffIndicator[2]=0;
+			}
+			if(time[0].hour_singles!=time[1].hour_singles){
+				AppCfg.TimeDiffIndicator[1]=1;
+				for(uint8_t i=0;i<5;i++){
+					AppCfg.NewTimeDataArray[i + 6] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
+				}
+			}
+			else {
+				AppCfg.TimeDiffIndicator[1]=0;
+			}
+			if(time[0].hour_tens!=time[1].hour_tens){
+				AppCfg.TimeDiffIndicator[0]=1;
+				for(uint8_t i=0;i<5;i++){
+					AppCfg.NewTimeDataArray[i] = BitSwapping(characters[time[0].hour_tens + '0'][i]);
+				}
+			}
+			else {
+				AppCfg.TimeDiffIndicator[0]=0;
+			}
+			/**/
+			AppCfg.FlipCounter = 0;
+		}
 		time[1]=time[0];
-		AppCfg.FirstRun=0;
+		AppCfg.UpdateTime = 0;
 	}
-	if(AppCfg.UpdateTime==1)
+	/**/
+	if( (AppCfg.TimeAnimation == 1) && (AppCfg.FlipCounter < 8) )
 	{
-		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
-		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&time[0]);
-
-		time[0].hour_tens=Time_Data.Hours / 10;
-		time[0].hour_singles=Time_Data.Hours % 10;
-		time[0].min_tens=Time_Data.Minutes / 10;
-		time[0].min_singles=Time_Data.Minutes % 10;
-		time[0].sec_tens=Time_Data.Seconds / 10;
-		time[0].sec_singles=Time_Data.Seconds % 10;
-
-		if(time[0].sec_singles!=time[1].sec_singles){
-			AppCfg.TimeDiffIndicator[5]=1;
-			for(uint8_t i=0;i<5;i++){
-				AppCfg.NewTimeDataArray[i + 30] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
-			}
-		}
-		else {
-			AppCfg.TimeDiffIndicator[5]=0;
-		}
-		if(time[0].sec_tens!=time[1].sec_tens){
-			AppCfg.TimeDiffIndicator[4]=1;
-			for(uint8_t i=0;i<5;i++){
-				AppCfg.NewTimeDataArray[i + 24] = BitSwapping(characters[time[0].sec_tens + '0'][i]);
-			}
-		}
-		else {
-			AppCfg.TimeDiffIndicator[4]=0;
-		}
-		if(time[0].min_singles!=time[1].min_singles){
-			AppCfg.TimeDiffIndicator[3]=1;
-			for(uint8_t i=0;i<5;i++){
-				AppCfg.NewTimeDataArray[i + 18] = BitSwapping(characters[time[0].min_singles + '0'][i]);
-			}
-		}
-		else {
-			AppCfg.TimeDiffIndicator[3]=0;
-		}
-		if(time[0].min_tens!=time[1].min_tens){
-			AppCfg.TimeDiffIndicator[2]=1;
-			for(uint8_t i=0;i<5;i++){
-				AppCfg.NewTimeDataArray[i + 12] = BitSwapping(characters[time[0].min_tens + '0'][i]);
-			}
-		}
-		else {
-			AppCfg.TimeDiffIndicator[2]=0;
-		}
-		if(time[0].hour_singles!=time[1].hour_singles){
-			AppCfg.TimeDiffIndicator[1]=1;
-			for(uint8_t i=0;i<5;i++){
-				AppCfg.NewTimeDataArray[i + 6] = BitSwapping(characters[time[0].hour_singles + '0'][i]);
-			}
-		}
-		else {
-			AppCfg.TimeDiffIndicator[1]=0;
-		}
-		if(time[0].hour_tens!=time[1].hour_tens){
-			AppCfg.TimeDiffIndicator[0]=1;
-			for(uint8_t i=0;i<5;i++){
-				AppCfg.NewTimeDataArray[i] = BitSwapping(characters[time[0].hour_tens + '0'][i]);
-			}
-		}
-		else {
-			AppCfg.TimeDiffIndicator[0]=0;
-		}
-		time[1]=time[0];
-		AppCfg.UpdateTime=0;
-	}
-	if(AppCfg.TimeAnimation==1){
 		if (AppCfg.TimeDiffIndicator[0]){
-			TimeAnimation(&AppCfg.DisplayData[HourTensStartIdx],&AppCfg.NewTimeDataArray[0]);
+			Rotate(&AppCfg.DisplayData[HourTensStartIdx],&AppCfg.NewTimeDataArray[0]);
 		}
 		if (AppCfg.TimeDiffIndicator[1]){
-			TimeAnimation(&AppCfg.DisplayData[HourSinglesStartIdx],&AppCfg.NewTimeDataArray[6]);
+			Rotate(&AppCfg.DisplayData[HourSinglesStartIdx],&AppCfg.NewTimeDataArray[6]);
 		}
 		if (AppCfg.TimeDiffIndicator[2]){
-			TimeAnimation(&AppCfg.DisplayData[MinTensStartIdx],&AppCfg.NewTimeDataArray[12]);
+			Rotate(&AppCfg.DisplayData[MinTensStartIdx],&AppCfg.NewTimeDataArray[12]);
 		}
 		if(AppCfg.TimeDiffIndicator[3]){
-			TimeAnimation(&AppCfg.DisplayData[MinSinglesStartIdx],&AppCfg.NewTimeDataArray[18]);
+			Rotate(&AppCfg.DisplayData[MinSinglesStartIdx],&AppCfg.NewTimeDataArray[18]);
 		}
 		if(AppCfg.TimeDiffIndicator[4]){
-			TimeAnimation(&AppCfg.DisplayData[SecTensStartIdx],&AppCfg.NewTimeDataArray[24]);
+			Rotate(&AppCfg.DisplayData[SecTensStartIdx],&AppCfg.NewTimeDataArray[24]);
 		}
 		if(AppCfg.TimeDiffIndicator[5]){
-			TimeAnimation(&AppCfg.DisplayData[SecSinglesStartIdx],&AppCfg.NewTimeDataArray[30]);
+			Rotate(&AppCfg.DisplayData[SecSinglesStartIdx],&AppCfg.NewTimeDataArray[30]);
 		}
-		SendFrameToDisplay();
-		AppCfg.FlipCounter++;
-		if(AppCfg.FlipCounter==8)
-		{
-			AppCfg.FlipCounter=0;
-			AppCfg.TimeAnimation=0;
-		}
-		//TODO: non flip time clock
+		SendTimeToDisplay();
+		AppCfg.FlipCounter ++;
 	}
 }
 /**/
-void CreateDisplayDataArray(void)
+void TextToColumnDataArray(void)
 {
 	AppCfg.TextScrolling = false;
 	AppCfg.TextLength = strlen((const char*)AppCfg.DisplayTextArray);
-	/**/
-/*	if(AppCfg.TextLength >= (SizeOf_ScrollText - SizeOf_WhiteSpaces))
-	{
-		AppCfg.ScrollingMode = JustText;
-	}*/
-	/*set to zero*/
-/*	for(uint16_t k=0;k<SizeOf_DisplayTextColumnArray;k++)
-	{
-	  AppCfg.DisplayTextColumnArray[k]=0;
-	}*/
-	/**/
 	uint16_t StartIndx;
+
 	if(AppCfg.ScrollingMode == WallToWall)
 	{
 		for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
@@ -280,7 +270,6 @@ void CreateDisplayDataArray(void)
 	}
 	/**/
 	AppCfg.FirstColumn = 0;
-	AppCfg.TextScrollEnd = false;
 	AppCfg.TextScrolling = true;
 }
 /**/
@@ -295,24 +284,24 @@ void SendToDisplay(uint16_t from)
 	  }
   }
   /**/
-  SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
+  MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
   /**/
   for(uint8_t i=0;i<8;i++){
 	  HAL_SPI_Transmit(&hspi2,&tmp[i*24],24,50);
 		MAX7219_LoadPuse();
   }
   /**/
-  SPI_Send(REG_SHTDWN, NORMAL_MODE);
+  MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
   asm("nop");
 }
 /**/
 void MAX7219_Init(void)
 {
-	SPI_Send(REG_NO_OP, NOP);
-	SPI_Send(REG_SHTDWN, SHUTDOWN_MODE);
-	SPI_Send(REG_DECODE, NO_DECODE);
-	SPI_Send(REG_SCANLIMIT, DISP0_7);
-	SPI_Send(REG_INTENSITY, INTENSITY_7);
+	MAX7219_Send(REG_NO_OP, NOP);
+	MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
+	MAX7219_Send(REG_DECODE, NO_DECODE);
+	MAX7219_Send(REG_SCANLIMIT, DISP0_7);
+	MAX7219_Send(REG_INTENSITY, INTENSITY_7);
 }
 /**/
 void MAX7219_LoadPuse(void)
@@ -324,7 +313,7 @@ void MAX7219_LoadPuse(void)
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
 }
 /**/
-void SPI_Send(uint8_t ADDR, uint8_t CMD)
+void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 {
 	uint8_t tmp[24];
 	for(uint8_t i=0;i<DispNum;i++){
@@ -336,7 +325,7 @@ void SPI_Send(uint8_t ADDR, uint8_t CMD)
 	MAX7219_LoadPuse();
 }
 /**/
-void SendFrameToDisplay(void)
+void SendTimeToDisplay(void)
 {
 	/*locals*/
 	uint8_t tmp1[24];
@@ -503,7 +492,7 @@ HAL_StatusTypeDef Init_Application(void)
 	/**/
 	AppCfg.FirstRun=1;
 	AppCfg.UpdateTime=0;
-	AppCfg.TimeAnimation=0;
+	AppCfg.TimeAnimation=1;
 	AppCfg.FlipCounter=0;
 	AppCfg.Point=false;
 	AppCfg.ScrollDateSecCounter=0;
@@ -543,18 +532,16 @@ void Run_Application(void)
 /**/
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
-	if(AppCfg.DisplayMode==Time)
+	if(AppCfg.DisplayMode == Time)
 	{
-		AppCfg.Point=!AppCfg.Point;
 		AppCfg.UpdateTime=1;
-		AppCfg.TimeAnimation=1;
 		AppCfg.ScrollDateSecCounter++;
 		AppCfg.ScrollTextSecCounter++;
 		if(AppCfg.ScrollDateSecCounter == AppCfg.ScrollDateIntervalInSec)
 		{
 			AppCfg.ScrollingMode=AppCfg.DateScrollingMode;
 			CreateDateData();
-			CreateDisplayDataArray();
+			TextToColumnDataArray();
 			AppCfg.DisplayMode=Date;
 			AppCfg.ScrollDateSecCounter=0;
 		}
@@ -562,7 +549,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 		{
 			strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.ScrollText);
 			AppCfg.ScrollingMode=AppCfg.TextScrollingMode;
-			CreateDisplayDataArray();
+			TextToColumnDataArray();
 			AppCfg.DisplayMode=Text;
 			AppCfg.ScrollTextSecCounter=0;
 		}
@@ -581,7 +568,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	{
 		AppCfg.DisplayMode = Time;
 		AppCfg.FirstRun = 1;
-		time_out();
+		UpdateTimeOnDisplay();
 		AppCfg.DisplayDateDone = false;
 	}
 
@@ -589,7 +576,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	{
 		AppCfg.DisplayMode = Time;
 		AppCfg.FirstRun = 1;
-		time_out();
+		UpdateTimeOnDisplay();
 		AppCfg.DisplayTextDone = false;
 	}
 }
@@ -603,7 +590,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		/**/
 		if(AppCfg.DisplayMode == Time)
 		{
-			time_out();
+			UpdateTimeOnDisplay();
 		}
 		/**/
 		if((AppCfg.DisplayMode == Text) || (AppCfg.DisplayMode == Date) )
@@ -669,7 +656,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			}
 			else//textscrolling false
 			{
-
+				//TODO:
 			}
 		}
 	}
