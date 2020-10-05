@@ -451,15 +451,19 @@ void RemoteXY_InitAndRun(void)
 		/*run application handler*/
 		ESP8266_RemoteXY_Handler();
 		/*if app sent data process and store*/
-		if(RemoteXY.button_1==1)
+		if(RemoteXY.Btn_SSID_Send == 1)
 		{
-			if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.edit_1)) != EE_OK) {
+			if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.TextBox_SSID)) != EE_OK) {
 				Error_Handler();
 			}
-			if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.edit_2)) != EE_OK) {
+			RemoteXY.Btn_SSID_Send = 0;
+		}
+		if(RemoteXY.Btn_Pw_Send == 1)
+		{
+			if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.TextBox_PassWord)) != EE_OK) {
 				Error_Handler();
 			}
-			RemoteXY.button_1=0;
+			RemoteXY.Btn_Pw_Send = 0;
 		}
 	}
 }
@@ -475,7 +479,7 @@ HAL_StatusTypeDef Init_Application(void)
 		return HAL_ERROR;
 	}
 	/*RemoteXY*/
-	//RemoteXY_InitAndRun();
+	RemoteXY_InitAndRun();
 
 	/*read eeprom SSID and PassWord*/
 	EE_ReadCharArray(VirtAddr_SSID,(uint8_t*)(AppCfg.SSID));
@@ -483,12 +487,12 @@ HAL_StatusTypeDef Init_Application(void)
 	//EE_ReadCharArray(VirtAddr_ScrollText, (uint8_t)AppCfg.ScrollText);
 
 	/*RTC sync from NTP*/
-	//if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
+	if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
 	{
 		//HAL_NVIC_SystemReset();
 	}
 	/**/
-	HAL_RTC_MspInit(&hrtc);
+	HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
 	/**/
 	AppCfg.FirstRun=1;
 	AppCfg.UpdateTime=0;
