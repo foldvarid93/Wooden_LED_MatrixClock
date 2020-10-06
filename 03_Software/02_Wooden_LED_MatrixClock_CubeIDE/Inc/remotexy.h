@@ -46,8 +46,9 @@
 //} RemoteXY;
 struct {
 
-  char TextBox_SSID[36];  // string UTF8 end zero
-  char TextBox_PassWord[11];  // string UTF8 end zero
+    // input variables
+  char TextBox_SSID[31];  // string UTF8 end zero
+  char TextBox_PassWord[31];  // string UTF8 end zero
   uint8_t Btn_SSID_Send; // =1 if button pressed, else =0
 
     // other variable

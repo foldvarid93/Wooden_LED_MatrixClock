@@ -88,7 +88,6 @@ int main(void) {
 	MX_I2C3_Init();
 	MX_SPI2_Init();
 	MX_RTC_Init();
-	HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
 	MX_TIM3_Init();
 	MX_TIM4_Init();
 	/* USER CODE BEGIN 2 */

@@ -412,10 +412,12 @@ HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
 				HAL_Date.Month = DateTime.month;
 				HAL_Date.Date = DateTime.date;
 				HAL_Date.WeekDay = DateTime.day;
+				HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
 				if(HAL_RTC_SetTime(&hrtc,&HAL_Time,RTC_FORMAT_BIN) == HAL_OK)
 				{
 					if(HAL_RTC_SetDate(&hrtc,&HAL_Date,RTC_FORMAT_BIN) == HAL_OK)
 					{
+						HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
 						return HAL_OK;
 					}
 				}
@@ -484,12 +486,12 @@ HAL_StatusTypeDef Init_Application(void)
 	//EE_ReadCharArray(VirtAddr_ScrollText, (uint8_t)AppCfg.ScrollText);
 
 	/*RTC sync from NTP*/
-	//if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
+	if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
 	{
 		//HAL_NVIC_SystemReset();
 	}
 	/**/
-	HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
+
 	/**/
 	AppCfg.FirstRun=1;
 	AppCfg.UpdateTime=0;
@@ -526,16 +528,31 @@ void Run_Application(void)
 	ESP8266_RemoteXY_InitAndStart();
 	while(1)
 	{
-		ESP8266_RemoteXY_Handler();
-		if(RemoteXY.Btn_SSID_Send == 1)
+		while(1)
 		{
-			if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.TextBox_SSID)) != EE_OK) {
-				Error_Handler();
+			ESP8266_RemoteXY_Handler();
+			if(ESP8266_RemoteXY_IsConnected() == 1)
+			{
+				break;
 			}
-			if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.TextBox_PassWord)) != EE_OK) {
-				Error_Handler();
+		}
+		/*while connected: run application*/
+		while(ESP8266_RemoteXY_IsConnected() == 1)
+		{
+			/*run application handler*/
+			ESP8266_RemoteXY_Handler();
+			/*if app sent data process and store*/
+			if(RemoteXY.Btn_SSID_Send == 1)
+			{
+				if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.TextBox_SSID)) != EE_OK) {
+					Error_Handler();
+				}
+
+				if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.TextBox_PassWord)) != EE_OK) {
+					Error_Handler();
+				}
+				RemoteXY.Btn_SSID_Send = 0;
 			}
-			RemoteXY.Btn_SSID_Send = 0;
 		}
 
 	}
