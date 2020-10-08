@@ -98,8 +98,6 @@ void UpdateTimeOnDisplay(void)
 		time[0].min_singles=Time_Data.Minutes % 10;
 		time[0].sec_tens=Time_Data.Seconds / 10;
 		time[0].sec_singles=Time_Data.Seconds % 10;
-
-		AppCfg.Point=!AppCfg.Point;
 		/**/
 		if((AppCfg.TimeAnimation == 0)||(AppCfg.FirstRun == 1))
 		{
@@ -120,6 +118,14 @@ void UpdateTimeOnDisplay(void)
 				AppCfg.DisplayData[i + SecSinglesStartIdx] = BitSwapping(characters[time[0].sec_singles + '0'][i]);
 			}
 			/**/
+			if(AppCfg.FirstRun == 1)
+			{
+				AppCfg.Point = 1;
+			}
+			else
+			{
+				AppCfg.Point=!AppCfg.Point;
+			}
 			if(AppCfg.Point == 1)
 			{
 				AppCfg.DisplayData[HourMinDoubleDot] = 0x22;
@@ -196,6 +202,8 @@ void UpdateTimeOnDisplay(void)
 				AppCfg.TimeDiffIndicator[0]=0;
 			}
 			/**/
+			AppCfg.DisplayData[HourMinDoubleDot] = 0x22;
+			AppCfg.DisplayData[MinSecDoubleDot] = 0x22;
 			AppCfg.FlipCounter = 0;
 		}
 		time[1]=time[0];
@@ -229,48 +237,78 @@ void UpdateTimeOnDisplay(void)
 /**/
 void TextToColumnDataArray(void)
 {
-	AppCfg.TextScrolling = false;
-	AppCfg.TextLength = strlen((const char*)AppCfg.DisplayTextArray);
+	/*locals*/
 	uint16_t StartIndx;
-
-	if(AppCfg.ScrollingMode == WallToWall)
+	AppCfg.TextLength = strlen((const char*)AppCfg.DisplayTextArray);
+	/**/
+	if((AppCfg.TextLength < SizeOf_WhiteSpaces) && (AppCfg.ScrollingMode == JustText))
+	{
+		AppCfg.TextScrolling = false;
+	}
+	else
+	{
+		AppCfg.TextScrolling = true;
+	}
+	/**/
+	if(AppCfg.TextScrolling == true)
+	{
+		if(AppCfg.ScrollingMode == WallToWall)
+		{
+			for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
+			{
+				AppCfg.DisplayTextColumnArray[i]=0;
+			}
+			StartIndx = NumberOf_DisplayColumn;
+		}
+		else
+		{
+			StartIndx = 0;
+		}
+		/*fill up with data*/
+		for (uint8_t i=0; i < AppCfg.TextLength; i++)
+		{
+			for (uint8_t j = 0; j < 6; j++)
+			{
+			  AppCfg.DisplayTextColumnArray[StartIndx] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
+			  StartIndx++;
+			}
+		}
+		/**/
+		if(AppCfg.ScrollingMode == WallToWall)
+		{
+			for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
+			{
+				AppCfg.DisplayTextColumnArray[StartIndx+i]=0;
+			}
+			AppCfg.LastColumn = StartIndx + NumberOf_DisplayColumn;
+		}
+		else
+		{
+			AppCfg.LastColumn = StartIndx;
+			AppCfg.TimeStamp = HAL_GetTick();
+		}
+	}
+	else
 	{
 		for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
 		{
 			AppCfg.DisplayTextColumnArray[i]=0;
 		}
-		StartIndx = NumberOf_DisplayColumn;
-	}
-	else
-	{
+		/*fill up with data*/
 		StartIndx = 0;
-	}
-	/*fill up with data*/
-	for (uint8_t i=0; i < AppCfg.TextLength; i++)
-	{
-		for (uint8_t j = 0; j < 6; j++)
+		for (uint8_t i=0; i < AppCfg.TextLength; i++)
 		{
-		  AppCfg.DisplayTextColumnArray[StartIndx] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
-		  StartIndx++;
+			for (uint8_t j = 0; j < 6; j++)
+			{
+			  AppCfg.DisplayTextColumnArray[StartIndx] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
+			  StartIndx++;
+			}
 		}
-	}
-	/**/
-	if(AppCfg.ScrollingMode == WallToWall)
-	{
-		for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
-		{
-			AppCfg.DisplayTextColumnArray[StartIndx+i]=0;
-		}
-		AppCfg.LastColumn = StartIndx + NumberOf_DisplayColumn;
-	}
-	else
-	{
-		AppCfg.LastColumn = StartIndx;
 		AppCfg.TimeStamp = HAL_GetTick();
 	}
+
 	/**/
 	AppCfg.FirstColumn = 0;
-	AppCfg.TextScrolling = true;
 }
 /**/
 void SendToDisplay(uint16_t from)
@@ -579,7 +617,7 @@ HAL_StatusTypeDef Init_Application(void)
 	AppCfg.FlipCounter=0;
 	AppCfg.Point=false;
 	AppCfg.DisplayMode=Time;
-	AppCfg.LastScrolled=Text;
+	AppCfg.LastScrolled=Date;
 	AppCfg.ScrollSecCounter=0;
 	/**/
 	HAL_TIM_Base_Start_IT(&htim3);
@@ -639,27 +677,21 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	{
 		AppCfg.UpdateTime=1;
 		/**/
-		if(AppCfg.LastScrolled == Date)
+		if((AppCfg.LastScrolled == Date) && (AppCfg.ScrollSecCounter == AppCfg.ScrollTextIntervalInSec))
 		{
-			if(AppCfg.ScrollSecCounter == AppCfg.ScrollTextIntervalInSec)
-			{
-				strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.ScrollText);
-				AppCfg.ScrollingMode = AppCfg.TextScrollingMode;
-				TextToColumnDataArray();
-				AppCfg.DisplayMode = Text;
-				AppCfg.ScrollSecCounter = 0;
-			}
+			AppCfg.ScrollingMode = AppCfg.TextScrollingMode;
+			strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.ScrollText);
+			TextToColumnDataArray();
+			AppCfg.DisplayMode = Text;
+			AppCfg.ScrollSecCounter = 0;
 		}
-		if(AppCfg.LastScrolled == Text)
+		if((AppCfg.LastScrolled == Text) && (AppCfg.ScrollSecCounter == AppCfg.ScrollDateIntervalInSec))
 		{
-			if(AppCfg.ScrollSecCounter == AppCfg.ScrollDateIntervalInSec)
-			{
-				AppCfg.ScrollingMode = AppCfg.DateScrollingMode;
-				CreateDateData();
-				TextToColumnDataArray();
-				AppCfg.DisplayMode = Date;
-				AppCfg.ScrollSecCounter = 0;
-			}
+			AppCfg.ScrollingMode = AppCfg.DateScrollingMode;
+			CreateDateData();
+			TextToColumnDataArray();
+			AppCfg.DisplayMode = Date;
+			AppCfg.ScrollSecCounter = 0;
 		}
 		/**/
 		AppCfg.ScrollSecCounter++;
@@ -694,7 +726,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	UNUSED(htim);
 	/*timer3 interrupt*/
-	if(htim->Instance==TIM3)
+	if(htim->Instance == TIM3)
 	{
 		/**/
 		if(AppCfg.DisplayMode == Time)
@@ -704,11 +736,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		/**/
 		if((AppCfg.DisplayMode == Text) || (AppCfg.DisplayMode == Date) )
 		{
+			/*scrolling text on display*/
 			if (AppCfg.TextScrolling == true)
 			{
 				if (AppCfg.FirstColumn == (AppCfg.LastColumn - 96))
 				{
-					//AppCfg.TextScrolling = false;
 					/**/
 					if(AppCfg.ScrollingMode == JustText)
 					{
@@ -759,18 +791,27 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 					}
 					else{
 						AppCfg.FirstColumn++;
-						AppCfg.TimeStamp=HAL_GetTick();
+						AppCfg.TimeStamp = HAL_GetTick();
 					}
 				}
 			}
-			else//textscrolling false
+			/*static text on display*/
+			else
 			{
-				//TODO:
+				SendToDisplay(AppCfg.FirstColumn);
+				if((HAL_GetTick() - AppCfg.TimeStamp)<3000)
+				{
+					/*wait*/
+				}
+				else
+				{
+					AppCfg.DisplayMode = TextDone;
+				}
 			}
 		}
 	}
 	/*timer4 interrupt*/
-	if(htim->Instance==TIM4)
+	if(htim->Instance == TIM4)
 	{
 
 	}
