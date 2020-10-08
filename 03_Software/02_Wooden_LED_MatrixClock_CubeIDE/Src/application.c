@@ -677,7 +677,26 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	{
 		AppCfg.UpdateTime=1;
 		/**/
-		if((AppCfg.LastScrolled == Date) && (AppCfg.ScrollSecCounter == AppCfg.ScrollTextIntervalInSec))
+		if(AppCfg.ScrollSecCounter >= AppCfg.ScrollTextIntervalInSec)
+		{
+			if(AppCfg.LastScrolled == Date)
+			{
+				AppCfg.ScrollingMode = AppCfg.TextScrollingMode;
+				strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.ScrollText);
+				TextToColumnDataArray();
+				AppCfg.LastScrolled = Text;
+			}
+			else
+			{
+				AppCfg.ScrollingMode = AppCfg.DateScrollingMode;
+				CreateDateData();
+				TextToColumnDataArray();
+				AppCfg.LastScrolled = Date;
+			}
+			AppCfg.ScrollSecCounter = 0;
+			AppCfg.DisplayMode = Text;
+		}
+/*		if((AppCfg.LastScrolled == Date) && (AppCfg.ScrollSecCounter == AppCfg.ScrollTextIntervalInSec))
 		{
 			AppCfg.ScrollingMode = AppCfg.TextScrollingMode;
 			strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.ScrollText);
@@ -693,7 +712,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 			AppCfg.DisplayMode = Date;
 			AppCfg.ScrollSecCounter = 0;
 		}
-		/**/
+		*/
 		AppCfg.ScrollSecCounter++;
 	}
 	/**/
@@ -705,20 +724,11 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	{
 	}
 	/**/
-	if(AppCfg.DisplayMode == DateDone)
-	{
-		AppCfg.DisplayMode = Time;
-		AppCfg.FirstRun = 1;
-		UpdateTimeOnDisplay();
-		AppCfg.LastScrolled = Date;
-	}
-	/**/
 	if(AppCfg.DisplayMode == TextDone)
 	{
 		AppCfg.DisplayMode = Time;
 		AppCfg.FirstRun = 1;
 		UpdateTimeOnDisplay();
-		AppCfg.LastScrolled = Text;
 	}
 }
 /**/
@@ -734,7 +744,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			UpdateTimeOnDisplay();
 		}
 		/**/
-		if((AppCfg.DisplayMode == Text) || (AppCfg.DisplayMode == Date) )
+		if(AppCfg.DisplayMode == Text)
 		{
 			/*scrolling text on display*/
 			if (AppCfg.TextScrolling == true)
@@ -748,30 +758,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 						{
 							/*wait*/
 						}
-						else{
-							if(AppCfg.DisplayMode == Text)
-							{
-								AppCfg.DisplayMode = TextDone;
-							}
-							/**/
-							if(AppCfg.DisplayMode == Date)
-							{
-								AppCfg.DisplayMode = DateDone;
-							}
+						else
+						{
+							AppCfg.DisplayMode = TextDone;
 						}
 
 					}
 					else
 					{
-						if(AppCfg.DisplayMode == Text)
-						{
-							AppCfg.DisplayMode = TextDone;
-						}
-						/**/
-						if(AppCfg.DisplayMode == Date)
-						{
-							AppCfg.DisplayMode = DateDone;
-						}
+						AppCfg.DisplayMode = TextDone;
 					}
 				}
 				else
