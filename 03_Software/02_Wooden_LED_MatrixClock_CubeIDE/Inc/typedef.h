@@ -53,8 +53,8 @@ typedef struct AppConfig_Type{
 	uint8_t 	UpdateTime;
 	uint8_t		FlipCounter;
 	uint8_t		Point;
-	uint16_t	ScrollDateSecCounter;
-	uint16_t	ScrollTextSecCounter;
+	uint16_t 	ScrollSecCounter;
+	uint16_t	LastScrolled;
 	uint8_t 	DisplayMode;
 	uint16_t 	FirstColumn;
 	uint16_t	LastColumn;

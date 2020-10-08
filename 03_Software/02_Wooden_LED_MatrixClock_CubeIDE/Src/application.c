@@ -572,15 +572,15 @@ HAL_StatusTypeDef Init_Application(void)
 	//EEPROM_Write();
 
 	/*read eeprom SSID and PassWord*/
-	EEPROM_Read();
+	EEPROM_ReadFrame();
 	/**/
 	AppCfg.FirstRun=1;
 	AppCfg.UpdateTime=0;
 	AppCfg.FlipCounter=0;
 	AppCfg.Point=false;
-	AppCfg.ScrollDateSecCounter=0;
-	AppCfg.ScrollTextSecCounter=0;
 	AppCfg.DisplayMode=Time;
+	AppCfg.LastScrolled=Text;
+	AppCfg.ScrollSecCounter=0;
 	/**/
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
@@ -638,49 +638,57 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	if(AppCfg.DisplayMode == Time)
 	{
 		AppCfg.UpdateTime=1;
-		AppCfg.ScrollDateSecCounter++;
-		AppCfg.ScrollTextSecCounter++;
-		if(AppCfg.ScrollDateSecCounter == AppCfg.ScrollDateIntervalInSec)
+		/**/
+		if(AppCfg.LastScrolled == Date)
 		{
-			AppCfg.ScrollingMode=AppCfg.DateScrollingMode;
-			CreateDateData();
-			TextToColumnDataArray();
-			AppCfg.DisplayMode=Date;
-			AppCfg.ScrollDateSecCounter=0;
+			if(AppCfg.ScrollSecCounter == AppCfg.ScrollTextIntervalInSec)
+			{
+				strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.ScrollText);
+				AppCfg.ScrollingMode = AppCfg.TextScrollingMode;
+				TextToColumnDataArray();
+				AppCfg.DisplayMode = Text;
+				AppCfg.ScrollSecCounter = 0;
+			}
 		}
-		if(AppCfg.ScrollTextIntervalInSec == AppCfg.ScrollTextSecCounter)
+		if(AppCfg.LastScrolled == Text)
 		{
-			strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.ScrollText);
-			AppCfg.ScrollingMode=AppCfg.TextScrollingMode;
-			TextToColumnDataArray();
-			AppCfg.DisplayMode=Text;
-			AppCfg.ScrollTextSecCounter=0;
+			if(AppCfg.ScrollSecCounter == AppCfg.ScrollDateIntervalInSec)
+			{
+				AppCfg.ScrollingMode = AppCfg.DateScrollingMode;
+				CreateDateData();
+				TextToColumnDataArray();
+				AppCfg.DisplayMode = Date;
+				AppCfg.ScrollSecCounter = 0;
+			}
 		}
-		//TODO: Text and Date display periodically
+		/**/
+		AppCfg.ScrollSecCounter++;
 	}
+	/**/
 	if(AppCfg.DisplayMode == Text)
 	{
-
 	}
+	/**/
 	if(AppCfg.DisplayMode == Date)
 	{
-
 	}
-
+	/**/
 	if(AppCfg.DisplayDateDone == true)
 	{
 		AppCfg.DisplayMode = Time;
 		AppCfg.FirstRun = 1;
 		UpdateTimeOnDisplay();
 		AppCfg.DisplayDateDone = false;
+		AppCfg.LastScrolled = Date;
 	}
-
+	/**/
 	if(AppCfg.DisplayTextDone == true)
 	{
 		AppCfg.DisplayMode = Time;
 		AppCfg.FirstRun = 1;
 		UpdateTimeOnDisplay();
 		AppCfg.DisplayTextDone = false;
+		AppCfg.LastScrolled = Text;
 	}
 }
 /**/
