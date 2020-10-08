@@ -88,7 +88,7 @@
 RTC_TimeTypeDef	 		Time_Data;							//id�t t�rol� strukt�rap�ld�ny
 RTC_DateTypeDef			Date_Data;							//d�tumot t�rol� strukt�rap�ld�ny
 TimeType				time[2];
-enum 					mode{Time, Date , Text , DisplayDateDone};
+enum 					mode{Time, Date , Text , DateDone, TextDone};
 enum 					ScrollMode{JustText, WallToWall};
 extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v sz�vegesen
 extern const uint8_t	Months[12][12];						//jan,feb.....dec sz�vegesen

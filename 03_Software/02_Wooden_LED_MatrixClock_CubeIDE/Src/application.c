@@ -673,21 +673,19 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	{
 	}
 	/**/
-	if(AppCfg.DisplayDateDone == true)
+	if(AppCfg.DisplayMode == DateDone)
 	{
 		AppCfg.DisplayMode = Time;
 		AppCfg.FirstRun = 1;
 		UpdateTimeOnDisplay();
-		AppCfg.DisplayDateDone = false;
 		AppCfg.LastScrolled = Date;
 	}
 	/**/
-	if(AppCfg.DisplayTextDone == true)
+	if(AppCfg.DisplayMode == TextDone)
 	{
 		AppCfg.DisplayMode = Time;
 		AppCfg.FirstRun = 1;
 		UpdateTimeOnDisplay();
-		AppCfg.DisplayTextDone = false;
 		AppCfg.LastScrolled = Text;
 	}
 }
@@ -721,12 +719,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 						else{
 							if(AppCfg.DisplayMode == Text)
 							{
-								AppCfg.DisplayTextDone = true;
+								AppCfg.DisplayMode = TextDone;
 							}
 							/**/
 							if(AppCfg.DisplayMode == Date)
 							{
-								AppCfg.DisplayDateDone = true;
+								AppCfg.DisplayMode = DateDone;
 							}
 						}
 
@@ -735,12 +733,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 					{
 						if(AppCfg.DisplayMode == Text)
 						{
-							AppCfg.DisplayTextDone = true;
+							AppCfg.DisplayMode = TextDone;
 						}
 						/**/
 						if(AppCfg.DisplayMode == Date)
 						{
-							AppCfg.DisplayDateDone = true;
+							AppCfg.DisplayMode = DateDone;
 						}
 					}
 				}

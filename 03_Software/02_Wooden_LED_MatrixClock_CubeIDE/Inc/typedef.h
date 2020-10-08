@@ -58,8 +58,6 @@ typedef struct AppConfig_Type{
 	uint8_t 	DisplayMode;
 	uint16_t 	FirstColumn;
 	uint16_t	LastColumn;
-	bool 		DisplayDateDone;
-	bool 		DisplayTextDone;
 	bool 		TextScrolling;
 	uint8_t 	TextLength;
 	uint8_t		ScrollingMode;
