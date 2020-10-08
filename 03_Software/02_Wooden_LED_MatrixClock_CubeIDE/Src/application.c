@@ -430,6 +430,56 @@ HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
 	}
 }
 /**/
+HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void){
+	/*ESP8266 HW reset and enabling*/
+	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_SET);
+	HAL_Delay(100);
+	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_SET);
+	HAL_Delay(1000);
+	/**/
+	Ringbuf_init();
+	/**/
+	ESP8266_Serial_Init();
+	/**/
+	if(ESP8266_NTP_ATCommand("AT+RESTORE", "ready", LONG_PAUSE) != HAL_OK)
+	{
+		  return HAL_ERROR;
+	}
+	if(ESP8266_NTP_ATCommand("AT", OK_STR, SHORT_PAUSE) != HAL_OK)
+	{
+		  return HAL_ERROR;
+	}
+	if(ESP8266_NTP_ATCommand("ATE0", OK_STR, SHORT_PAUSE) != HAL_OK)
+	{
+		  return HAL_ERROR;
+	}
+	if(ESP8266_NTP_ATCommand("AT+CWMODE=3", OK_STR, SHORT_PAUSE) != HAL_OK)
+	{
+		  return HAL_ERROR;
+	}
+	if(ESP8266_NTP_ATCommand("AT+CIPMUX=1", OK_STR, SHORT_PAUSE) != HAL_OK)
+	{
+		  return HAL_ERROR;
+	}
+	if(ESP8266_NTP_ATCommand("AT+CIPSERVER=1,23", OK_STR, SHORT_PAUSE) != HAL_OK)
+	{
+		  return HAL_ERROR;
+	}
+	if(ESP8266_NTP_ATCommand("AT+CWSAP=\"ESP\",\"password\",1,4", OK_STR,10000) != HAL_OK)
+	{
+		  return HAL_ERROR;
+	}
+	while(1){
+		if(ESP8266_NTP_ATCommand("AT+CIPSEND=0,10", OK_STR,10000) != HAL_OK)
+		{
+			  return HAL_ERROR;
+		}
+	}
+	return HAL_OK;
+}
+/**/
 void RemoteXY_InitAndRun(void)
 {
 	/*defines*/
@@ -466,6 +516,44 @@ void RemoteXY_InitAndRun(void)
 		}
 	}
 }
+/**/
+void EEPROM_WriteFrame(void)
+{
+	//
+	sprintf((char*)AppCfg.SSID,"foldvarid93");
+	sprintf((char*)AppCfg.PassWord,"19701971");
+	sprintf((char*)AppCfg.ScrollText,"6041, Kerekegyháza Tavasz u. 25.");
+	AppCfg.TimeAnimation = 1;
+	AppCfg.ScrollDateIntervalInSec = 10;
+	AppCfg.ScrollTextIntervalInSec = 15;
+	AppCfg.TextScrollingMode=JustText;
+	AppCfg.DateScrollingMode=WallToWall;
+	//
+	EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.SSID));
+	EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(AppCfg.PassWord));
+	EE_WriteCharArray(VirtAddr_ScrollText, (uint8_t*)(AppCfg.ScrollText));
+	//
+	EE_WriteVariable(VirtAddr_ScrollTextIntervalInSec, AppCfg.ScrollTextIntervalInSec);
+	EE_WriteVariable(VirtAddr_ScrollDateIntervalInSec, AppCfg.ScrollDateIntervalInSec);
+	//
+	EE_WriteVariable(VirtAddr_TimeAnimation, AppCfg.TimeAnimation);
+	EE_WriteVariable(VirtAddr_TextScrollingMode, AppCfg.TextScrollingMode);
+	EE_WriteVariable(VirtAddr_DateScrollingMode, AppCfg.DateScrollingMode);
+}
+/**/
+void EEPROM_ReadFrame(void)
+{
+	EE_ReadCharArray(VirtAddr_SSID,(uint8_t*)(AppCfg.SSID));
+	EE_ReadCharArray(VirtAddr_PassWord,(uint8_t*)(AppCfg.PassWord));
+	EE_ReadCharArray(VirtAddr_ScrollText,(uint8_t*)(AppCfg.ScrollText));
+	//
+	EE_ReadVariable(VirtAddr_ScrollTextIntervalInSec,&(AppCfg.ScrollTextIntervalInSec));
+	EE_ReadVariable(VirtAddr_ScrollDateIntervalInSec, &(AppCfg.ScrollDateIntervalInSec));
+	//
+	EE_ReadVariable(VirtAddr_TimeAnimation, &(AppCfg.TimeAnimation));
+	EE_ReadVariable(VirtAddr_TextScrollingMode, &(AppCfg.TextScrollingMode));
+	EE_ReadVariable(VirtAddr_DateScrollingMode, &(AppCfg.DateScrollingMode));
+}
 /* Application Main Functions Start ---------------------------------------------------------*/
 HAL_StatusTypeDef Init_Application(void)
 {
@@ -480,46 +568,31 @@ HAL_StatusTypeDef Init_Application(void)
 	/*RemoteXY*/
 	//RemoteXY_InitAndRun();
 
-	/*read eeprom SSID and PassWord*/
-	EE_ReadCharArray(VirtAddr_SSID,(uint8_t*)(AppCfg.SSID));
-	EE_ReadCharArray(VirtAddr_PassWord,(uint8_t*)(AppCfg.PassWord));
-	//EE_ReadCharArray(VirtAddr_ScrollText, (uint8_t)AppCfg.ScrollText);
+	/*write eeprom*/
+	//EEPROM_Write();
 
+	/*read eeprom SSID and PassWord*/
+	EEPROM_Read();
+	/**/
+	AppCfg.FirstRun=1;
+	AppCfg.UpdateTime=0;
+	AppCfg.FlipCounter=0;
+	AppCfg.Point=false;
+	AppCfg.ScrollDateSecCounter=0;
+	AppCfg.ScrollTextSecCounter=0;
+	AppCfg.DisplayMode=Time;
+	/**/
+	HAL_TIM_Base_Start_IT(&htim3);
+	HAL_TIM_Base_Start_IT(&htim4);
+	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
 	/*RTC sync from NTP*/
 	if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
 	{
 		//HAL_NVIC_SystemReset();
 	}
 	/**/
-
+	//ESP8266_AccessPoint_InitAndRun();
 	/**/
-	AppCfg.FirstRun=1;
-	AppCfg.UpdateTime=0;
-	AppCfg.TimeAnimation=1;
-	AppCfg.FlipCounter=0;
-	AppCfg.Point=false;
-	AppCfg.ScrollDateSecCounter=0;
-	AppCfg.ScrollTextSecCounter=0;
-	AppCfg.DisplayMode=Time;
-	AppCfg.ScrollDateIntervalInSec=10;
-	AppCfg.ScrollTextIntervalInSec=15;
-	AppCfg.TextScrollingMode=WallToWall;
-	AppCfg.DateScrollingMode=WallToWall;
-	/*
-	char tmp[256];
-	uint8_t z;
-	for(uint8_t i=0;i<0xff;i++){
-		z=(('A'+i)%'A')+'A';
-		tmp[i]=z;
-	}
-	tmp[0xFF]='\0';
-	strcpy((char*)AppCfg.ScrollText, tmp);
-	*/
-	strcpy((char*)AppCfg.ScrollText, "6041, Kerekegyháza Tavasz u. 25.");
-	/**/
-	HAL_TIM_Base_Start_IT(&htim3);
-	HAL_TIM_Base_Start_IT(&htim4);
-	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
 	return HAL_OK;
 }
 /**/

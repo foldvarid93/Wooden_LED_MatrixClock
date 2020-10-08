@@ -6,25 +6,28 @@
 typedef struct AppConfig_Type{
 	/*defines*/
 #define VirtAddr_SSID						(0x0)
-#define SizeOf_SSID							(0x0100)
+#define SizeOf_SSID							(50u)
 	/**/
 #define VirtAddr_PassWord 					(VirtAddr_SSID + SizeOf_SSID)
-#define SizeOf_PassWord						(0x0100)
+#define SizeOf_PassWord						(50u)
 	/**/
 #define VirtAddr_ScrollText					(VirtAddr_PassWord + SizeOf_PassWord)
-#define SizeOf_ScrollText					(0x0100)
+#define SizeOf_ScrollText					(256u)
 	/**/
 #define VirtAddr_ScrollTextIntervalInSec	(VirtAddr_ScrollText + SizeOf_ScrollText)
-#define SizeOf_ScrollTextIntervalInSec		(0x0002)
+#define SizeOf_ScrollTextIntervalInSec		(2u)
 	/**/
 #define VirtAddr_ScrollDateIntervalInSec	(VirtAddr_ScrollTextIntervalInSec + SizeOf_ScrollTextIntervalInSec)
-#define SizeOf_ScrollDateIntervalInSec		(0x0002)
+#define SizeOf_ScrollDateIntervalInSec		(2u)
 	/**/
 #define VirtAddr_TimeAnimation				(VirtAddr_ScrollDateIntervalInSec + SizeOf_ScrollDateIntervalInSec)
-#define SizeOf_TimeAnimation				(0x0001)
+#define SizeOf_TimeAnimation				(2u)
 	/**/
 #define VirtAddr_TextScrollingMode			(VirtAddr_TimeAnimation + SizeOf_TimeAnimation)
-#define SizeOf_TextScrollingMode			(0x0001)
+#define SizeOf_TextScrollingMode			(2u)
+	/**/
+#define VirtAddr_DateScrollingMode			(VirtAddr_TextScrollingMode + SizeOf_TextScrollingMode)
+#define SizeOf_DateScrollingMode			(2u)
 	/**/
 #define SizeOf_CharacterOnDisplay			(0x0006)
 #define SizeOf_DisplayTextColumnArray		((SizeOf_CharacterOnDisplay * SizeOf_ScrollText)+(2*NumberOf_DisplayColumn))
@@ -39,9 +42,9 @@ typedef struct AppConfig_Type{
 	uint8_t		ScrollText[SizeOf_ScrollText];
 	uint16_t	ScrollTextIntervalInSec;//0-65536 sec
 	uint16_t	ScrollDateIntervalInSec;//0-65536 sec
-	uint8_t 	TimeAnimation;//0 or 1
-	uint8_t		TextScrollingMode;//0 or 1
-	uint8_t		DateScrollingMode;//0 or 1
+	uint16_t 	TimeAnimation;//0 or 1
+	uint16_t	TextScrollingMode;//0 or 1
+	uint16_t	DateScrollingMode;//0 or 1
 	/*normal variables*/
 	uint8_t		DisplayTextArray[SizeOf_ScrollText];
 	uint8_t 	DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];

@@ -118,7 +118,13 @@ uint8_t BitSwapping(uint8_t ch);
 /**/
 HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord);
 /**/
+HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void);
+/**/
 void RemoteXY_InitAndRun(void);
+/**/
+void EEPROM_WriteFrame(void);
+/**/
+void EEPROM_ReadFrame(void);
 /**/
 HAL_StatusTypeDef Init_Application(void);
 /**/
