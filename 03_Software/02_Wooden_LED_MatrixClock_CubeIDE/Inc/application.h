@@ -126,6 +126,8 @@ void EEPROM_WriteFrame(void);
 /**/
 void EEPROM_ReadFrame(void);
 /**/
+void AppConfig_Init(void);
+/**/
 HAL_StatusTypeDef Init_Application(void);
 /**/
 void Run_Application(void);

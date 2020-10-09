@@ -592,6 +592,17 @@ void EEPROM_ReadFrame(void)
 	EE_ReadVariable(VirtAddr_TextScrollingMode, &(AppCfg.TextScrollingMode));
 	EE_ReadVariable(VirtAddr_DateScrollingMode, &(AppCfg.DateScrollingMode));
 }
+/**/
+void AppConfig_Init(void)
+{
+	AppCfg.FirstRun=1;
+	AppCfg.UpdateTime=0;
+	AppCfg.FlipCounter=0;
+	AppCfg.Point=false;
+	AppCfg.DisplayMode=Time;
+	AppCfg.LastScrolled=Date;
+	AppCfg.ScrollSecCounter=0;
+}
 /* Application Main Functions Start ---------------------------------------------------------*/
 HAL_StatusTypeDef Init_Application(void)
 {
@@ -612,13 +623,7 @@ HAL_StatusTypeDef Init_Application(void)
 	/*read eeprom SSID and PassWord*/
 	EEPROM_ReadFrame();
 	/**/
-	AppCfg.FirstRun=1;
-	AppCfg.UpdateTime=0;
-	AppCfg.FlipCounter=0;
-	AppCfg.Point=false;
-	AppCfg.DisplayMode=Time;
-	AppCfg.LastScrolled=Date;
-	AppCfg.ScrollSecCounter=0;
+	AppConfig_Init();
 	/**/
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
@@ -696,23 +701,6 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 			AppCfg.ScrollSecCounter = 0;
 			AppCfg.DisplayMode = Text;
 		}
-/*		if((AppCfg.LastScrolled == Date) && (AppCfg.ScrollSecCounter == AppCfg.ScrollTextIntervalInSec))
-		{
-			AppCfg.ScrollingMode = AppCfg.TextScrollingMode;
-			strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.ScrollText);
-			TextToColumnDataArray();
-			AppCfg.DisplayMode = Text;
-			AppCfg.ScrollSecCounter = 0;
-		}
-		if((AppCfg.LastScrolled == Text) && (AppCfg.ScrollSecCounter == AppCfg.ScrollDateIntervalInSec))
-		{
-			AppCfg.ScrollingMode = AppCfg.DateScrollingMode;
-			CreateDateData();
-			TextToColumnDataArray();
-			AppCfg.DisplayMode = Date;
-			AppCfg.ScrollSecCounter = 0;
-		}
-		*/
 		AppCfg.ScrollSecCounter++;
 	}
 	/**/
@@ -749,7 +737,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			/*scrolling text on display*/
 			if (AppCfg.TextScrolling == true)
 			{
-				if (AppCfg.FirstColumn == (AppCfg.LastColumn - 96))
+				if (AppCfg.FirstColumn == (AppCfg.LastColumn - NumberOf_DisplayColumn))
 				{
 					/**/
 					if(AppCfg.ScrollingMode == JustText)
