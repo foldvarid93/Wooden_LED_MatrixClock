@@ -108,7 +108,7 @@ void SendToDisplay(uint16_t from);
 /**/
 void MAX7219_Init(void);
 /**/
-void MAX7219_LoadPuse(void);
+void MAX7219_LoadPulse(void);
 /**/
 void MAX7219_Send(uint8_t ADDR, uint8_t CMD);
 /**/

@@ -326,7 +326,7 @@ void SendToDisplay(uint16_t from)
   /**/
   for(uint8_t i=0;i<8;i++){
 	  HAL_SPI_Transmit(&hspi2,&tmp[i*24],24,50);
-		MAX7219_LoadPuse();
+	  MAX7219_LoadPulse();
   }
   /**/
   MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
@@ -342,7 +342,7 @@ void MAX7219_Init(void)
 	MAX7219_Send(REG_INTENSITY, INTENSITY_7);
 }
 /**/
-void MAX7219_LoadPuse(void)
+void MAX7219_LoadPulse(void)
 {
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
 	for(uint8_t i=0;i<10;i++){
@@ -360,7 +360,7 @@ void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 	}
 	/**/
 	HAL_SPI_Transmit(&hspi2,tmp,24,50);
-	MAX7219_LoadPuse();
+	MAX7219_LoadPulse();
 }
 /**/
 void SendTimeToDisplay(void)
@@ -385,16 +385,16 @@ void SendTimeToDisplay(void)
 	}
 	/*Shutdown drivers*/
 	HAL_SPI_Transmit(&hspi2,tmp1,24,100);
-	MAX7219_LoadPuse();
+	MAX7219_LoadPulse();
 	/*Send out data*/
 	for(uint8_t i=NumberOf_ColumnOfOneDisplay ; i>0 ; i--)
 	{
 		HAL_SPI_Transmit(&hspi2, &tmp3[i-1][0], 24, 100);
-		MAX7219_LoadPuse();
+		MAX7219_LoadPulse();
 	}
 	/*Turn back on display*/
 	HAL_SPI_Transmit(&hspi2,tmp2,24,100);
-	MAX7219_LoadPuse();
+	MAX7219_LoadPulse();
 }
 /**/
 uint8_t BitSwapping(uint8_t ch)
@@ -468,7 +468,8 @@ HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
 	}
 }
 /**/
-HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void){
+HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void)
+{
 	/*ESP8266 HW reset and enabling*/
 	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_RESET);
@@ -501,7 +502,8 @@ HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void){
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT+CIPSERVER=1,23", OK_STR, SHORT_PAUSE) != HAL_OK)
+
+	if(ESP8266_NTP_ATCommand("AT+CIPAP=\"100.100.4.1\"", OK_STR, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
@@ -509,10 +511,14 @@ HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void){
 	{
 		  return HAL_ERROR;
 	}
+	if(ESP8266_NTP_ATCommand("AT+CIPSERVER=1,80", OK_STR, SHORT_PAUSE) != HAL_OK)
+	{
+		  return HAL_ERROR;
+	}
 	while(1){
-		if(ESP8266_NTP_ATCommand("AT+CIPSEND=0,10", OK_STR,10000) != HAL_OK)
+		//if(ESP8266_NTP_ATCommand("AT+CIPSEND=0,10", OK_STR,10000) != HAL_OK)
 		{
-			  return HAL_ERROR;
+			  //return HAL_ERROR;
 		}
 	}
 	return HAL_OK;
@@ -618,7 +624,7 @@ HAL_StatusTypeDef Init_Application(void)
 	//RemoteXY_InitAndRun();
 
 	/*write eeprom*/
-	//EEPROM_Write();
+	//EEPROM_WriteFrame();
 
 	/*read eeprom SSID and PassWord*/
 	EEPROM_ReadFrame();
@@ -629,12 +635,12 @@ HAL_StatusTypeDef Init_Application(void)
 	HAL_TIM_Base_Start_IT(&htim4);
 	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
 	/*RTC sync from NTP*/
-	if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
+	//if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
 	{
 		//HAL_NVIC_SystemReset();
 	}
 	/**/
-	//ESP8266_AccessPoint_InitAndRun();
+	ESP8266_AccessPoint_InitAndRun();
 	/**/
 	return HAL_OK;
 }
