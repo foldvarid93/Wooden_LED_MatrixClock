@@ -297,35 +297,6 @@ again:
 	if (so_far == len) return 1;
 	else return -1;
 }
-
-int Get_HTML_Message(void)
-{
-	uint16_t head;
-	uint16_t tail;
-	uint16_t MsgLength;
-	uint8_t MsgBuf[512];
-	HAL_Delay(100);
-	if(Wait_for("START"))
-	{
-		tail=rx_buffer.tail;
-		if(Wait_for_timeout("END", 1000))
-		{
-			head=rx_buffer.head-strlen("END");
-			MsgLength=head-tail;
-			memset(MsgBuf,0,sizeof(MsgBuf));
-			strncpy((char*)MsgBuf, (char*)&(rx_buffer.buffer[tail]),MsgLength);
-			MsgBuf[MsgLength]='\0';
-
-		  if((ESP8266_NTP_ATCommand("AT+CIPCLOSE=0", OK_STR, SHORT_PAUSE)) != HAL_OK)
-		  {
-			  return HAL_ERROR;
-		  }
-		Uart_flush();
-			asm("nop");
-		}
-	}
-	return 0;
-}
 int Wait_for_timeout (char *string, int Timeout)
 {
 	char tmp[256];

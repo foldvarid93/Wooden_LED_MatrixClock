@@ -4,6 +4,7 @@
 //Flash variables
 bool FlashWriteEnabled=true;
 uint16_t VirtAddVarTab;//[NB_OF_VAR] = {0x0001};
+extern ring_buffer rx_buffer;
 /*********************************///
 const uint8_t	DateText[] ={"A mai dátum: "};
 const uint8_t	WeekDays[7][10]={
@@ -494,7 +495,11 @@ HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT+CWMODE=3", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_NTP_ATCommand("AT+CWMODE=2", OK_STR, SHORT_PAUSE) != HAL_OK)
+	{
+		  return HAL_ERROR;
+	}
+	if(ESP8266_NTP_ATCommand("AT+CWSAP=\"ESP\",\"password\",1,4", OK_STR,10000) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
@@ -503,11 +508,7 @@ HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void)
 		  return HAL_ERROR;
 	}
 
-	if(ESP8266_NTP_ATCommand("AT+CIPAP=\"100.100.4.1\"", OK_STR, SHORT_PAUSE) != HAL_OK)
-	{
-		  return HAL_ERROR;
-	}
-	if(ESP8266_NTP_ATCommand("AT+CWSAP=\"ESP\",\"password\",1,4", OK_STR,10000) != HAL_OK)
+	if(ESP8266_NTP_ATCommand("AT+CIPAP=\"192.168.4.1\"", OK_STR, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
@@ -518,10 +519,37 @@ HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void)
 	Uart_flush();
 	while(1)
 	{
-		//
 		Get_HTML_Message();
 	}
 	return HAL_OK;
+}
+/**/
+int Get_HTML_Message(void) {
+	uint16_t head;
+	uint16_t tail;
+	uint16_t MsgLength;
+	uint8_t MsgBuf[512];
+
+	if (Wait_for(".-'S.-'T.-'A.-'R.-'T.-'")) {
+		tail = rx_buffer.tail;
+		if (Wait_for(".-'S.-'T.-'O.-'P.-'")) {
+			head = rx_buffer.tail - strlen(".-'S.-'T.-'O.-'P.-'");
+			MsgLength = head - tail;
+			memset(MsgBuf, 0, sizeof(MsgBuf));
+			strncpy((char*) MsgBuf, (char*) &(rx_buffer.buffer[tail]),MsgLength);
+			MsgBuf[MsgLength] = '\0';
+			char tmp[]="HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
+
+			if (ESP8266_NTP_ATCommand("AT+CIPSEND=0,44", OK_STR, SHORT_PAUSE)!= HAL_OK)
+			{
+				return HAL_ERROR;
+			}
+			UartPrintCharArray((char*)tmp,strlen(tmp));
+			Uart_flush();
+			asm("nop");
+		}
+	}
+	return 0;
 }
 /**/
 void RemoteXY_InitAndRun(void)

@@ -120,6 +120,8 @@ HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord);
 /**/
 HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void);
 /**/
+int Get_HTML_Message(void);
+/**/
 void RemoteXY_InitAndRun(void);
 /**/
 void EEPROM_WriteFrame(void);
