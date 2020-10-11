@@ -210,6 +210,7 @@ void Uart_flush (void)
 {
 	memset(_rx_buffer->buffer,'\0', UART_BUFFER_SIZE);
 	_rx_buffer->head = 0;
+	_rx_buffer->tail = 0;
 }
 
 int Uart_peek()
@@ -259,7 +260,7 @@ again:
 	else return -1;
 }
 
-int Get_after (char *string, uint8_t numberofchars, char *buffertosave)
+int Get_after (char *string, uint16_t numberofchars, char *buffertosave)
 {
 
 	while (Wait_for(string) != 1);
@@ -297,12 +298,40 @@ again:
 	else return -1;
 }
 
+int Get_HTML_Message(void)
+{
+	uint16_t head;
+	uint16_t tail;
+	uint16_t MsgLength;
+	uint8_t MsgBuf[512];
+	HAL_Delay(100);
+	if(Wait_for("START"))
+	{
+		tail=rx_buffer.tail;
+		if(Wait_for_timeout("END", 1000))
+		{
+			head=rx_buffer.head-strlen("END");
+			MsgLength=head-tail;
+			memset(MsgBuf,0,sizeof(MsgBuf));
+			strncpy((char*)MsgBuf, (char*)&(rx_buffer.buffer[tail]),MsgLength);
+			MsgBuf[MsgLength]='\0';
+
+		  if((ESP8266_NTP_ATCommand("AT+CIPCLOSE=0", OK_STR, SHORT_PAUSE)) != HAL_OK)
+		  {
+			  return HAL_ERROR;
+		  }
+		Uart_flush();
+			asm("nop");
+		}
+	}
+	return 0;
+}
 int Wait_for_timeout (char *string, int Timeout)
 {
 	char tmp[256];
 	int len = strlen (string);
-	uint8_t Diff=0;
-	uint8_t TmpIdx=0;
+	uint16_t Diff=0;
+	uint16_t TmpIdx=0;
 	uint32_t timeOut = HAL_GetTick();//save start timestamp
 	uint8_t StateMachineStatus=0;
 	while (HAL_GetTick() - timeOut <= Timeout) {
@@ -343,7 +372,7 @@ int Wait_for_timeout (char *string, int Timeout)
 				{
 					TmpIdx=_rx_buffer->tail;
 					/*if the first character mach, continue*/
-					for(uint8_t i=0;i<len;i++)
+					for(uint16_t i=0;i<len;i++)
 					{
 						tmp[i]=_rx_buffer->buffer[TmpIdx];
 						TmpIdx = (TmpIdx + 1) % UART_BUFFER_SIZE;
@@ -379,64 +408,6 @@ int Wait_for_timeout (char *string, int Timeout)
 	}
 	return 0;//return with 0, fail or timeout
 }
-/*
-again:
-	while (!IsDataAvailable())
-	{
-
-	}
-	while (Uart_peek() != string[so_far])
-	{
-		_rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;
-	}
-
-	while (Uart_peek() == string [so_far])
-	{
-		so_far++;
-		Uart_read();
-		if (so_far == len) return 1;
-		while (!IsDataAvailable());
-	}
-
-	if (so_far != len)
-	{
-		so_far = 0;
-		goto again;
-	}
-
-	if (so_far == len) return 1;
-	else return -1;
-}
-*/
-/*uint8_t Wait_forr (const char * answer, uint16_t delay)
-{
-	uint32_t timeOut = HAL_GetTick();
-	uint8_t Length = 0;
-	char tmp[256];
-
-	while (HAL_GetTick() - timeOut <= delay) {
-		Length = strlen(answer);
-		uint8_t i=0;
-		uint8_t StartIdx;
-		uint8_t SrcIdx;
-		if((_rx_buffer->tail-Length)<0){
-			StartIdx=_rx_buffer->tail + UART_BUFFER_SIZE -Length;
-		}
-		else{
-			StartIdx=_rx_buffer->tail - Length;
-		}
-
-		for(uint8_t i=0;i<Length;i++)
-		{
-			SrcIdx=(StartIdx+i)%UART_BUFFER_SIZE;
-			tmp[i]=_rx_buffer->buffer[SrcIdx];
-		}
-
-	}
-	return 0;
-}
-*/
-
 
 void Uart_isr (UART_HandleTypeDef *huart)
 {
@@ -504,7 +475,7 @@ void Uart_isr (UART_HandleTypeDef *huart)
 /*
 uint16_t Get_position (char *string)
 {
-  static uint8_t so_far;
+  static uint16_t so_far;
   uint16_t counter;
   int len = strlen (string);
   if (_rx_buffer->tail>_rx_buffer->head)

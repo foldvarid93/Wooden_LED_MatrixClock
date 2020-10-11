@@ -11,7 +11,7 @@
 #include "stm32f4xx_hal.h"
 
 /* change the size of the buffer */
-#define UART_BUFFER_SIZE 256
+#define UART_BUFFER_SIZE 2048
 
 typedef struct
 {
@@ -79,7 +79,7 @@ int Copy_upto (char *string, char *buffertocopyinto);
 * Returns 1 on success and -1 otherwise
 * USAGE: while (!(Get_after ("some string", 6, buffer)));
 */
-int Get_after (char *string, uint8_t numberofchars, char *buffertosave);
+int Get_after (char *string, uint16_t numberofchars, char *buffertosave);
 
 
 /* Wait until a paricular string is detected in the Rx Buffer
