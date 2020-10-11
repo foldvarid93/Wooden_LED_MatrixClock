@@ -515,11 +515,11 @@ HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void)
 	{
 		  return HAL_ERROR;
 	}
-	while(1){
-		//if(ESP8266_NTP_ATCommand("AT+CIPSEND=0,10", OK_STR,10000) != HAL_OK)
-		{
-			  //return HAL_ERROR;
-		}
+	Uart_flush();
+	while(1)
+	{
+		//
+		Get_HTML_Message();
 	}
 	return HAL_OK;
 }

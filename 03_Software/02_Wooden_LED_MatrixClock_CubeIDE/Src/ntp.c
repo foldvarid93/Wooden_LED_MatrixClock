@@ -82,7 +82,8 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 	uint8_t packetBuffer[ NTP_PACKET_SIZE];
 	/**/
 	Uart_flush();
-	  if((ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"pool.ntp.org\",123", OK_STR, 1000)) != HAL_OK ){//if connection failed -> error
+	  if((ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"pool.ntp.org\",123", OK_STR, 1000)) != HAL_OK )//if connection failed -> error
+	  {
 		  return HAL_ERROR;
 	  }
 	  /**/
@@ -100,7 +101,8 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 	  packetBuffer[15] = 52;
 
 	  /**/
-	  if(ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE) != HAL_OK){
+	  if(ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE) != HAL_OK)
+	  {
 		  return HAL_ERROR;
 	  }
 	  /**/
@@ -108,7 +110,6 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 
 	  memset(packetBuffer, 0, NTP_PACKET_SIZE);
 	  int i = 0;
-	  //HAL_Delay(1000);
 	  /**/
 	  if (Wait_for_timeout("+IPD,48:",1000) == 1)
 	  {
@@ -119,7 +120,8 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 				 break;
 			  }
 		  }
-		  while (serial.available() > 0) {
+		  while (serial.available() > 0)
+		  {
 			  uint8_t ch = serial.read();
 			  if (i < NTP_PACKET_SIZE)
 			  {
@@ -132,7 +134,8 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 			  }
 		  }
 	  }
-	  else{
+	  else
+	  {
 		  return HAL_ERROR;
 	  }
 	  /*UTC time: 1900 jan 1, monday, 0:00:00*/
@@ -195,7 +198,8 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 	  /*Second*/
 	  DateTime->sec=(UNIXTimeHungary_Sec % NUMBEROFSECONDS_MINUTE);
 	  /**/
-	  if((ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE)) != HAL_OK){
+	  if((ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE)) != HAL_OK)
+	  {
 		  return HAL_ERROR;
 	  }
 	  /**/
