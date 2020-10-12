@@ -26,9 +26,8 @@ uint8_t RemoteXY_CONF[] =
 
 
 /*externs*/
-extern UART_HandleTypeDef huart3;
 
-extern ring_buffer *_rx_buffer;
+extern ring_buffer rx_buffer;
 
 /***************************************************************************************
  * Function declarations
@@ -425,7 +424,7 @@ uint8_t UartAvailable(void)
 
 uint8_t UartFind(char *str)
 {
-	return (uint8_t) Look_for(str, (char*)_rx_buffer->buffer);
+	return (uint8_t) Look_for(str, (char*)rx_buffer.buffer);
 }
 
 void UartPrintLn(char *str)

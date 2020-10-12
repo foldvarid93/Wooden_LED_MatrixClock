@@ -523,47 +523,47 @@ HAL_StatusTypeDef Init_Application(void)
 	/*RTC sync from NTP*/
 	//if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
 	{
-		//HAL_NVIC_SystemReset();
 	}
 	/**/
-	ESP8266_AccessPoint_InitAndRun();
+	//ESP8266_AccessPoint_InitAndRun();
 	/**/
 	return HAL_OK;
 }
 /**/
 void Run_Application(void)
 {
-	ESP8266_RemoteXY_InitAndStart();
-	while(1)
-	{
-		while(1)
-		{
-			ESP8266_RemoteXY_Handler();
-			if(ESP8266_RemoteXY_IsConnected() == 1)
-			{
-				break;
-			}
-		}
-		/*while connected: run application*/
-		while(ESP8266_RemoteXY_IsConnected() == 1)
-		{
-			/*run application handler*/
-			ESP8266_RemoteXY_Handler();
-			/*if app sent data process and store*/
-			if(RemoteXY.Btn_SSID_Send == 1)
-			{
-				if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.TextBox_SSID)) != EE_OK) {
-					Error_Handler();
-				}
-
-				if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.TextBox_PassWord)) != EE_OK) {
-					Error_Handler();
-				}
-				RemoteXY.Btn_SSID_Send = 0;
-			}
-		}
-
-	}
+	ESP8266_AccessPoint_InitAndRun();
+//	ESP8266_RemoteXY_InitAndStart();
+//	while(1)
+//	{
+//		while(1)
+//		{
+//			ESP8266_RemoteXY_Handler();
+//			if(ESP8266_RemoteXY_IsConnected() == 1)
+//			{
+//				break;
+//			}
+//		}
+//		/*while connected: run application*/
+//		while(ESP8266_RemoteXY_IsConnected() == 1)
+//		{
+//			/*run application handler*/
+//			ESP8266_RemoteXY_Handler();
+//			/*if app sent data process and store*/
+//			if(RemoteXY.Btn_SSID_Send == 1)
+//			{
+//				if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.TextBox_SSID)) != EE_OK) {
+//					Error_Handler();
+//				}
+//
+//				if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.TextBox_PassWord)) != EE_OK) {
+//					Error_Handler();
+//				}
+//				RemoteXY.Btn_SSID_Send = 0;
+//			}
+//		}
+//
+//	}
 }
 /* Application Main Functions End ---------------------------------------------------------*/
 /* Interrupt Callbacks Start ---------------------------------------------------------*/

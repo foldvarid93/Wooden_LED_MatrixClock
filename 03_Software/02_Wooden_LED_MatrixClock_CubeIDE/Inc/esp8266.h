@@ -9,7 +9,21 @@
 /***************************************************************************************
  * Defines
  **************************************************************************************/
-
+#define SizeOf_HTML_Message		(2048u)
+/**/
+#define AT_OK					"OK"
+#define AT_READY				"ready"
+#define HTML_OK					"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
+#define MSG_ID01_START			"MsG_STRT-iD_01"
+#define MSG_ID01_STOP			"MsG_STOP-iD_01"
+#define MSG_ID02_START			"MsG_STRT-iD_02"
+#define MSG_ID02_STOP			"MsG_STOP-iD_02"
+#define MSG_ID03_START			"MsG_STRT-iD_03"
+#define MSG_ID03_STOP			"MsG_STOP-iD_03"
+#define MSG_ID04_START			"MsG_STRT-iD_04"
+#define MSG_ID04_STOP			"MsG_STOP-iD_04"
+#define MSG_ID05_START			"MsG_STRT-iD_05"
+#define MSG_ID05_STOP			"MsG_STOP-iD_05"
 /***************************************************************************************
  * Typedefs
  **************************************************************************************/
@@ -26,7 +40,9 @@ HAL_StatusTypeDef ESP8266_AT_SendAndReceiveWithTimeout(const char * Command, con
 /**/
 HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void);
 /**/
-HAL_StatusTypeDef Get_HTML_Message(void);
+HAL_StatusTypeDef HTML_GetMessage(uint8_t * Message);
+/**/
+HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message);
 /**/
 /**************************************************************************************/
 #endif

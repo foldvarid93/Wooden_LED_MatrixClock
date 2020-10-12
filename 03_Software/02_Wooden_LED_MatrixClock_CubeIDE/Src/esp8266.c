@@ -6,7 +6,7 @@
  * Variables
  **************************************************************************************/
 /*globals*/
-
+uint8_t HTML_Message[SizeOf_HTML_Message];
 /*externs*/
 extern ring_buffer rx_buffer;
 /***************************************************************************************
@@ -142,53 +142,54 @@ HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void)
 	/**/
 	ESP8266_Serial_Init();
 	/**/
-	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+RESTORE", "ready", LONG_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+RESTORE", AT_READY, LONG_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_AT_SendAndReceiveWithTimeout("AT", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT", AT_OK, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_AT_SendAndReceiveWithTimeout("ATE0", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("ATE0", AT_OK, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CWMODE=2", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CWMODE=2", AT_OK, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CWSAP=\"ESP\",\"password\",1,4", OK_STR,10000) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CWSAP=\"ESP\",\"password\",1,4", AT_OK,10000) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPMUX=1", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPMUX=1", AT_OK, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
 
-	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPAP=\"192.168.4.1\"", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPAP=\"192.168.4.1\"", AT_OK, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPSERVER=1,80", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPSERVER=1,80", AT_OK, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
 	Uart_flush();
 	while(1)
 	{
-		Get_HTML_Message();
+		if(HTML_GetMessage(HTML_Message) == HAL_OK){
+			HTML_Interpreter(HTML_Message);
+		}
 	}
 	return HAL_OK;
 }
 /**/
-HAL_StatusTypeDef Get_HTML_Message(void)
+HAL_StatusTypeDef HTML_GetMessage(uint8_t * Message)
 {
 	uint16_t head;
 	uint16_t tail;
 	uint16_t MsgLength;
-	uint8_t MsgBuf[512];
 
 	if (Wait_for(".-'S.-'T.-'A.-'R.-'T.-'"))
 	{
@@ -197,17 +198,63 @@ HAL_StatusTypeDef Get_HTML_Message(void)
 		{
 			head = rx_buffer.tail - strlen(".-'S.-'T.-'O.-'P.-'");
 			MsgLength = head - tail;
-			memset(MsgBuf, 0, sizeof(MsgBuf));
-			strncpy((char*) MsgBuf, (char*) &(rx_buffer.buffer[tail]),MsgLength);
-			MsgBuf[MsgLength] = '\0';
-			char tmp[]="HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
+			memset(Message, 0, SizeOf_HTML_Message);
+			strncpy((char*) Message, (char*) &(rx_buffer.buffer[tail]),MsgLength);
+			Message[MsgLength] = '\0';
 
-			if (ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPSEND=0,44", OK_STR, SHORT_PAUSE)!= HAL_OK)
+			if (ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPSEND=0,44", AT_OK, SHORT_PAUSE)!= HAL_OK)
 			{
 				return HAL_ERROR;
 			}
-			UartPrintCharArray((char*)tmp,strlen(tmp));
+			UartPrintCharArray(HTML_OK,strlen(HTML_OK));
 			Uart_flush();
+			asm("nop");
+		}
+	}
+	return HAL_OK;
+}
+/**/
+HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
+{
+	uint16_t MessageLength=strlen((char*)Message);
+#define MSG_ID_LENGTH			(14)
+#define MSG_ID_FRAME_LENGTH		(2*MSG_ID_LENGTH)
+	char MSG_START[MSG_ID_LENGTH + 1];
+	char MSG[SizeOf_HTML_Message];
+	char MSG_STOP[MSG_ID_LENGTH + 1];
+	if(MessageLength > (2 * MSG_ID_LENGTH))
+	{
+		strncpy((char*)MSG_START,(char*)Message,MSG_ID_LENGTH);
+		MSG_START[MSG_ID_LENGTH]='\0';
+		strncpy((char*)MSG,(char*)&Message[MSG_ID_LENGTH],(MessageLength - MSG_ID_FRAME_LENGTH));
+		MSG[MessageLength - MSG_ID_FRAME_LENGTH]='\0';
+		strncpy((char*)MSG_STOP,(char*)&Message[MessageLength-MSG_ID_LENGTH],MSG_ID_LENGTH);
+		MSG_STOP[MSG_ID_LENGTH]='\0';
+
+		/*Message ID1*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID01_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID01_STOP)) == 0))
+		{
+			if(strlen((char*)MSG) <= sizeof(AppCfg.SSID)){
+				strcpy((char*)AppCfg.SSID,(char*)MSG);
+				EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.SSID));
+			}
+		}
+		/*Message ID2*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID02_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID02_STOP)) == 0))
+		{
+			if(strlen((char*)MSG) <= sizeof(AppCfg.PassWord)){
+				strcpy((char*)AppCfg.PassWord,(char*)MSG);
+				EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.PassWord));
+			}
+		}
+		/*Message ID3*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID03_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID03_STOP)) == 0))
+		{
+			asm("nop");
+		}
+		/*Message ID4*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID04_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID04_STOP)) == 0))
+		{
 			asm("nop");
 		}
 	}
