@@ -202,6 +202,7 @@ HAL_StatusTypeDef HTML_GetMessage(uint8_t * Message)
 			strncpy((char*) Message, (char*) &(rx_buffer.buffer[tail]),MsgLength);
 			Message[MsgLength] = '\0';
 
+			/*HTML respond: OK*/
 			if (ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPSEND=0,63", AT_OK, SHORT_PAUSE)!= HAL_OK)
 			{
 				return HAL_ERROR;
@@ -210,6 +211,7 @@ HAL_StatusTypeDef HTML_GetMessage(uint8_t * Message)
 			{
 				return HAL_ERROR;
 			}
+			/*Close connection*/
 			if (ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPCLOSE=0", AT_OK, SHORT_PAUSE)!= HAL_OK)
 			{
 				return HAL_ERROR;
@@ -288,6 +290,12 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			/*Message ID4*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID04_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID04_STOP)) == 0))
 			{
+				asm("nop");
+				//TODO: save date and time
+			}
+			/*Message ID5*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID05_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID05_STOP)) == 0))
+			{
 				if(strlen((char*)MSG) == 1)
 				{
 					if(strcmp((char*)MSG,"1") == 0)
@@ -302,11 +310,6 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 					}
 				}
 			}
-			/*Message ID5*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID05_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID05_STOP)) == 0))
-			{
-				asm("nop");
-			}
 			/*Message ID6*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID06_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID06_STOP)) == 0))
 			{
@@ -319,6 +322,46 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			}
 			/*Message ID8*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID08_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID08_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID9*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID09_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID09_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID10*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID10_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID10_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID11*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID11_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID11_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID12*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID12_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID12_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID13*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID13_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID13_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID14*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID14_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID14_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID15*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID15_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID15_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID16*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID16_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID16_STOP)) == 0))
 			{
 				asm("nop");
 			}
