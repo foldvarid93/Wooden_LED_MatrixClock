@@ -202,7 +202,7 @@ HAL_StatusTypeDef HTML_GetMessage(uint8_t * Message)
 			strncpy((char*) Message, (char*) &(rx_buffer.buffer[tail]),MsgLength);
 			Message[MsgLength] = '\0';
 
-			if (ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPSEND=0,15", AT_OK, SHORT_PAUSE)!= HAL_OK)
+			if (ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPSEND=0,63", AT_OK, SHORT_PAUSE)!= HAL_OK)
 			{
 				return HAL_ERROR;
 			}
