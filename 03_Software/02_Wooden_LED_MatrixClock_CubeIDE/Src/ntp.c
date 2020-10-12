@@ -223,6 +223,7 @@ HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
 		{
 			if(ESP8266_NTP_GetDateTime(&DateTime) == HAL_OK)
 			{
+				//TODO: rework function
 				HAL_Time.Hours = DateTime.hour;
 				HAL_Time.Minutes = DateTime.min;
 				HAL_Time.Seconds = DateTime.sec;
