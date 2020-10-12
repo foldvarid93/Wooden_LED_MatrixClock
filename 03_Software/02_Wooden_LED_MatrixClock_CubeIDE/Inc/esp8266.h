@@ -24,6 +24,12 @@
 #define MSG_ID04_STOP			"MsG_STOP-iD_04"
 #define MSG_ID05_START			"MsG_STRT-iD_05"
 #define MSG_ID05_STOP			"MsG_STOP-iD_05"
+#define MSG_ID06_START			"MsG_STRT-iD_06"
+#define MSG_ID06_STOP			"MsG_STOP-iD_06"
+#define MSG_ID07_START			"MsG_STRT-iD_07"
+#define MSG_ID07_STOP			"MsG_STOP-iD_07"
+#define MSG_ID08_START			"MsG_STRT-iD_08"
+#define MSG_ID08_STOP			"MsG_STOP-iD_08"
 /***************************************************************************************
  * Typedefs
  **************************************************************************************/

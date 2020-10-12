@@ -222,41 +222,88 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 	char MSG_START[MSG_ID_LENGTH + 1];
 	char MSG[SizeOf_HTML_Message];
 	char MSG_STOP[MSG_ID_LENGTH + 1];
-	if(MessageLength > (2 * MSG_ID_LENGTH))
-	{
-		strncpy((char*)MSG_START,(char*)Message,MSG_ID_LENGTH);
-		MSG_START[MSG_ID_LENGTH]='\0';
-		strncpy((char*)MSG,(char*)&Message[MSG_ID_LENGTH],(MessageLength - MSG_ID_FRAME_LENGTH));
-		MSG[MessageLength - MSG_ID_FRAME_LENGTH]='\0';
-		strncpy((char*)MSG_STOP,(char*)&Message[MessageLength-MSG_ID_LENGTH],MSG_ID_LENGTH);
-		MSG_STOP[MSG_ID_LENGTH]='\0';
+	uint8_t* StartPtr;
+	uint8_t* StopPtr;
+	uint8_t* MsgPtr;
+	uint16_t MsgLen;
 
-		/*Message ID1*/
-		if(((strcmp((char*) MSG_START,(char*)MSG_ID01_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID01_STOP)) == 0))
+	while(MessageLength > 0)
+	{
+		StartPtr = (uint8_t*) strstr((const char*)Message, (char*)"MsG_STRT-");
+		MsgPtr = StartPtr + MSG_ID_LENGTH;
+		StopPtr = (uint8_t*) strstr((const char*)Message, (char*)"MsG_STOP-");
+		if(MsgPtr == StopPtr)
 		{
-			if(strlen((char*)MSG) <= sizeof(AppCfg.SSID)){
-				strcpy((char*)AppCfg.SSID,(char*)MSG);
-				EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.SSID));
+			return HAL_OK;
+		}
+		else
+		{
+			MsgLen = StopPtr - MsgPtr;
+
+			strncpy((char*)MSG_START,(char*)StartPtr,MSG_ID_LENGTH);
+			MSG_START[MSG_ID_LENGTH] = '\0';
+
+			strncpy((char*)MSG,(char*)MsgPtr,MsgLen);
+			MSG[MsgLen] = '\0';
+
+			strncpy((char*)MSG_STOP,(char*)StopPtr,MSG_ID_LENGTH);
+			MSG_STOP[MSG_ID_LENGTH] = '\0';
+
+			/*Message ID1*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID01_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID01_STOP)) == 0))
+			{
+				if(strlen((char*)MSG) <= sizeof(AppCfg.SSID))
+				{
+					strcpy((char*)AppCfg.SSID,(char*)MSG);
+					EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.SSID));
+				}
+			}
+			/*Message ID2*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID02_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID02_STOP)) == 0))
+			{
+				if(strlen((char*)MSG) <= sizeof(AppCfg.PassWord))
+				{
+					strcpy((char*)AppCfg.PassWord,(char*)MSG);
+					EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(AppCfg.PassWord));
+				}
+			}
+			/*Message ID3*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID03_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID03_STOP)) == 0))
+			{
+				if(strlen((char*)MSG) <= sizeof(AppCfg.ScrollText))
+				{
+					strcpy((char*)AppCfg.ScrollText,(char*)MSG);
+					EE_WriteCharArray(VirtAddr_ScrollText, (uint8_t*)(AppCfg.ScrollText));
+				}
+			}
+			/*Message ID4*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID04_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID04_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID5*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID05_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID05_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID6*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID06_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID06_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID7*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID07_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID07_STOP)) == 0))
+			{
+				asm("nop");
+			}
+			/*Message ID8*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID08_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID08_STOP)) == 0))
+			{
+				asm("nop");
 			}
 		}
-		/*Message ID2*/
-		if(((strcmp((char*) MSG_START,(char*)MSG_ID02_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID02_STOP)) == 0))
-		{
-			if(strlen((char*)MSG) <= sizeof(AppCfg.PassWord)){
-				strcpy((char*)AppCfg.PassWord,(char*)MSG);
-				EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.PassWord));
-			}
-		}
-		/*Message ID3*/
-		if(((strcmp((char*) MSG_START,(char*)MSG_ID03_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID03_STOP)) == 0))
-		{
-			asm("nop");
-		}
-		/*Message ID4*/
-		if(((strcmp((char*) MSG_START,(char*)MSG_ID04_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID04_STOP)) == 0))
-		{
-			asm("nop");
-		}
+		Message = (uint8_t*) StopPtr + MSG_ID_LENGTH;
+		MessageLength = strlen((char*)Message);
 	}
 	return HAL_OK;
 }
