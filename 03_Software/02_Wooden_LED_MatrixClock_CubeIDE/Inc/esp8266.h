@@ -13,7 +13,7 @@
 /**/
 #define AT_OK					"OK"
 #define AT_READY				"ready"
-#define HTML_OK					"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
+#define HTML_OK					"HTTP/1.1 200 OK"
 #define MSG_ID01_START			"MsG_STRT-iD_01"
 #define MSG_ID01_STOP			"MsG_STOP-iD_01"
 #define MSG_ID02_START			"MsG_STRT-iD_02"

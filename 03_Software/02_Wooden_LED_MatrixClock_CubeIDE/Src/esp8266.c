@@ -202,11 +202,20 @@ HAL_StatusTypeDef HTML_GetMessage(uint8_t * Message)
 			strncpy((char*) Message, (char*) &(rx_buffer.buffer[tail]),MsgLength);
 			Message[MsgLength] = '\0';
 
-			if (ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPSEND=0,44", AT_OK, SHORT_PAUSE)!= HAL_OK)
+			if (ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPSEND=0,15", AT_OK, SHORT_PAUSE)!= HAL_OK)
 			{
 				return HAL_ERROR;
 			}
-			UartPrintCharArray(HTML_OK,strlen(HTML_OK));
+			if (ESP8266_AT_SendAndReceiveWithTimeout(HTML_OK, AT_OK, SHORT_PAUSE)!= HAL_OK)
+			{
+				return HAL_ERROR;
+			}
+			if (ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPCLOSE=0", AT_OK, SHORT_PAUSE)!= HAL_OK)
+			{
+				return HAL_ERROR;
+			}
+			//UartPrintCharArray(HTML_OK,strlen(HTML_OK));
+
 			Uart_flush();
 			asm("nop");
 		}
@@ -279,7 +288,19 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			/*Message ID4*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID04_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID04_STOP)) == 0))
 			{
-				asm("nop");
+				if(strlen((char*)MSG) == 1)
+				{
+					if(strcmp((char*)MSG,"1") == 0)
+					{
+						AppCfg.TimeAnimation = 1;
+						EE_WriteVariable(VirtAddr_TimeAnimation, AppCfg.TimeAnimation);
+					}
+					else
+					{
+						AppCfg.TimeAnimation = 0;
+						EE_WriteVariable(VirtAddr_TimeAnimation, AppCfg.TimeAnimation);
+					}
+				}
 			}
 			/*Message ID5*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID05_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID05_STOP)) == 0))
