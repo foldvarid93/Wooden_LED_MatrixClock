@@ -323,13 +323,6 @@ int Wait_for_timeout (char *string, int Timeout)
 			{
 				if(StateMachineStatus == 0)
 				{
-					/*seek the first matching character*/
-					/*
-					while (Uart_peek() != string[so_far])
-					{
-						_rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;
-					}
-					*/
 					if(Uart_peek() != string[0])
 					{
 						_rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;
@@ -369,12 +362,12 @@ int Wait_for_timeout (char *string, int Timeout)
 			/*else do nothing, wait*/
 			else
 			{
-
 			}
 
 		}
 		/*no available data wait for data or timeout*/
-		else{
+		else
+		{
 		}
 	}
 	return 0;//return with 0, fail or timeout

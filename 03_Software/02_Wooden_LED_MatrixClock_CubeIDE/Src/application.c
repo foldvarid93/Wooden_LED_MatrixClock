@@ -28,7 +28,7 @@ const uint8_t	Months[12][12]={
 								{"október"},
 								{"november"},
 								{"december"}};
-/*********************************/				//Date functions begin
+/*********************************/
 /**/
 void CreateDateData(void)
 {
@@ -56,8 +56,6 @@ void CreateDateData(void)
 	}
 	AppCfg.DisplayTextArray[i]='\0';			//lez?r? nulla
 }
-/*********************************/				//Date functions end
-/*********************************/				//Time functions begin
 /**/
 void Rotate(uint8_t* Dest,uint8_t* Source)
 {
@@ -410,146 +408,6 @@ uint8_t BitSwapping(uint8_t ch)
 	if (ch&0B01000000) retval|=0B00000010;
 	if (ch&0B10000000) retval|=0B00000001;
 	return ~retval;
-}
-/**/
-HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
-{
-	RTC_DataType DateTime={0,0,0,0,0,0,0};
-	RTC_TimeTypeDef HAL_Time={0,0,0,0,0,0,RTC_DAYLIGHTSAVING_NONE,RTC_STOREOPERATION_RESET};
-	RTC_DateTypeDef HAL_Date={0,0,0,0};
-	uint8_t Attempt=0;
-#define NumberOfAttepmts 	3
-	/*Try to connect AP*/
-	while(1)
-	{
-		Attempt++;
-		if(Attempt<NumberOfAttepmts)
-		{
-			if(ESP8266_NTP_Init(SSID, PassWord) == HAL_OK)
-			{
-				break;
-			}
-		}
-		else
-		{
-			return HAL_ERROR;
-		}
-	}
-	/*Try to get NTP packet*/
-	Attempt=0;
-	while(1)
-	{
-		Attempt++;
-		if(Attempt<NumberOfAttepmts)
-		{
-			if(ESP8266_NTP_GetDateTime(&DateTime) == HAL_OK)
-			{
-				HAL_Time.Hours = DateTime.hour;
-				HAL_Time.Minutes = DateTime.min;
-				HAL_Time.Seconds = DateTime.sec;
-				HAL_Date.Year = DateTime.year;
-				HAL_Date.Month = DateTime.month;
-				HAL_Date.Date = DateTime.date;
-				HAL_Date.WeekDay = DateTime.day;
-				HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
-				if(HAL_RTC_SetTime(&hrtc,&HAL_Time,RTC_FORMAT_BIN) == HAL_OK)
-				{
-					if(HAL_RTC_SetDate(&hrtc,&HAL_Date,RTC_FORMAT_BIN) == HAL_OK)
-					{
-						HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
-						return HAL_OK;
-					}
-				}
-			}
-		}
-		else
-		{
-			return HAL_ERROR;
-		}
-	}
-}
-/**/
-HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void)
-{
-	/*ESP8266 HW reset and enabling*/
-	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_SET);
-	HAL_Delay(100);
-	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_SET);
-	HAL_Delay(1000);
-	/**/
-	Ringbuf_init();
-	/**/
-	ESP8266_Serial_Init();
-	/**/
-	if(ESP8266_NTP_ATCommand("AT+RESTORE", "ready", LONG_PAUSE) != HAL_OK)
-	{
-		  return HAL_ERROR;
-	}
-	if(ESP8266_NTP_ATCommand("AT", OK_STR, SHORT_PAUSE) != HAL_OK)
-	{
-		  return HAL_ERROR;
-	}
-	if(ESP8266_NTP_ATCommand("ATE0", OK_STR, SHORT_PAUSE) != HAL_OK)
-	{
-		  return HAL_ERROR;
-	}
-	if(ESP8266_NTP_ATCommand("AT+CWMODE=2", OK_STR, SHORT_PAUSE) != HAL_OK)
-	{
-		  return HAL_ERROR;
-	}
-	if(ESP8266_NTP_ATCommand("AT+CWSAP=\"ESP\",\"password\",1,4", OK_STR,10000) != HAL_OK)
-	{
-		  return HAL_ERROR;
-	}
-	if(ESP8266_NTP_ATCommand("AT+CIPMUX=1", OK_STR, SHORT_PAUSE) != HAL_OK)
-	{
-		  return HAL_ERROR;
-	}
-
-	if(ESP8266_NTP_ATCommand("AT+CIPAP=\"192.168.4.1\"", OK_STR, SHORT_PAUSE) != HAL_OK)
-	{
-		  return HAL_ERROR;
-	}
-	if(ESP8266_NTP_ATCommand("AT+CIPSERVER=1,80", OK_STR, SHORT_PAUSE) != HAL_OK)
-	{
-		  return HAL_ERROR;
-	}
-	Uart_flush();
-	while(1)
-	{
-		Get_HTML_Message();
-	}
-	return HAL_OK;
-}
-/**/
-int Get_HTML_Message(void) {
-	uint16_t head;
-	uint16_t tail;
-	uint16_t MsgLength;
-	uint8_t MsgBuf[512];
-
-	if (Wait_for(".-'S.-'T.-'A.-'R.-'T.-'")) {
-		tail = rx_buffer.tail;
-		if (Wait_for(".-'S.-'T.-'O.-'P.-'")) {
-			head = rx_buffer.tail - strlen(".-'S.-'T.-'O.-'P.-'");
-			MsgLength = head - tail;
-			memset(MsgBuf, 0, sizeof(MsgBuf));
-			strncpy((char*) MsgBuf, (char*) &(rx_buffer.buffer[tail]),MsgLength);
-			MsgBuf[MsgLength] = '\0';
-			char tmp[]="HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
-
-			if (ESP8266_NTP_ATCommand("AT+CIPSEND=0,44", OK_STR, SHORT_PAUSE)!= HAL_OK)
-			{
-				return HAL_ERROR;
-			}
-			UartPrintCharArray((char*)tmp,strlen(tmp));
-			Uart_flush();
-			asm("nop");
-		}
-	}
-	return 0;
 }
 /**/
 void RemoteXY_InitAndRun(void)

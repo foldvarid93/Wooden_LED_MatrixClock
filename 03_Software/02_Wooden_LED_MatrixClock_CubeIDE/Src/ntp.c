@@ -7,7 +7,7 @@
  * Variables
  **************************************************************************************/
 /*globals*/
-const uint8_t NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
+#define NTP_PACKET_SIZE  48 // NTP time stamp is in the first 48 bytes of the message
 
 /*externs*/
 extern Serial_t serial;
@@ -16,17 +16,6 @@ extern ring_buffer *_rx_buffer;
 /***************************************************************************************
  * Function definitions
  **************************************************************************************/
-/*Sending AT command and wait */
-HAL_StatusTypeDef ESP8266_NTP_ATCommand(const char * Command, const char * Respond, uint32_t Timeout)
-{
-	ESP8266_SendATCommand(Command, 0);
-
-	if((ESP8266_WaitATAnswer(Respond, Timeout)) == 1){
-		return HAL_OK;
-	}
-	return HAL_ERROR;
-}
-
 /*Init ESP8266 for NTP communication*/
 HAL_StatusTypeDef ESP8266_NTP_Init(const uint8_t * SSID, const uint8_t * PassWord)
 {
@@ -44,31 +33,31 @@ HAL_StatusTypeDef ESP8266_NTP_Init(const uint8_t * SSID, const uint8_t * PassWor
 	/**/
 	ESP8266_Serial_Init();
 	/**/
-	if(ESP8266_NTP_ATCommand("AT+RESTORE", "ready", LONG_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+RESTORE", "ready", LONG_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT", OK_STR, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("ATE0", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("ATE0", OK_STR, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT+CWMODE=1", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CWMODE=1", OK_STR, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT+CWQAP", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CWQAP", OK_STR, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand((char*)TmpBuff, OK_STR,10000) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout((char*)TmpBuff, OK_STR,10000) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_NTP_ATCommand("AT+CIPMUX=0", OK_STR, SHORT_PAUSE) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPMUX=0", OK_STR, SHORT_PAUSE) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
@@ -78,11 +67,10 @@ HAL_StatusTypeDef ESP8266_NTP_Init(const uint8_t * SSID, const uint8_t * PassWor
 HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 {
 	/*Locals*/
-	uint8_t NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
 	uint8_t packetBuffer[ NTP_PACKET_SIZE];
 	/**/
 	Uart_flush();
-	  if((ESP8266_NTP_ATCommand("AT+CIPSTART=\"UDP\",\"pool.ntp.org\",123", OK_STR, 1000)) != HAL_OK )//if connection failed -> error
+	  if((ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPSTART=\"UDP\",\"pool.ntp.org\",123", OK_STR, 1000)) != HAL_OK )//if connection failed -> error
 	  {
 		  return HAL_ERROR;
 	  }
@@ -101,7 +89,7 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 	  packetBuffer[15] = 52;
 
 	  /**/
-	  if(ESP8266_NTP_ATCommand("AT+CIPSEND=48", OK_STR, SHORT_PAUSE) != HAL_OK)
+	  if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPSEND=48", OK_STR, SHORT_PAUSE) != HAL_OK)
 	  {
 		  return HAL_ERROR;
 	  }
@@ -198,7 +186,7 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 	  /*Second*/
 	  DateTime->sec=(UNIXTimeHungary_Sec % NUMBEROFSECONDS_MINUTE);
 	  /**/
-	  if((ESP8266_NTP_ATCommand("AT+CIPCLOSE", OK_STR, SHORT_PAUSE)) != HAL_OK)
+	  if((ESP8266_AT_SendAndReceiveWithTimeout("AT+CIPCLOSE", OK_STR, SHORT_PAUSE)) != HAL_OK)
 	  {
 		  return HAL_ERROR;
 	  }
@@ -206,3 +194,59 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 	  return HAL_OK;
 }
 /**/
+HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
+{
+	RTC_DataType DateTime={0,0,0,0,0,0,0};
+	RTC_TimeTypeDef HAL_Time={0,0,0,0,0,0,RTC_DAYLIGHTSAVING_NONE,RTC_STOREOPERATION_RESET};
+	RTC_DateTypeDef HAL_Date={0,0,0,0};
+	uint8_t Attempt=0;
+#define NumberOfAttepmts 	3
+	/*Try to connect AP*/
+	while(1)
+	{
+		Attempt++;
+		if(Attempt<NumberOfAttepmts)
+		{
+			if(ESP8266_NTP_Init(SSID, PassWord) == HAL_OK)
+			{
+				break;
+			}
+		}
+		else
+		{
+			return HAL_ERROR;
+		}
+	}
+	/*Try to get NTP packet*/
+	Attempt=0;
+	while(1)
+	{
+		Attempt++;
+		if(Attempt<NumberOfAttepmts)
+		{
+			if(ESP8266_NTP_GetDateTime(&DateTime) == HAL_OK)
+			{
+				HAL_Time.Hours = DateTime.hour;
+				HAL_Time.Minutes = DateTime.min;
+				HAL_Time.Seconds = DateTime.sec;
+				HAL_Date.Year = DateTime.year;
+				HAL_Date.Month = DateTime.month;
+				HAL_Date.Date = DateTime.date;
+				HAL_Date.WeekDay = DateTime.day;
+				HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
+				if(HAL_RTC_SetTime(&hrtc,&HAL_Time,RTC_FORMAT_BIN) == HAL_OK)
+				{
+					if(HAL_RTC_SetDate(&hrtc,&HAL_Date,RTC_FORMAT_BIN) == HAL_OK)
+					{
+						HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
+						return HAL_OK;
+					}
+				}
+			}
+		}
+		else
+		{
+			return HAL_ERROR;
+		}
+	}
+}

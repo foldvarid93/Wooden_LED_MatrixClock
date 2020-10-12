@@ -11,9 +11,22 @@
  **************************************************************************************/
 
 /***************************************************************************************
- * Function declarations
+ * Typedefs
  **************************************************************************************/
 
-
+/***************************************************************************************
+ * Function declarations
+ **************************************************************************************/
+/**/
+void ESP8266_AT_Send(const char * command, ...);
+/**/
+HAL_StatusTypeDef ESP8266_AT_ReceiveWithTimeout(const char * Answer, uint16_t Timeout);
+/**/
+HAL_StatusTypeDef ESP8266_AT_SendAndReceiveWithTimeout(const char * Command, const char * Respond, uint32_t Timeout);
+/**/
+HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void);
+/**/
+HAL_StatusTypeDef Get_HTML_Message(void);
+/**/
 /**************************************************************************************/
 #endif

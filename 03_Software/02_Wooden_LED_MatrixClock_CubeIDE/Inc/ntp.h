@@ -26,11 +26,11 @@
 /***************************************************************************************
  * Function declarations
  **************************************************************************************/
-
-HAL_StatusTypeDef ESP8266_NTP_ATCommand(const char * Command, const char * Respond, uint32_t Timeout);
-
+/**/
 HAL_StatusTypeDef ESP8266_NTP_Init(const uint8_t * SSID, const uint8_t * PassWord);
-
+/**/
 HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime);
+/**/
+HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord);
 /**************************************************************************************/
 #endif
