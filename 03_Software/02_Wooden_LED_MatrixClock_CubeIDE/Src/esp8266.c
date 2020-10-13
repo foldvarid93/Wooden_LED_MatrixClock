@@ -260,7 +260,16 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			strncpy((char*)MSG_STOP,(char*)StopPtr,MSG_ID_LENGTH);
 			MSG_STOP[MSG_ID_LENGTH] = '\0';
 
-			/*Message ID1*/
+			/* Group 0 ***********************************************************************************************************/
+			/*Message ID00*/
+			/* NTP Sync ON/OFF */
+
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID00_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID00_STOP)) == 0))
+			{
+				AppCfg.NTPSyncEnable= atoi((char*) MSG);
+			}
+			/* Message ID01 */
+			/*SSID*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID01_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID01_STOP)) == 0))
 			{
 				if(strlen((char*)MSG) <= sizeof(AppCfg.SSID))
@@ -269,7 +278,8 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 					EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.SSID));
 				}
 			}
-			/*Message ID2*/
+			/* Message ID02 */
+			/* Password */
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID02_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID02_STOP)) == 0))
 			{
 				if(strlen((char*)MSG) <= sizeof(AppCfg.PassWord))
@@ -279,7 +289,19 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 				}
 			}
 			/*Message ID3*/
+			/*Ntp sync interval*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID03_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID03_STOP)) == 0))
+			{
+				uint8_t i=0;
+				while(MSG[i] != 'h'){
+					i++;
+				}
+				MSG[i] = '\0';
+				AppCfg.NTPSyncInterval = atoi((char*) MSG);
+			}
+			/* Group 1 ***********************************************************************************************************/
+			/*Message ID10*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID10_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID10_STOP)) == 0))
 			{
 				if(strlen((char*)MSG) <= sizeof(AppCfg.ScrollText))
 				{
@@ -287,8 +309,14 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 					EE_WriteCharArray(VirtAddr_ScrollText, (uint8_t*)(AppCfg.ScrollText));
 				}
 			}
-			/*Message ID4*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID04_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID04_STOP)) == 0))
+			/*Message ID11*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID10_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID10_STOP)) == 0))
+			{
+
+			}
+			/* Group 2 ***********************************************************************************************************/
+			/*Message ID20*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID20_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID20_STOP)) == 0))
 			{
 				RTC_TimeTypeDef HAL_Time={0,0,0,0,0,0,RTC_DAYLIGHTSAVING_NONE,RTC_STOREOPERATION_RESET};
 				RTC_DateTypeDef HAL_Date={0,0,0,0};
@@ -346,8 +374,9 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 					}
 				}
 			}
-			/*Message ID5*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID05_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID05_STOP)) == 0))
+			/* Group 3 ***********************************************************************************************************/
+			/*Message ID30*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID30_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID30_STOP)) == 0))
 			{
 				if(strlen((char*)MSG) == 1)
 				{
@@ -363,58 +392,8 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 					}
 				}
 			}
-			/*Message ID6*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID06_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID06_STOP)) == 0))
-			{
-				asm("nop");
-			}
-			/*Message ID7*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID07_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID07_STOP)) == 0))
-			{
-				asm("nop");
-			}
-			/*Message ID8*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID08_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID08_STOP)) == 0))
-			{
-				asm("nop");
-			}
-			/*Message ID9*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID09_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID09_STOP)) == 0))
-			{
-				asm("nop");
-			}
-			/*Message ID10*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID10_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID10_STOP)) == 0))
-			{
-				asm("nop");
-			}
-			/*Message ID11*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID11_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID11_STOP)) == 0))
-			{
-				asm("nop");
-			}
-			/*Message ID12*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID12_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID12_STOP)) == 0))
-			{
-				asm("nop");
-			}
-			/*Message ID13*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID13_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID13_STOP)) == 0))
-			{
-				asm("nop");
-			}
-			/*Message ID14*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID14_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID14_STOP)) == 0))
-			{
-				asm("nop");
-			}
-			/*Message ID15*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID15_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID15_STOP)) == 0))
-			{
-				asm("nop");
-			}
-			/*Message ID16*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID16_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID16_STOP)) == 0))
+			/*Message ID31*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID31_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID31_STOP)) == 0))
 			{
 				asm("nop");
 			}

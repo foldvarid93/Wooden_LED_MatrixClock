@@ -45,6 +45,8 @@ typedef struct AppConfig_Type{
 	uint16_t 	TimeAnimation;//0 or 1
 	uint16_t	TextScrollingMode;//0 or 1
 	uint16_t	DateScrollingMode;//0 or 1
+	uint16_t 	NTPSyncEnable;
+	uint16_t	NTPSyncInterval;
 	/*normal variables*/
 	uint8_t		DisplayTextArray[SizeOf_ScrollText];
 	uint8_t 	DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];
