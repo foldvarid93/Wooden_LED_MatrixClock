@@ -14,10 +14,10 @@ extern Serial_t serial;
  * Function definitions
  **************************************************************************************/
 /*Init ESP8266 for NTP communication*/
-HAL_StatusTypeDef ESP8266_NTP_Init(const uint8_t * SSID, const uint8_t * PassWord)
+HAL_StatusTypeDef ESP8266_NTP_Init(const uint8_t * NTP_SSID, const uint8_t * NTP_PassWord)
 {
 	char TmpBuff[100];
-	sprintf(TmpBuff,"AT+CWJAP=\"%s\",\"%s\"",SSID,PassWord);
+	sprintf(TmpBuff,"AT+CWJAP=\"%s\",\"%s\"",NTP_SSID,NTP_PassWord);
 	/*ESP8266 HW reset and enabling*/
 	HAL_GPIO_WritePin(ESP8266_RST_GPIO_Port, ESP8266_RST_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(ESP8266_EN_GPIO_Port, ESP8266_EN_Pin, GPIO_PIN_RESET);
@@ -191,7 +191,7 @@ HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime)
 	  return HAL_OK;
 }
 /**/
-HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
+HAL_StatusTypeDef RTC_NTPSync(const uint8_t * NTP_SSID, const uint8_t * NTP_PassWord)
 {
 	RTC_DataType DateTime={0,0,0,0,0,0,0};
 	RTC_TimeTypeDef HAL_Time={0,0,0,0,0,0,RTC_DAYLIGHTSAVING_NONE,RTC_STOREOPERATION_RESET};
@@ -204,7 +204,7 @@ HAL_StatusTypeDef RTC_NTPSync(const uint8_t * SSID, const uint8_t * PassWord)
 		Attempt++;
 		if(Attempt<NumberOfAttepmts)
 		{
-			if(ESP8266_NTP_Init(SSID, PassWord) == HAL_OK)
+			if(ESP8266_NTP_Init(NTP_SSID, NTP_PassWord) == HAL_OK)
 			{
 				break;
 			}

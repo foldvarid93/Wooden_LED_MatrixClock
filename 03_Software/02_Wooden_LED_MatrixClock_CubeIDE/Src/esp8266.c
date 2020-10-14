@@ -263,29 +263,28 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			/* Group 0 ***********************************************************************************************************/
 			/*Message ID00*/
 			/* NTP Sync ON/OFF */
-
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID00_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID00_STOP)) == 0))
 			{
-				AppCfg.NTPSyncEnable= atoi((char*) MSG);
+				AppCfg.NTP_SyncEnabled = atoi((char*) MSG);
 			}
 			/* Message ID01 */
-			/*SSID*/
+			/*NTP_SSID*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID01_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID01_STOP)) == 0))
 			{
-				if(strlen((char*)MSG) <= sizeof(AppCfg.SSID))
+				if(strlen((char*)MSG) <= sizeof(AppCfg.NTP_SSID))
 				{
-					strcpy((char*)AppCfg.SSID,(char*)MSG);
-					EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.SSID));
+					strcpy((char*)AppCfg.NTP_SSID,(char*)MSG);
+					EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.NTP_SSID));
 				}
 			}
 			/* Message ID02 */
 			/* Password */
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID02_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID02_STOP)) == 0))
 			{
-				if(strlen((char*)MSG) <= sizeof(AppCfg.PassWord))
+				if(strlen((char*)MSG) <= sizeof(AppCfg.NTP_PassWord))
 				{
-					strcpy((char*)AppCfg.PassWord,(char*)MSG);
-					EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(AppCfg.PassWord));
+					strcpy((char*)AppCfg.NTP_PassWord,(char*)MSG);
+					EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(AppCfg.NTP_PassWord));
 				}
 			}
 			/*Message ID3*/
@@ -297,26 +296,91 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 					i++;
 				}
 				MSG[i] = '\0';
-				AppCfg.NTPSyncInterval = atoi((char*) MSG);
+				AppCfg.NTP_SyncInterval = atoi((char*) MSG);
 			}
 			/* Group 1 ***********************************************************************************************************/
 			/*Message ID10*/
+			/*text message enabled*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID10_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID10_STOP)) == 0))
 			{
-				if(strlen((char*)MSG) <= sizeof(AppCfg.ScrollText))
-				{
-					strcpy((char*)AppCfg.ScrollText,(char*)MSG);
-					EE_WriteCharArray(VirtAddr_ScrollText, (uint8_t*)(AppCfg.ScrollText));
-				}
+				AppCfg.Text_Enabled = atoi((char*) MSG);
 			}
 			/*Message ID11*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID10_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID10_STOP)) == 0))
+			/*text message display mode*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID11_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID11_STOP)) == 0))
 			{
-
+				if(strcmp((char*) MSG, (char*)"No Scroll Message") == 0)
+				{
+					AppCfg.Text_ScrollingMode = JustText;
+					AppCfg.TextScrolling = false;
+				}
+				else if(strcmp((char*) MSG, (char*)"Scrolling Just Message") == 0)
+				{
+					AppCfg.Text_ScrollingMode = ScrollInAndOut;
+					AppCfg.TextScrolling = false;
+				}
+				else if(strcmp((char*) MSG, (char*)"Scrolling In and Out Message") == 0)
+				{
+					AppCfg.Text_ScrollingMode = ScrollInAndOut;
+					AppCfg.TextScrolling = true;
+				}
+				else
+				{
+					asm("nop");
+				}
+			}
+			/*Message ID12*/
+			/* Text scroll Interval*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID12_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID12_STOP)) == 0))
+			{
+				AppCfg.Text_ScrollIntervalInSec = atoi((char*) MSG);
+			}
+			/*Message ID13*/
+			/*Scrolltext text message*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID13_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID13_STOP)) == 0))
+			{
+				if(strlen((char*)MSG) <= sizeof(AppCfg.Text_Message))
+				{
+					strcpy((char*)AppCfg.Text_Message,(char*)MSG);
+					EE_WriteCharArray(VirtAddr_ScrollText, (uint8_t*)(AppCfg.Text_Message));
+				}
 			}
 			/* Group 2 ***********************************************************************************************************/
 			/*Message ID20*/
+			/*date message enabled*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID20_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID20_STOP)) == 0))
+			{
+				AppCfg.Date_Enabled = atoi((char*) MSG);
+			}
+			/*Message ID21*/
+			/*text message display mode*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID21_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID21_STOP)) == 0))
+			{
+				if(strcmp((char*) MSG, (char*)"Just Date No Scroll") == 0)
+				{
+					AppCfg.Date_ScrollingMode = JustText;
+				}
+				else if(strcmp((char*) MSG, (char*)"Just Date Scroll") == 0)
+				{
+					AppCfg.Date_ScrollingMode = ScrollInAndOut;
+				}
+				else if(strcmp((char*) MSG, (char*)"Scroll Date Message") == 0)
+				{
+					AppCfg.Date_ScrollingMode = ScrollInAndOut;
+				}
+				else
+				{
+					asm("nop");
+				}
+			}
+			/*Message ID22*/
+			/* Date scroll Interval*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID22_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID22_STOP)) == 0))
+			{
+				AppCfg.Date_ScrollIntervalInSec = atoi((char*) MSG);
+			}
+			/*Message ID23*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID23_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID23_STOP)) == 0))
 			{
 				RTC_TimeTypeDef HAL_Time={0,0,0,0,0,0,RTC_DAYLIGHTSAVING_NONE,RTC_STOREOPERATION_RESET};
 				RTC_DateTypeDef HAL_Date={0,0,0,0};
@@ -348,6 +412,7 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 				HAL_Date.Date =  atoi((const char*)TmpBuf);
 				/*Day*/
 				//TODO: set day
+				HAL_Date.WeekDay = 3;
 				/*hour*/
 				for(uint8_t j=0 ; MSG[i] != '.' ; i++ , j++)
 				{

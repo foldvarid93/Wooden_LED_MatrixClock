@@ -37,16 +37,21 @@ typedef struct AppConfig_Type{
 #define NumberOf_DisplayColumn				(NumberOf_Display * NumberOf_ColumnOfOneDisplay)
 
 	/*read out from eeprom elements*/
-	uint8_t 	SSID[SizeOf_SSID];
-	uint8_t		PassWord[SizeOf_PassWord];
-	uint8_t		ScrollText[SizeOf_ScrollText];
-	uint16_t	ScrollTextIntervalInSec;//0-65536 sec
-	uint16_t	ScrollDateIntervalInSec;//0-65536 sec
+	uint8_t 	NTP_SSID[SizeOf_SSID];
+	uint8_t		NTP_PassWord[SizeOf_PassWord];
+	uint16_t 	NTP_SyncEnabled;
+	uint16_t	NTP_SyncInterval;
+	/*Text*/
+	uint8_t		Text_Message[SizeOf_ScrollText];
+	uint16_t 	Text_Enabled;
+	uint16_t	Text_ScrollingMode;//0 or 1
+	uint16_t	Text_ScrollIntervalInSec;//0-65536 sec
+	/*Date*/
+	uint16_t	Date_Enabled;
+	uint16_t	Date_ScrollingMode;//0 or 1
+	uint16_t	Date_ScrollIntervalInSec;//0-65536 sec
+	/*Time*/
 	uint16_t 	TimeAnimation;//0 or 1
-	uint16_t	TextScrollingMode;//0 or 1
-	uint16_t	DateScrollingMode;//0 or 1
-	uint16_t 	NTPSyncEnable;
-	uint16_t	NTPSyncInterval;
 	/*normal variables*/
 	uint8_t		DisplayTextArray[SizeOf_ScrollText];
 	uint8_t 	DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];

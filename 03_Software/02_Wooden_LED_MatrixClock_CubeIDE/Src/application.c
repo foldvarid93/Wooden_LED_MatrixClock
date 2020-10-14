@@ -251,7 +251,7 @@ void TextToColumnDataArray(void)
 	/**/
 	if(AppCfg.TextScrolling == true)
 	{
-		if(AppCfg.ScrollingMode == WallToWall)
+		if(AppCfg.ScrollingMode == ScrollInAndOut)
 		{
 			for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
 			{
@@ -273,7 +273,7 @@ void TextToColumnDataArray(void)
 			}
 		}
 		/**/
-		if(AppCfg.ScrollingMode == WallToWall)
+		if(AppCfg.ScrollingMode == ScrollInAndOut)
 		{
 			for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
 			{
@@ -450,39 +450,41 @@ void RemoteXY_InitAndRun(void)
 void EEPROM_WriteFrame(void)
 {
 	//
-	sprintf((char*)AppCfg.SSID,"foldvarid93");
-	sprintf((char*)AppCfg.PassWord,"19701971");
-	sprintf((char*)AppCfg.ScrollText,"6041, Kerekegyháza Tavasz u. 25.");
+	sprintf((char*)AppCfg.NTP_SSID,"foldvarid93");
+	sprintf((char*)AppCfg.NTP_PassWord,"19701971");
+	sprintf((char*)AppCfg.Text_Message,"6041, Kerekegyháza Tavasz u. 25.");
 	AppCfg.TimeAnimation = 1;
-	AppCfg.ScrollDateIntervalInSec = 10;
-	AppCfg.ScrollTextIntervalInSec = 15;
-	AppCfg.TextScrollingMode=JustText;
-	AppCfg.DateScrollingMode=WallToWall;
+	AppCfg.Date_ScrollIntervalInSec = 10;
+	AppCfg.Text_ScrollIntervalInSec = 15;
+	AppCfg.Text_ScrollingMode=JustText;
+	AppCfg.Date_ScrollingMode=ScrollInAndOut;
 	//
-	EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.SSID));
-	EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(AppCfg.PassWord));
-	EE_WriteCharArray(VirtAddr_ScrollText, (uint8_t*)(AppCfg.ScrollText));
+	EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.NTP_SSID));
+	EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(AppCfg.NTP_PassWord));
+	EE_WriteCharArray(VirtAddr_ScrollText, (uint8_t*)(AppCfg.Text_Message));
 	//
-	EE_WriteVariable(VirtAddr_ScrollTextIntervalInSec, AppCfg.ScrollTextIntervalInSec);
-	EE_WriteVariable(VirtAddr_ScrollDateIntervalInSec, AppCfg.ScrollDateIntervalInSec);
+	EE_WriteVariable(VirtAddr_ScrollTextIntervalInSec, AppCfg.Text_ScrollIntervalInSec);
+	EE_WriteVariable(VirtAddr_ScrollDateIntervalInSec, AppCfg.Date_ScrollIntervalInSec);
 	//
 	EE_WriteVariable(VirtAddr_TimeAnimation, AppCfg.TimeAnimation);
-	EE_WriteVariable(VirtAddr_TextScrollingMode, AppCfg.TextScrollingMode);
-	EE_WriteVariable(VirtAddr_DateScrollingMode, AppCfg.DateScrollingMode);
+	EE_WriteVariable(VirtAddr_TextScrollingMode, AppCfg.Text_ScrollingMode);
+	EE_WriteVariable(VirtAddr_DateScrollingMode, AppCfg.Date_ScrollingMode);
 }
 /**/
 void EEPROM_ReadFrame(void)
 {
-	EE_ReadCharArray(VirtAddr_SSID,(uint8_t*)(AppCfg.SSID));
-	EE_ReadCharArray(VirtAddr_PassWord,(uint8_t*)(AppCfg.PassWord));
-	EE_ReadCharArray(VirtAddr_ScrollText,(uint8_t*)(AppCfg.ScrollText));
-	//
-	EE_ReadVariable(VirtAddr_ScrollTextIntervalInSec,&(AppCfg.ScrollTextIntervalInSec));
-	EE_ReadVariable(VirtAddr_ScrollDateIntervalInSec, &(AppCfg.ScrollDateIntervalInSec));
-	//
+	/*NTP*/
+	EE_ReadCharArray(VirtAddr_SSID,(uint8_t*)(AppCfg.NTP_SSID));
+	EE_ReadCharArray(VirtAddr_PassWord,(uint8_t*)(AppCfg.NTP_PassWord));
+	/*Text*/
+	EE_ReadCharArray(VirtAddr_ScrollText,(uint8_t*)(AppCfg.Text_Message));
+	EE_ReadVariable(VirtAddr_ScrollTextIntervalInSec,&(AppCfg.Text_ScrollIntervalInSec));
+	EE_ReadVariable(VirtAddr_TextScrollingMode, &(AppCfg.Text_ScrollingMode));
+	/*Date*/
+	EE_ReadVariable(VirtAddr_ScrollDateIntervalInSec, &(AppCfg.Date_ScrollIntervalInSec));
+	EE_ReadVariable(VirtAddr_DateScrollingMode, &(AppCfg.Date_ScrollingMode));
+	/*Time*/
 	EE_ReadVariable(VirtAddr_TimeAnimation, &(AppCfg.TimeAnimation));
-	EE_ReadVariable(VirtAddr_TextScrollingMode, &(AppCfg.TextScrollingMode));
-	EE_ReadVariable(VirtAddr_DateScrollingMode, &(AppCfg.DateScrollingMode));
 }
 /**/
 void AppConfig_Init(void)
@@ -512,7 +514,7 @@ HAL_StatusTypeDef Init_Application(void)
 	/*write eeprom*/
 	//EEPROM_WriteFrame();
 
-	/*read eeprom SSID and PassWord*/
+	/*read eeprom NTP_SSID and NTP_PassWord*/
 	EEPROM_ReadFrame();
 	/**/
 	AppConfig_Init();
@@ -521,7 +523,7 @@ HAL_StatusTypeDef Init_Application(void)
 	HAL_TIM_Base_Start_IT(&htim4);
 	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
 	/*RTC sync from NTP*/
-	//if(RTC_NTPSync(AppCfg.SSID,AppCfg.PassWord) !=HAL_OK)
+	//if(RTC_NTPSync(AppCfg.NTP_SSID,AppCfg.NTP_PassWord) !=HAL_OK)
 	{
 	}
 	/**/
@@ -574,18 +576,18 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	{
 		AppCfg.UpdateTime=1;
 		/**/
-		if(AppCfg.ScrollSecCounter >= AppCfg.ScrollTextIntervalInSec)
+		if(AppCfg.ScrollSecCounter >= AppCfg.Text_ScrollIntervalInSec)
 		{
 			if(AppCfg.LastScrolled == Date)
 			{
-				AppCfg.ScrollingMode = AppCfg.TextScrollingMode;
-				strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.ScrollText);
+				AppCfg.ScrollingMode = AppCfg.Text_ScrollingMode;
+				strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.Text_Message);
 				TextToColumnDataArray();
 				AppCfg.LastScrolled = Text;
 			}
 			else
 			{
-				AppCfg.ScrollingMode = AppCfg.DateScrollingMode;
+				AppCfg.ScrollingMode = AppCfg.Date_ScrollingMode;
 				CreateDateData();
 				TextToColumnDataArray();
 				AppCfg.LastScrolled = Date;
