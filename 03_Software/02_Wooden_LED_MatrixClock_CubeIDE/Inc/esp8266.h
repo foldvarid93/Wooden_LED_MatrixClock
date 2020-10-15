@@ -101,6 +101,27 @@
 /*group 4*/
 #define MSG_ID40_START			"MsG_STRT-iD_40"
 #define MSG_ID40_STOP			"MsG_STOP-iD_40"
+#define MSG_ID41_START			"MsG_STRT-iD_41"
+#define MSG_ID41_STOP			"MsG_STOP-iD_41"
+#define MSG_ID42_START			"MsG_STRT-iD_42"
+#define MSG_ID42_STOP			"MsG_STOP-iD_42"
+#define MSG_ID43_START			"MsG_STRT-iD_43"
+#define MSG_ID43_STOP			"MsG_STOP-iD_43"
+#define MSG_ID44_START			"MsG_STRT-iD_44"
+#define MSG_ID44_STOP			"MsG_STOP-iD_44"
+#define MSG_ID45_START			"MsG_STRT-iD_45"
+#define MSG_ID45_STOP			"MsG_STOP-iD_45"
+#define MSG_ID46_START			"MsG_STRT-iD_46"
+#define MSG_ID46_STOP			"MsG_STOP-iD_46"
+#define MSG_ID47_START			"MsG_STRT-iD_47"
+#define MSG_ID47_STOP			"MsG_STOP-iD_47"
+#define MSG_ID48_START			"MsG_STRT-iD_48"
+#define MSG_ID48_STOP			"MsG_STOP-iD_48"
+#define MSG_ID49_START			"MsG_STRT-iD_49"
+#define MSG_ID49_STOP			"MsG_STOP-iD_49"
+/**/
+#define MSG_ID50_START			"MsG_STRT-iD_50"
+#define MSG_ID50_STOP			"MsG_STOP-iD_50"
 /***************************************************************************************
  * Typedefs
  **************************************************************************************/

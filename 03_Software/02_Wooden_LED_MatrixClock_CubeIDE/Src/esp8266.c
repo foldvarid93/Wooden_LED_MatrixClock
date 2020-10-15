@@ -265,7 +265,18 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			/* NTP Sync ON/OFF */
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID00_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID00_STOP)) == 0))
 			{
-				AppCfg.NTP_SyncEnabled = atoi((char*) MSG);
+				if(strcmp((char*) MSG, (char*) "true") == 0)
+				{
+					AppCfg.NTP_SyncEnabled = 1;
+				}
+				else if(strcmp((char*) MSG, (char*) "false") == 0)
+				{
+					AppCfg.NTP_SyncEnabled = 0;
+				}
+				else
+				{
+					AppCfg.NTP_SyncEnabled = 0;
+				}
 			}
 			/* Message ID01 */
 			/*NTP_SSID*/
@@ -274,7 +285,6 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 				if(strlen((char*)MSG) <= sizeof(AppCfg.NTP_SSID))
 				{
 					strcpy((char*)AppCfg.NTP_SSID,(char*)MSG);
-					EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.NTP_SSID));
 				}
 			}
 			/* Message ID02 */
@@ -284,7 +294,6 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 				if(strlen((char*)MSG) <= sizeof(AppCfg.NTP_PassWord))
 				{
 					strcpy((char*)AppCfg.NTP_PassWord,(char*)MSG);
-					EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(AppCfg.NTP_PassWord));
 				}
 			}
 			/*Message ID3*/
@@ -303,7 +312,18 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			/*text message enabled*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID10_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID10_STOP)) == 0))
 			{
-				AppCfg.Text_Enabled = atoi((char*) MSG);
+				if(strcmp((char*) MSG, (char*) "true") == 0)
+				{
+					AppCfg.Text_Enabled = 1;
+				}
+				else if(strcmp((char*) MSG, (char*) "false") == 0)
+				{
+					AppCfg.Text_Enabled = 0;
+				}
+				else
+				{
+					AppCfg.Text_Enabled = 0;
+				}
 			}
 			/*Message ID11*/
 			/*text message display mode*/
@@ -342,7 +362,6 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 				if(strlen((char*)MSG) <= sizeof(AppCfg.Text_Message))
 				{
 					strcpy((char*)AppCfg.Text_Message,(char*)MSG);
-					EE_WriteCharArray(VirtAddr_ScrollText, (uint8_t*)(AppCfg.Text_Message));
 				}
 			}
 			/* Group 2 ***********************************************************************************************************/
@@ -350,7 +369,18 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			/*date message enabled*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID20_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID20_STOP)) == 0))
 			{
-				AppCfg.Date_Enabled = atoi((char*) MSG);
+				if(strcmp((char*) MSG, (char*) "true") == 0)
+				{
+					AppCfg.Date_Enabled = 1;
+				}
+				else if(strcmp((char*) MSG, (char*) "false") == 0)
+				{
+					AppCfg.Date_Enabled = 0;
+				}
+				else
+				{
+					AppCfg.Date_Enabled = 0;
+				}
 			}
 			/*Message ID21*/
 			/*text message display mode*/
@@ -422,7 +452,7 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 				i++;
 				HAL_Time.Hours =  atoi((const char*)TmpBuf);
 				/*Minute*/
-				for(uint8_t j=0 ; MSG[i] != '.' ; i++ , j++)
+				for(uint8_t j=0 ; MSG[i] != '\0' ; i++ , j++)
 				{
 					TmpBuf[j] = MSG[i];
 					TmpBuf[j+1] = '\0';
@@ -441,26 +471,111 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			}
 			/* Group 3 ***********************************************************************************************************/
 			/*Message ID30*/
+			/*TimeAnimation*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID30_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID30_STOP)) == 0))
 			{
-				if(strlen((char*)MSG) == 1)
+				if(strcmp((char*) MSG, (char*) "true") == 0)
 				{
-					if(strcmp((char*)MSG,"1") == 0)
-					{
-						AppCfg.TimeAnimation = 1;
-						EE_WriteVariable(VirtAddr_TimeAnimation, AppCfg.TimeAnimation);
-					}
-					else
-					{
-						AppCfg.TimeAnimation = 0;
-						EE_WriteVariable(VirtAddr_TimeAnimation, AppCfg.TimeAnimation);
-					}
+					AppCfg.TimeAnimation = 1;
+				}
+				else if(strcmp((char*) MSG, (char*) "false") == 0)
+				{
+					AppCfg.TimeAnimation = 0;
+				}
+				else
+				{
+					AppCfg.TimeAnimation = 0;
 				}
 			}
 			/*Message ID31*/
+			/*Brightness*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID31_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID31_STOP)) == 0))
 			{
+				if(strcmp((char*) MSG, (char*) "true") == 0)
+				{
+					AppCfg.DisplayBrightnessMode = 1;
+				}
+				else if(strcmp((char*) MSG, (char*) "false") == 0)
+				{
+					AppCfg.DisplayBrightnessMode = 0;
+				}
+				else
+				{
+					AppCfg.DisplayBrightnessMode = 0;
+				}
+			}
+			/*Message ID32*/
+			/*Brightness*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID32_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID32_STOP)) == 0))
+			{
+				uint16_t Tmp= (uint16_t) (atof (MSG));
+
+				switch (Tmp)
+				{
+				case 0: AppCfg.DisplayBrightness = INTENSITY_1; break;
+				case 1: AppCfg.DisplayBrightness = INTENSITY_1; break;
+				/**/
+				case 2: AppCfg.DisplayBrightness = INTENSITY_3; break;
+				case 3: AppCfg.DisplayBrightness = INTENSITY_3; break;
+				/**/
+				case 4: AppCfg.DisplayBrightness = INTENSITY_5; break;
+				case 5: AppCfg.DisplayBrightness = INTENSITY_5; break;
+				/**/
+				case 6: AppCfg.DisplayBrightness = INTENSITY_7; break;
+				case 7: AppCfg.DisplayBrightness = INTENSITY_7; break;
+				/**/
+				case 8: AppCfg.DisplayBrightness = INTENSITY_9; break;
+				case 9: AppCfg.DisplayBrightness = INTENSITY_9; break;
+				/**/
+				case 10: AppCfg.DisplayBrightness = INTENSITY_11; break;
+				case 11: AppCfg.DisplayBrightness = INTENSITY_11; break;
+				/**/
+				case 12: AppCfg.DisplayBrightness = INTENSITY_13; break;
+				case 13: AppCfg.DisplayBrightness = INTENSITY_13; break;
+				/**/
+				case 14: AppCfg.DisplayBrightness = INTENSITY_15; break;
+				case 15: AppCfg.DisplayBrightness = INTENSITY_15; break;
+				/**/
+				case 16: AppCfg.DisplayBrightness = INTENSITY_17; break;
+				case 17: AppCfg.DisplayBrightness = INTENSITY_17; break;
+				/**/
+				case 18: AppCfg.DisplayBrightness = INTENSITY_19; break;
+				case 19: AppCfg.DisplayBrightness = INTENSITY_19; break;
+				/**/
+				case 20: AppCfg.DisplayBrightness = INTENSITY_21; break;
+				case 21: AppCfg.DisplayBrightness = INTENSITY_21; break;
+				/**/
+				case 22: AppCfg.DisplayBrightness = INTENSITY_23; break;
+				case 23: AppCfg.DisplayBrightness = INTENSITY_23; break;
+				/**/
+				case 24: AppCfg.DisplayBrightness = INTENSITY_25; break;
+				case 25: AppCfg.DisplayBrightness = INTENSITY_25; break;
+				/**/
+				case 26: AppCfg.DisplayBrightness = INTENSITY_27; break;
+				case 27: AppCfg.DisplayBrightness = INTENSITY_27; break;
+				/**/
+				case 28: AppCfg.DisplayBrightness = INTENSITY_29; break;
+				case 29: AppCfg.DisplayBrightness = INTENSITY_29; break;
+				/**/
+				case 30: AppCfg.DisplayBrightness = INTENSITY_31; break;
+				case 31: AppCfg.DisplayBrightness = INTENSITY_31; break;
+				/**/
+				default: AppCfg.DisplayBrightness = INTENSITY_15;
+				}
+				MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
+			}
+			/* Group 4 ***********************************************************************************************************/
+			/*Message ID40*/
+			/*Load*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID40_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID40_STOP)) == 0))
+			{
 				asm("nop");
+			}
+			/*Message ID41*/
+			/*Save*/
+			if(((strcmp((char*) MSG_START,(char*)MSG_ID41_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID41_STOP)) == 0))
+			{
+				EEPROM_WriteFrame();
 			}
 		}
 		Message = (uint8_t*) StopPtr + MSG_ID_LENGTH;

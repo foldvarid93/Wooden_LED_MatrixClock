@@ -50,8 +50,10 @@ typedef struct AppConfig_Type{
 	uint16_t	Date_Enabled;
 	uint16_t	Date_ScrollingMode;//0 or 1
 	uint16_t	Date_ScrollIntervalInSec;//0-65536 sec
-	/*Time*/
+	/*Other*/
 	uint16_t 	TimeAnimation;//0 or 1
+	uint16_t 	DisplayBrightnessMode;//0 or 1
+	uint16_t 	DisplayBrightness;//1,3,5,7.. 31
 	/*normal variables*/
 	uint8_t		DisplayTextArray[SizeOf_ScrollText];
 	uint8_t 	DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];

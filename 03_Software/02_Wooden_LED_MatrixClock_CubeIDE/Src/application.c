@@ -449,23 +449,14 @@ void RemoteXY_InitAndRun(void)
 /**/
 void EEPROM_WriteFrame(void)
 {
-	//
-	sprintf((char*)AppCfg.NTP_SSID,"foldvarid93");
-	sprintf((char*)AppCfg.NTP_PassWord,"19701971");
-	sprintf((char*)AppCfg.Text_Message,"6041, Kerekegyháza Tavasz u. 25.");
-	AppCfg.TimeAnimation = 1;
-	AppCfg.Date_ScrollIntervalInSec = 10;
-	AppCfg.Text_ScrollIntervalInSec = 15;
-	AppCfg.Text_ScrollingMode=JustText;
-	AppCfg.Date_ScrollingMode=ScrollInAndOut;
-	//
+	/**/
 	EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.NTP_SSID));
 	EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(AppCfg.NTP_PassWord));
 	EE_WriteCharArray(VirtAddr_ScrollText, (uint8_t*)(AppCfg.Text_Message));
-	//
+	/**/
 	EE_WriteVariable(VirtAddr_ScrollTextIntervalInSec, AppCfg.Text_ScrollIntervalInSec);
 	EE_WriteVariable(VirtAddr_ScrollDateIntervalInSec, AppCfg.Date_ScrollIntervalInSec);
-	//
+	/**/
 	EE_WriteVariable(VirtAddr_TimeAnimation, AppCfg.TimeAnimation);
 	EE_WriteVariable(VirtAddr_TextScrollingMode, AppCfg.Text_ScrollingMode);
 	EE_WriteVariable(VirtAddr_DateScrollingMode, AppCfg.Date_ScrollingMode);
