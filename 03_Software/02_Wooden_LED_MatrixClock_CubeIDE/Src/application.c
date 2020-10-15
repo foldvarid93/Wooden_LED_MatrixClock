@@ -435,13 +435,6 @@ void RemoteXY_InitAndRun(void)
 		/*if app sent data process and store*/
 		if(RemoteXY.Btn_SSID_Send == 1)
 		{
-			if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.TextBox_SSID)) != EE_OK) {
-				Error_Handler();
-			}
-
-			if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.TextBox_PassWord)) != EE_OK) {
-				Error_Handler();
-			}
 			RemoteXY.Btn_SSID_Send = 0;
 		}
 	}
@@ -449,33 +442,46 @@ void RemoteXY_InitAndRun(void)
 /**/
 void EEPROM_WriteFrame(void)
 {
-	/**/
-	EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(AppCfg.NTP_SSID));
-	EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(AppCfg.NTP_PassWord));
-	EE_WriteCharArray(VirtAddr_ScrollText, (uint8_t*)(AppCfg.Text_Message));
-	/**/
-	EE_WriteVariable(VirtAddr_ScrollTextIntervalInSec, AppCfg.Text_ScrollIntervalInSec);
-	EE_WriteVariable(VirtAddr_ScrollDateIntervalInSec, AppCfg.Date_ScrollIntervalInSec);
-	/**/
-	EE_WriteVariable(VirtAddr_TimeAnimation, AppCfg.TimeAnimation);
-	EE_WriteVariable(VirtAddr_TextScrollingMode, AppCfg.Text_ScrollingMode);
-	EE_WriteVariable(VirtAddr_DateScrollingMode, AppCfg.Date_ScrollingMode);
+	/*NTP*/
+	EE_WriteCharArray(VA_NTP_SSID, (uint8_t*)(AppCfg.NTP_SSID));
+	EE_WriteCharArray(VA_NTP_PassWord, (uint8_t*)(AppCfg.NTP_PassWord));
+	EE_WriteVariable(VA_NTP_SyncEnabled, (uint16_t)(AppCfg.NTP_SyncEnabled));
+	EE_WriteVariable(SO_NTP_SyncInterval, (uint16_t)(AppCfg.NTP_SyncInterval));
+	/*Text*/
+	EE_WriteCharArray(VA_Text_Message, (uint8_t*)(AppCfg.Text_Message));
+	EE_WriteVariable(VA_Text_Enabled, (uint16_t)(AppCfg.Text_Enabled));
+	EE_WriteVariable(VA_Text_ScrollingMode, (uint16_t)(AppCfg.Text_ScrollingMode));
+	EE_WriteVariable(VA_Text_ScrollIntervalInSec, (uint16_t)(AppCfg.Text_ScrollIntervalInSec));
+	/*Date*/
+	EE_WriteVariable(VA_Date_Enabled, (uint16_t)(AppCfg.Date_Enabled));
+	EE_WriteVariable(VA_Date_ScrollingMode, (uint16_t)(AppCfg.Date_ScrollingMode));
+	EE_WriteVariable(VA_Date_ScrollIntervalInSec, (uint16_t)(AppCfg.Date_ScrollIntervalInSec));
+	/*Other*/
+	EE_WriteVariable(VA_TimeAnimation, AppCfg.TimeAnimation);
+	EE_WriteVariable(VA_DisplayBrightnessMode, AppCfg.DisplayBrightnessMode);
+	EE_WriteVariable(VA_DisplayBrightness, AppCfg.DisplayBrightness);
 }
 /**/
 void EEPROM_ReadFrame(void)
 {
 	/*NTP*/
-	EE_ReadCharArray(VirtAddr_SSID,(uint8_t*)(AppCfg.NTP_SSID));
-	EE_ReadCharArray(VirtAddr_PassWord,(uint8_t*)(AppCfg.NTP_PassWord));
+	EE_ReadCharArray(VA_NTP_SSID, (uint8_t*)(AppCfg.NTP_SSID));
+	EE_ReadCharArray(VA_NTP_PassWord, (uint8_t*)(AppCfg.NTP_PassWord));
+	EE_ReadVariable(VA_NTP_SyncEnabled, &(AppCfg.NTP_SyncEnabled));
+	EE_ReadVariable(SO_NTP_SyncInterval, &(AppCfg.NTP_SyncInterval));
 	/*Text*/
-	EE_ReadCharArray(VirtAddr_ScrollText,(uint8_t*)(AppCfg.Text_Message));
-	EE_ReadVariable(VirtAddr_ScrollTextIntervalInSec,&(AppCfg.Text_ScrollIntervalInSec));
-	EE_ReadVariable(VirtAddr_TextScrollingMode, &(AppCfg.Text_ScrollingMode));
+	EE_ReadCharArray(VA_Text_Message, (uint8_t*)(AppCfg.Text_Message));
+	EE_ReadVariable(VA_Text_Enabled, &(AppCfg.Text_Enabled));
+	EE_ReadVariable(VA_Text_ScrollingMode, &(AppCfg.Text_ScrollingMode));
+	EE_ReadVariable(VA_Text_ScrollIntervalInSec, &(AppCfg.Text_ScrollIntervalInSec));
 	/*Date*/
-	EE_ReadVariable(VirtAddr_ScrollDateIntervalInSec, &(AppCfg.Date_ScrollIntervalInSec));
-	EE_ReadVariable(VirtAddr_DateScrollingMode, &(AppCfg.Date_ScrollingMode));
-	/*Time*/
-	EE_ReadVariable(VirtAddr_TimeAnimation, &(AppCfg.TimeAnimation));
+	EE_ReadVariable(VA_Date_Enabled, &(AppCfg.Date_Enabled));
+	EE_ReadVariable(VA_Date_ScrollingMode, &(AppCfg.Date_ScrollingMode));
+	EE_ReadVariable(VA_Date_ScrollIntervalInSec, &(AppCfg.Date_ScrollIntervalInSec));
+	/*Other*/
+	EE_ReadVariable(VA_TimeAnimation, &(AppCfg.TimeAnimation));
+	EE_ReadVariable(VA_DisplayBrightnessMode, &(AppCfg.DisplayBrightnessMode));
+	EE_ReadVariable(VA_DisplayBrightness, &(AppCfg.DisplayBrightness));
 }
 /**/
 void AppConfig_Init(void)
@@ -525,38 +531,13 @@ HAL_StatusTypeDef Init_Application(void)
 /**/
 void Run_Application(void)
 {
-	ESP8266_AccessPoint_InitAndRun();
-//	ESP8266_RemoteXY_InitAndStart();
-//	while(1)
-//	{
-//		while(1)
-//		{
-//			ESP8266_RemoteXY_Handler();
-//			if(ESP8266_RemoteXY_IsConnected() == 1)
-//			{
-//				break;
-//			}
-//		}
-//		/*while connected: run application*/
-//		while(ESP8266_RemoteXY_IsConnected() == 1)
-//		{
-//			/*run application handler*/
-//			ESP8266_RemoteXY_Handler();
-//			/*if app sent data process and store*/
-//			if(RemoteXY.Btn_SSID_Send == 1)
-//			{
-//				if (EE_WriteCharArray(VirtAddr_SSID, (uint8_t*)(RemoteXY.TextBox_SSID)) != EE_OK) {
-//					Error_Handler();
-//				}
-//
-//				if (EE_WriteCharArray(VirtAddr_PassWord, (uint8_t*)(RemoteXY.TextBox_PassWord)) != EE_OK) {
-//					Error_Handler();
-//				}
-//				RemoteXY.Btn_SSID_Send = 0;
-//			}
-//		}
-//
-//	}
+	while(1)
+	{
+		if(ESP8266_AccessPoint_InitAndRun()== HAL_ERROR)
+		{
+			HAL_Delay(10000);
+		}
+	}
 }
 /* Application Main Functions End ---------------------------------------------------------*/
 /* Interrupt Callbacks Start ---------------------------------------------------------*/

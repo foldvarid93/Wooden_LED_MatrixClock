@@ -5,49 +5,66 @@
 // =====================================================================================
 typedef struct AppConfig_Type{
 	/*defines*/
-#define VirtAddr_SSID						(0x0)
-#define SizeOf_SSID							(50u)
+#define VA_NTP_SSID							(0x0)
+#define SO_NTP_SSID							(50u)
 	/**/
-#define VirtAddr_PassWord 					(VirtAddr_SSID + SizeOf_SSID)
-#define SizeOf_PassWord						(50u)
+#define VA_NTP_PassWord 					(VA_NTP_SSID + SO_NTP_SSID)
+#define SO_NTP_PassWord						(50u)
 	/**/
-#define VirtAddr_ScrollText					(VirtAddr_PassWord + SizeOf_PassWord)
-#define SizeOf_ScrollText					(256u)
+#define VA_NTP_SyncEnabled 					(VA_NTP_PassWord + SO_NTP_PassWord)
+#define SO_NTP_SyncEnabled					(2u)
 	/**/
-#define VirtAddr_ScrollTextIntervalInSec	(VirtAddr_ScrollText + SizeOf_ScrollText)
-#define SizeOf_ScrollTextIntervalInSec		(2u)
+#define VA_NTP_SyncInterval 				(VA_NTP_SyncEnabled + SO_NTP_SyncEnabled)
+#define SO_NTP_SyncInterval					(2u)
 	/**/
-#define VirtAddr_ScrollDateIntervalInSec	(VirtAddr_ScrollTextIntervalInSec + SizeOf_ScrollTextIntervalInSec)
-#define SizeOf_ScrollDateIntervalInSec		(2u)
+#define VA_Text_Message						(VA_NTP_SyncInterval + SO_NTP_SyncInterval)
+#define SO_Text_Message						(256u)
 	/**/
-#define VirtAddr_TimeAnimation				(VirtAddr_ScrollDateIntervalInSec + SizeOf_ScrollDateIntervalInSec)
-#define SizeOf_TimeAnimation				(2u)
+#define VA_Text_Enabled						(VA_Text_Message + SO_Text_Message)
+#define SO_Text_Enabled						(2u)
 	/**/
-#define VirtAddr_TextScrollingMode			(VirtAddr_TimeAnimation + SizeOf_TimeAnimation)
-#define SizeOf_TextScrollingMode			(2u)
+#define VA_Text_ScrollingMode				(VA_Text_Enabled + SO_Text_Enabled)
+#define SO_Text_ScrollingMode				(2u)
 	/**/
-#define VirtAddr_DateScrollingMode			(VirtAddr_TextScrollingMode + SizeOf_TextScrollingMode)
-#define SizeOf_DateScrollingMode			(2u)
+#define VA_Text_ScrollIntervalInSec			(VA_Text_ScrollingMode + SO_Text_ScrollingMode)
+#define SO_Text_ScrollIntervalInSec			(2u)
+	/**/
+#define VA_Date_Enabled						(VA_Text_ScrollIntervalInSec + SO_Text_ScrollIntervalInSec)
+#define SO_Date_Enabled						(2u)
+	/**/
+#define VA_Date_ScrollingMode				(VA_Date_Enabled + SO_Date_Enabled)
+#define SO_Date_ScrollingMode				(2u)
+	/**/
+#define VA_Date_ScrollIntervalInSec			(VA_Date_ScrollingMode + SO_Date_ScrollingMode)
+#define SO_Date_ScrollIntervalInSec			(2u)
+	/**/
+#define VA_TimeAnimation					(VA_Date_ScrollIntervalInSec + SO_Date_ScrollIntervalInSec)
+#define SO_TimeAnimation					(2u)
+	/**/
+#define VA_DisplayBrightnessMode			(VA_TimeAnimation + SO_TimeAnimation)
+#define SO_DisplayBrightnessMode			(2u)
+	/**/
+#define VA_DisplayBrightness				(VA_DisplayBrightnessMode + SO_DisplayBrightnessMode)
+#define SO_DisplayBrightness				(2u)
 	/**/
 #define SizeOf_CharacterOnDisplay			(0x0006)
-#define SizeOf_DisplayTextColumnArray		((SizeOf_CharacterOnDisplay * SizeOf_ScrollText)+(2*NumberOf_DisplayColumn))
+#define SizeOf_DisplayTextColumnArray		((SizeOf_CharacterOnDisplay * SO_Text_Message)+(2*NumberOf_DisplayColumn))
 #define SizeOf_WhiteSpaces					(NumberOf_DisplayColumn/SizeOf_CharacterOnDisplay)
 #define NumberOf_ColumnOfOneDisplay			(8)
 #define NumberOf_Display					(12)
 #define NumberOf_DisplayColumn				(NumberOf_Display * NumberOf_ColumnOfOneDisplay)
-
-	/*read out from eeprom elements*/
-	uint8_t 	NTP_SSID[SizeOf_SSID];
-	uint8_t		NTP_PassWord[SizeOf_PassWord];
+	/*NTP*/
+	uint8_t 	NTP_SSID[SO_NTP_SSID];
+	uint8_t		NTP_PassWord[SO_NTP_PassWord];
 	uint16_t 	NTP_SyncEnabled;
 	uint16_t	NTP_SyncInterval;
 	/*Text*/
-	uint8_t		Text_Message[SizeOf_ScrollText];
-	uint16_t 	Text_Enabled;
+	uint8_t		Text_Message[SO_Text_Message];
+	uint16_t 	Text_Enabled;//0 or 1
 	uint16_t	Text_ScrollingMode;//0 or 1
 	uint16_t	Text_ScrollIntervalInSec;//0-65536 sec
 	/*Date*/
-	uint16_t	Date_Enabled;
+	uint16_t	Date_Enabled;//0 or 1
 	uint16_t	Date_ScrollingMode;//0 or 1
 	uint16_t	Date_ScrollIntervalInSec;//0-65536 sec
 	/*Other*/
@@ -55,7 +72,7 @@ typedef struct AppConfig_Type{
 	uint16_t 	DisplayBrightnessMode;//0 or 1
 	uint16_t 	DisplayBrightness;//1,3,5,7.. 31
 	/*normal variables*/
-	uint8_t		DisplayTextArray[SizeOf_ScrollText];
+	uint8_t		DisplayTextArray[SO_Text_Message];
 	uint8_t 	DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];
 	uint8_t 	Connected;
 	bool		FirstRun;
