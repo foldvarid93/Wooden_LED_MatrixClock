@@ -170,7 +170,7 @@ HAL_StatusTypeDef RTC_NTPSync(const uint8_t * NTP_SSID, const uint8_t * NTP_Pass
 		{
 			if(ESP8266_NTP_GetDateTime(&HAL_Date, &HAL_Time) == HAL_OK)
 			{
-
+				return HAL_OK;
 			}
 		}
 		else

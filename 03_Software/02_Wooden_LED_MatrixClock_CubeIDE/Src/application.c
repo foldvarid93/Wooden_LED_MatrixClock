@@ -443,19 +443,19 @@ void RemoteXY_InitAndRun(void)
 void EEPROM_WriteFrame(void)
 {
 	/*NTP*/
-	EE_WriteCharArray(VA_NTP_SSID, (uint8_t*)(AppCfg.NTP_SSID));
-	EE_WriteCharArray(VA_NTP_PassWord, (uint8_t*)(AppCfg.NTP_PassWord));
-	EE_WriteVariable(VA_NTP_SyncEnabled, (uint16_t)(AppCfg.NTP_SyncEnabled));
-	EE_WriteVariable(SO_NTP_SyncInterval, (uint16_t)(AppCfg.NTP_SyncInterval));
+	EE_WriteCharArray(VA_NTP_SSID, AppCfg.NTP_SSID);
+	EE_WriteCharArray(VA_NTP_PassWord, AppCfg.NTP_PassWord);
+	EE_WriteVariable(VA_NTP_SyncEnabled, (AppCfg.NTP_SyncEnabled));
+	EE_WriteVariable(SO_NTP_SyncInterval, (AppCfg.NTP_SyncInterval));
 	/*Text*/
-	EE_WriteCharArray(VA_Text_Message, (uint8_t*)(AppCfg.Text_Message));
-	EE_WriteVariable(VA_Text_Enabled, (uint16_t)(AppCfg.Text_Enabled));
-	EE_WriteVariable(VA_Text_ScrollingMode, (uint16_t)(AppCfg.Text_ScrollingMode));
-	EE_WriteVariable(VA_Text_ScrollIntervalInSec, (uint16_t)(AppCfg.Text_ScrollIntervalInSec));
+	EE_WriteCharArray(VA_Text_Message, AppCfg.Text_Message);
+	EE_WriteVariable(VA_Text_Enabled, AppCfg.Text_Enabled);
+	EE_WriteVariable(VA_Text_ScrollingMode, AppCfg.Text_ScrollingMode);
+	EE_WriteVariable(VA_Text_ScrollIntervalInSec, AppCfg.Text_ScrollIntervalInSec);
 	/*Date*/
-	EE_WriteVariable(VA_Date_Enabled, (uint16_t)(AppCfg.Date_Enabled));
-	EE_WriteVariable(VA_Date_ScrollingMode, (uint16_t)(AppCfg.Date_ScrollingMode));
-	EE_WriteVariable(VA_Date_ScrollIntervalInSec, (uint16_t)(AppCfg.Date_ScrollIntervalInSec));
+	EE_WriteVariable(VA_Date_Enabled, AppCfg.Date_Enabled);
+	EE_WriteVariable(VA_Date_ScrollingMode, AppCfg.Date_ScrollingMode);
+	EE_WriteVariable(VA_Date_ScrollIntervalInSec, AppCfg.Date_ScrollIntervalInSec);
 	/*Other*/
 	EE_WriteVariable(VA_TimeAnimation, AppCfg.TimeAnimation);
 	EE_WriteVariable(VA_DisplayBrightnessMode, AppCfg.DisplayBrightnessMode);
@@ -509,6 +509,7 @@ HAL_StatusTypeDef Init_Application(void)
 	//RemoteXY_InitAndRun();
 
 	/*write eeprom*/
+	EE_WriteCharArray(VA_NTP_SSID, "GJWKEGKEPORHKLKE");
 	//EEPROM_WriteFrame();
 
 	/*read eeprom NTP_SSID and NTP_PassWord*/
@@ -520,8 +521,12 @@ HAL_StatusTypeDef Init_Application(void)
 	HAL_TIM_Base_Start_IT(&htim4);
 	__HAL_RTC_EXTI_ENABLE_IT(RTC_IT_ALRA);
 	/*RTC sync from NTP*/
-	//if(RTC_NTPSync(AppCfg.NTP_SSID,AppCfg.NTP_PassWord) !=HAL_OK)
+	if(AppCfg.NTP_SyncEnabled)
 	{
+		if(RTC_NTPSync(AppCfg.NTP_SSID,AppCfg.NTP_PassWord) !=HAL_OK)
+		{
+
+		}
 	}
 	/**/
 	//ESP8266_AccessPoint_InitAndRun();
