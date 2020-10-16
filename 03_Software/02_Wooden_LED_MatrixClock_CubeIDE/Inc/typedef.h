@@ -74,7 +74,9 @@ typedef struct AppConfig_Type{
 	/*normal variables*/
 	uint8_t		DisplayTextArray[SO_Text_Message];
 	uint8_t 	DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];
-	uint8_t 	Connected;
+	bool	 	NTP_Connected;
+	uint8_t 	SM_ActualState;
+	uint8_t 	SM_NextState;
 	bool		FirstRun;
 	uint8_t 	UpdateTime;
 	uint8_t		FlipCounter;

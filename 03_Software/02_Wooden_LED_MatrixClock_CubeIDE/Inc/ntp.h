@@ -30,8 +30,12 @@
 /**/
 HAL_StatusTypeDef ESP8266_NTP_Init(const uint8_t * NTP_SSID, const uint8_t * NTP_PassWord);
 /**/
-HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DataType *DateTime);
+HAL_StatusTypeDef ESP8266_NTP_GetDateTime(RTC_DateTypeDef *Date, RTC_TimeTypeDef *Time);
 /**/
 HAL_StatusTypeDef RTC_NTPSync(const uint8_t * NTP_SSID, const uint8_t * NTP_PassWord);
+/**/
+HAL_StatusTypeDef Convert_UTCToDateTime(uint32_t UTCTime_Sec);
+/**/
+HAL_StatusTypeDef Convert_CharArrayToDateTime(const char* MSG);
 /**************************************************************************************/
 #endif

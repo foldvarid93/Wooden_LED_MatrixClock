@@ -412,61 +412,9 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			/*Message ID23*/
 			if(((strcmp((char*) MSG_START,(char*)MSG_ID23_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID23_STOP)) == 0))
 			{
-				RTC_TimeTypeDef HAL_Time={0,0,0,0,0,0,RTC_DAYLIGHTSAVING_NONE,RTC_STOREOPERATION_RESET};
-				RTC_DateTypeDef HAL_Date={0,0,0,0};
-				uint8_t i=0;
-				char TmpBuf[20];
-				/*year*/
-				for(uint8_t j=0 ; MSG[i] != '.' ; i++ , j++)
+				if (Convert_CharArrayToDateTime((const char*) MSG) == HAL_ERROR)
 				{
-					TmpBuf[j] = MSG[i];
-					TmpBuf[j+1] = '\0';
-				}
-				i++;
-				HAL_Date.Year =  atoi((const char*)TmpBuf) - 2000;
-				/*month*/
-				for(uint8_t j=0 ; MSG[i] != '.' ; i++ , j++)
-				{
-					TmpBuf[j] = MSG[i];
-					TmpBuf[j+1] = '\0';
-				}
-				i++;
-				HAL_Date.Month =  atoi((const char*)TmpBuf);
-				/*date*/
-				for(uint8_t j=0 ; MSG[i] != '.' ; i++ , j++)
-				{
-					TmpBuf[j] = MSG[i];
-					TmpBuf[j+1] = '\0';
-				}
-				i++;
-				HAL_Date.Date =  atoi((const char*)TmpBuf);
-				/*Day*/
-				//TODO: set day
-				HAL_Date.WeekDay = 3;
-				/*hour*/
-				for(uint8_t j=0 ; MSG[i] != '.' ; i++ , j++)
-				{
-					TmpBuf[j] = MSG[i];
-					TmpBuf[j+1] = '\0';
-				}
-				i++;
-				HAL_Time.Hours =  atoi((const char*)TmpBuf);
-				/*Minute*/
-				for(uint8_t j=0 ; MSG[i] != '\0' ; i++ , j++)
-				{
-					TmpBuf[j] = MSG[i];
-					TmpBuf[j+1] = '\0';
-				}
-				HAL_Time.Minutes =  atoi((const char*)TmpBuf);
-				/**/
-				HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
-				if(HAL_RTC_SetTime(&hrtc,&HAL_Time,RTC_FORMAT_BIN) == HAL_OK)
-				{
-					if(HAL_RTC_SetDate(&hrtc,&HAL_Date,RTC_FORMAT_BIN) == HAL_OK)
-					{
-						HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
-						return HAL_OK;
-					}
+					return HAL_ERROR;
 				}
 			}
 			/* Group 3 ***********************************************************************************************************/

@@ -586,6 +586,33 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	}
 }
 /**/
+void StateMachine(uint8_t NextState)
+{
+	if(NextState == 0)
+	{
+
+	}
+	else
+	{
+		if (AppCfg.SM_ActualState == Time)
+		{
+
+		}
+		if (AppCfg.SM_ActualState == Date)
+		{
+
+		}
+		if (AppCfg.SM_ActualState == Text)
+		{
+
+		}
+		if (AppCfg.SM_ActualState == DateDone)
+		{
+
+		}
+	}
+}
+/**/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	UNUSED(htim);
@@ -684,5 +711,6 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 /**/
 void HAL_SYSTICK_Callback(void)
 {
+
 }
 /* Interrupt Callbacks End ---------------------------------------------------------*/
