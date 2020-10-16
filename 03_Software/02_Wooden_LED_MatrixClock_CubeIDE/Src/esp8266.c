@@ -158,7 +158,7 @@ HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void)
 	{
 		  return HAL_ERROR;
 	}
-	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CWSAP=\"ESP\",\"password\",1,4", AT_OK,10000) != HAL_OK)
+	if(ESP8266_AT_SendAndReceiveWithTimeout("AT+CWSAP=\"FlipClock\",\"FL1pCL0ck\",1,4", AT_OK,10000) != HAL_OK)
 	{
 		  return HAL_ERROR;
 	}
@@ -245,286 +245,288 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 		StopPtr = (uint8_t*) strstr((const char*)Message, (char*)"MsG_STOP-");
 		if(MsgPtr == StopPtr)
 		{
-			return HAL_OK;
+			//return HAL_OK;
 		}
-		else
+
+		MsgLen = StopPtr - MsgPtr;
+
+		strncpy((char*)MSG_START,(char*)StartPtr,MSG_ID_LENGTH);
+		MSG_START[MSG_ID_LENGTH] = '\0';
+
+		strncpy((char*)MSG,(char*)MsgPtr,MsgLen);
+		MSG[MsgLen] = '\0';
+
+		strncpy((char*)MSG_STOP,(char*)StopPtr,MSG_ID_LENGTH);
+		MSG_STOP[MSG_ID_LENGTH] = '\0';
+
+		/* Group 0 ***********************************************************************************************************/
+		/*Message ID00*/
+		/* NTP Sync ON/OFF */
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID00_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID00_STOP)) == 0))
 		{
-			MsgLen = StopPtr - MsgPtr;
-
-			strncpy((char*)MSG_START,(char*)StartPtr,MSG_ID_LENGTH);
-			MSG_START[MSG_ID_LENGTH] = '\0';
-
-			strncpy((char*)MSG,(char*)MsgPtr,MsgLen);
-			MSG[MsgLen] = '\0';
-
-			strncpy((char*)MSG_STOP,(char*)StopPtr,MSG_ID_LENGTH);
-			MSG_STOP[MSG_ID_LENGTH] = '\0';
-
-			/* Group 0 ***********************************************************************************************************/
-			/*Message ID00*/
-			/* NTP Sync ON/OFF */
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID00_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID00_STOP)) == 0))
+			if(strcmp((char*) MSG, (char*) "true") == 0)
 			{
-				if(strcmp((char*) MSG, (char*) "true") == 0)
-				{
-					AppCfg.NTP_SyncEnabled = 1;
-				}
-				else if(strcmp((char*) MSG, (char*) "false") == 0)
-				{
-					AppCfg.NTP_SyncEnabled = 0;
-				}
-				else
-				{
-					AppCfg.NTP_SyncEnabled = 0;
-				}
+				AppCfg.NTP_SyncEnabled = 1;
 			}
-			/* Message ID01 */
-			/*NTP_SSID*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID01_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID01_STOP)) == 0))
+			else if(strcmp((char*) MSG, (char*) "false") == 0)
 			{
-				if(strlen((char*)MSG) <= sizeof(AppCfg.NTP_SSID))
-				{
-					strcpy((char*)AppCfg.NTP_SSID,(char*)MSG);
-				}
+				AppCfg.NTP_SyncEnabled = 0;
 			}
-			/* Message ID02 */
-			/* Password */
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID02_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID02_STOP)) == 0))
+			else
 			{
-				if(strlen((char*)MSG) <= sizeof(AppCfg.NTP_PassWord))
-				{
-					strcpy((char*)AppCfg.NTP_PassWord,(char*)MSG);
-				}
+				AppCfg.NTP_SyncEnabled = 0;
 			}
-			/*Message ID3*/
-			/*Ntp sync interval*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID03_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID03_STOP)) == 0))
+		}
+		/* Message ID01 */
+		/*NTP_SSID*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID01_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID01_STOP)) == 0))
+		{
+			if(strlen((char*)MSG) <= sizeof(AppCfg.NTP_SSID))
 			{
-				uint8_t i=0;
-				while(MSG[i] != 'h'){
-					i++;
-				}
-				MSG[i] = '\0';
-				AppCfg.NTP_SyncInterval = atoi((char*) MSG);
+				strcpy((char*)AppCfg.NTP_SSID,(char*)MSG);
 			}
-			/* Group 1 ***********************************************************************************************************/
-			/*Message ID10*/
-			/*text message enabled*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID10_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID10_STOP)) == 0))
+		}
+		/* Message ID02 */
+		/* Password */
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID02_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID02_STOP)) == 0))
+		{
+			if(strlen((char*)MSG) <= sizeof(AppCfg.NTP_PassWord))
 			{
-				if(strcmp((char*) MSG, (char*) "true") == 0)
-				{
-					AppCfg.Text_Enabled = 1;
-				}
-				else if(strcmp((char*) MSG, (char*) "false") == 0)
-				{
-					AppCfg.Text_Enabled = 0;
-				}
-				else
-				{
-					AppCfg.Text_Enabled = 0;
-				}
+				strcpy((char*)AppCfg.NTP_PassWord,(char*)MSG);
 			}
-			/*Message ID11*/
-			/*text message display mode*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID11_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID11_STOP)) == 0))
+		}
+		/*Message ID03*/
+		/*Ntp sync interval*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID03_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID03_STOP)) == 0))
+		{
+			uint8_t i=0;
+			while(MSG[i] != 'h'){
+				i++;
+			}
+			MSG[i] = '\0';
+			AppCfg.NTP_SyncInterval = atoi((char*) MSG);
+		}
+		/*Message ID04*/
+		/*Date Time manual set*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID04_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID04_STOP)) == 0))
+		{
+			if (Convert_CharArrayToDateTime((const char*) MSG) == HAL_ERROR)
 			{
-				if(strcmp((char*) MSG, (char*)"No Scroll Message") == 0)
-				{
-					AppCfg.Text_ScrollingMode = JustText;
-					AppCfg.TextScrolling = false;
-				}
-				else if(strcmp((char*) MSG, (char*)"Scrolling Just Message") == 0)
-				{
-					AppCfg.Text_ScrollingMode = ScrollInAndOut;
-					AppCfg.TextScrolling = false;
-				}
-				else if(strcmp((char*) MSG, (char*)"Scrolling In and Out Message") == 0)
-				{
-					AppCfg.Text_ScrollingMode = ScrollInAndOut;
-					AppCfg.TextScrolling = true;
-				}
-				else
-				{
-					asm("nop");
-				}
+				return HAL_ERROR;
 			}
-			/*Message ID12*/
-			/* Text scroll Interval*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID12_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID12_STOP)) == 0))
+		}
+		/* Group 1 ***********************************************************************************************************/
+		/*Message ID10*/
+		/*text message enabled*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID10_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID10_STOP)) == 0))
+		{
+			if(strcmp((char*) MSG, (char*) "true") == 0)
 			{
-				AppCfg.Text_ScrollIntervalInSec = atoi((char*) MSG);
+				AppCfg.Text_Enabled = 1;
 			}
-			/*Message ID13*/
-			/*Scrolltext text message*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID13_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID13_STOP)) == 0))
+			else if(strcmp((char*) MSG, (char*) "false") == 0)
 			{
-				if(strlen((char*)MSG) <= sizeof(AppCfg.Text_Message))
-				{
-					strcpy((char*)AppCfg.Text_Message,(char*)MSG);
-				}
+				AppCfg.Text_Enabled = 0;
 			}
-			/* Group 2 ***********************************************************************************************************/
-			/*Message ID20*/
-			/*date message enabled*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID20_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID20_STOP)) == 0))
+			else
 			{
-				if(strcmp((char*) MSG, (char*) "true") == 0)
-				{
-					AppCfg.Date_Enabled = 1;
-				}
-				else if(strcmp((char*) MSG, (char*) "false") == 0)
-				{
-					AppCfg.Date_Enabled = 0;
-				}
-				else
-				{
-					AppCfg.Date_Enabled = 0;
-				}
+				AppCfg.Text_Enabled = 0;
 			}
-			/*Message ID21*/
-			/*text message display mode*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID21_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID21_STOP)) == 0))
+		}
+		/*Message ID11*/
+		/*text message display mode*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID11_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID11_STOP)) == 0))
+		{
+			if(strcmp((char*) MSG, (char*)"No Scroll Message") == 0)
 			{
-				if(strcmp((char*) MSG, (char*)"Just Date No Scroll") == 0)
-				{
-					AppCfg.Date_ScrollingMode = JustText;
-				}
-				else if(strcmp((char*) MSG, (char*)"Just Date Scroll") == 0)
-				{
-					AppCfg.Date_ScrollingMode = ScrollInAndOut;
-				}
-				else if(strcmp((char*) MSG, (char*)"Scroll Date Message") == 0)
-				{
-					AppCfg.Date_ScrollingMode = ScrollInAndOut;
-				}
-				else
-				{
-					asm("nop");
-				}
+				AppCfg.Text_ScrollingMode = JustText;
+				AppCfg.TextScrolling = false;
 			}
-			/*Message ID22*/
-			/* Date scroll Interval*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID22_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID22_STOP)) == 0))
+			else if(strcmp((char*) MSG, (char*)"Scrolling Just Message") == 0)
 			{
-				AppCfg.Date_ScrollIntervalInSec = atoi((char*) MSG);
+				AppCfg.Text_ScrollingMode = ScrollInAndOut;
+				AppCfg.TextScrolling = false;
 			}
-			/*Message ID23*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID23_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID23_STOP)) == 0))
+			else if(strcmp((char*) MSG, (char*)"Scrolling In and Out Message") == 0)
 			{
-				if (Convert_CharArrayToDateTime((const char*) MSG) == HAL_ERROR)
-				{
-					return HAL_ERROR;
-				}
+				AppCfg.Text_ScrollingMode = ScrollInAndOut;
+				AppCfg.TextScrolling = true;
 			}
-			/* Group 3 ***********************************************************************************************************/
-			/*Message ID30*/
-			/*TimeAnimation*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID30_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID30_STOP)) == 0))
-			{
-				if(strcmp((char*) MSG, (char*) "true") == 0)
-				{
-					AppCfg.TimeAnimation = 1;
-				}
-				else if(strcmp((char*) MSG, (char*) "false") == 0)
-				{
-					AppCfg.TimeAnimation = 0;
-				}
-				else
-				{
-					AppCfg.TimeAnimation = 0;
-				}
-			}
-			/*Message ID31*/
-			/*Brightness*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID31_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID31_STOP)) == 0))
-			{
-				if(strcmp((char*) MSG, (char*) "true") == 0)
-				{
-					AppCfg.DisplayBrightnessMode = 1;
-				}
-				else if(strcmp((char*) MSG, (char*) "false") == 0)
-				{
-					AppCfg.DisplayBrightnessMode = 0;
-				}
-				else
-				{
-					AppCfg.DisplayBrightnessMode = 0;
-				}
-			}
-			/*Message ID32*/
-			/*Brightness*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID32_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID32_STOP)) == 0))
-			{
-				uint16_t Tmp= (uint16_t) (atof (MSG));
-
-				switch (Tmp)
-				{
-				case 0: AppCfg.DisplayBrightness = INTENSITY_1; break;
-				case 1: AppCfg.DisplayBrightness = INTENSITY_1; break;
-				/**/
-				case 2: AppCfg.DisplayBrightness = INTENSITY_3; break;
-				case 3: AppCfg.DisplayBrightness = INTENSITY_3; break;
-				/**/
-				case 4: AppCfg.DisplayBrightness = INTENSITY_5; break;
-				case 5: AppCfg.DisplayBrightness = INTENSITY_5; break;
-				/**/
-				case 6: AppCfg.DisplayBrightness = INTENSITY_7; break;
-				case 7: AppCfg.DisplayBrightness = INTENSITY_7; break;
-				/**/
-				case 8: AppCfg.DisplayBrightness = INTENSITY_9; break;
-				case 9: AppCfg.DisplayBrightness = INTENSITY_9; break;
-				/**/
-				case 10: AppCfg.DisplayBrightness = INTENSITY_11; break;
-				case 11: AppCfg.DisplayBrightness = INTENSITY_11; break;
-				/**/
-				case 12: AppCfg.DisplayBrightness = INTENSITY_13; break;
-				case 13: AppCfg.DisplayBrightness = INTENSITY_13; break;
-				/**/
-				case 14: AppCfg.DisplayBrightness = INTENSITY_15; break;
-				case 15: AppCfg.DisplayBrightness = INTENSITY_15; break;
-				/**/
-				case 16: AppCfg.DisplayBrightness = INTENSITY_17; break;
-				case 17: AppCfg.DisplayBrightness = INTENSITY_17; break;
-				/**/
-				case 18: AppCfg.DisplayBrightness = INTENSITY_19; break;
-				case 19: AppCfg.DisplayBrightness = INTENSITY_19; break;
-				/**/
-				case 20: AppCfg.DisplayBrightness = INTENSITY_21; break;
-				case 21: AppCfg.DisplayBrightness = INTENSITY_21; break;
-				/**/
-				case 22: AppCfg.DisplayBrightness = INTENSITY_23; break;
-				case 23: AppCfg.DisplayBrightness = INTENSITY_23; break;
-				/**/
-				case 24: AppCfg.DisplayBrightness = INTENSITY_25; break;
-				case 25: AppCfg.DisplayBrightness = INTENSITY_25; break;
-				/**/
-				case 26: AppCfg.DisplayBrightness = INTENSITY_27; break;
-				case 27: AppCfg.DisplayBrightness = INTENSITY_27; break;
-				/**/
-				case 28: AppCfg.DisplayBrightness = INTENSITY_29; break;
-				case 29: AppCfg.DisplayBrightness = INTENSITY_29; break;
-				/**/
-				case 30: AppCfg.DisplayBrightness = INTENSITY_31; break;
-				case 31: AppCfg.DisplayBrightness = INTENSITY_31; break;
-				/**/
-				default: AppCfg.DisplayBrightness = INTENSITY_15;
-				}
-				MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
-			}
-			/* Group 4 ***********************************************************************************************************/
-			/*Message ID40*/
-			/*Load*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID40_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID40_STOP)) == 0))
+			else
 			{
 				asm("nop");
 			}
-			/*Message ID41*/
-			/*Save*/
-			if(((strcmp((char*) MSG_START,(char*)MSG_ID41_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID41_STOP)) == 0))
+		}
+		/*Message ID12*/
+		/* Text scroll Interval*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID12_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID12_STOP)) == 0))
+		{
+			AppCfg.Text_ScrollIntervalInSec = atoi((char*) MSG);
+		}
+		/*Message ID13*/
+		/*Scrolltext text message*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID13_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID13_STOP)) == 0))
+		{
+			if(strlen((char*)MSG) <= sizeof(AppCfg.Text_Message))
 			{
-				EEPROM_WriteFrame();
+				strcpy((char*)AppCfg.Text_Message,(char*)MSG);
 			}
+		}
+		/*Message ID14*/
+		/*date message enabled*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID14_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID14_STOP)) == 0))
+		{
+			if(strcmp((char*) MSG, (char*) "true") == 0)
+			{
+				AppCfg.Date_Enabled = 1;
+			}
+			else if(strcmp((char*) MSG, (char*) "false") == 0)
+			{
+				AppCfg.Date_Enabled = 0;
+			}
+			else
+			{
+				AppCfg.Date_Enabled = 0;
+			}
+		}
+		/*Message ID15*/
+		/*text message display mode*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID15_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID15_STOP)) == 0))
+		{
+			if(strcmp((char*) MSG, (char*)"Just Date No Scroll") == 0)
+			{
+				AppCfg.Date_ScrollingMode = JustText;
+			}
+			else if(strcmp((char*) MSG, (char*)"Just Date Scroll") == 0)
+			{
+				AppCfg.Date_ScrollingMode = ScrollInAndOut;
+			}
+			else if(strcmp((char*) MSG, (char*)"Scroll Date Message") == 0)
+			{
+				AppCfg.Date_ScrollingMode = ScrollInAndOut;
+			}
+			else
+			{
+				asm("nop");
+			}
+		}
+		/*Message ID16*/
+		/* Date scroll Interval*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID16_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID16_STOP)) == 0))
+		{
+			AppCfg.Date_ScrollIntervalInSec = atoi((char*) MSG);
+		}
+		/* Group 2 ***********************************************************************************************************/
+
+
+
+		/* Group 3 ***********************************************************************************************************/
+		/*Message ID30*/
+		/*TimeAnimation*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID30_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID30_STOP)) == 0))
+		{
+			if(strcmp((char*) MSG, (char*) "true") == 0)
+			{
+				AppCfg.TimeAnimation = 1;
+			}
+			else if(strcmp((char*) MSG, (char*) "false") == 0)
+			{
+				AppCfg.TimeAnimation = 0;
+			}
+			else
+			{
+				AppCfg.TimeAnimation = 0;
+			}
+		}
+		/*Message ID31*/
+		/*Brightness*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID31_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID31_STOP)) == 0))
+		{
+			if(strcmp((char*) MSG, (char*) "true") == 0)
+			{
+				AppCfg.DisplayBrightnessMode = 1;
+			}
+			else if(strcmp((char*) MSG, (char*) "false") == 0)
+			{
+				AppCfg.DisplayBrightnessMode = 0;
+			}
+			else
+			{
+				AppCfg.DisplayBrightnessMode = 0;
+			}
+		}
+		/*Message ID32*/
+		/*Brightness*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID32_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID32_STOP)) == 0))
+		{
+			uint16_t Tmp= (uint16_t) (atof (MSG));
+
+			switch (Tmp)
+			{
+			case 0: AppCfg.DisplayBrightness = INTENSITY_1; break;
+			case 1: AppCfg.DisplayBrightness = INTENSITY_1; break;
+			/**/
+			case 2: AppCfg.DisplayBrightness = INTENSITY_3; break;
+			case 3: AppCfg.DisplayBrightness = INTENSITY_3; break;
+			/**/
+			case 4: AppCfg.DisplayBrightness = INTENSITY_5; break;
+			case 5: AppCfg.DisplayBrightness = INTENSITY_5; break;
+			/**/
+			case 6: AppCfg.DisplayBrightness = INTENSITY_7; break;
+			case 7: AppCfg.DisplayBrightness = INTENSITY_7; break;
+			/**/
+			case 8: AppCfg.DisplayBrightness = INTENSITY_9; break;
+			case 9: AppCfg.DisplayBrightness = INTENSITY_9; break;
+			/**/
+			case 10: AppCfg.DisplayBrightness = INTENSITY_11; break;
+			case 11: AppCfg.DisplayBrightness = INTENSITY_11; break;
+			/**/
+			case 12: AppCfg.DisplayBrightness = INTENSITY_13; break;
+			case 13: AppCfg.DisplayBrightness = INTENSITY_13; break;
+			/**/
+			case 14: AppCfg.DisplayBrightness = INTENSITY_15; break;
+			case 15: AppCfg.DisplayBrightness = INTENSITY_15; break;
+			/**/
+			case 16: AppCfg.DisplayBrightness = INTENSITY_17; break;
+			case 17: AppCfg.DisplayBrightness = INTENSITY_17; break;
+			/**/
+			case 18: AppCfg.DisplayBrightness = INTENSITY_19; break;
+			case 19: AppCfg.DisplayBrightness = INTENSITY_19; break;
+			/**/
+			case 20: AppCfg.DisplayBrightness = INTENSITY_21; break;
+			case 21: AppCfg.DisplayBrightness = INTENSITY_21; break;
+			/**/
+			case 22: AppCfg.DisplayBrightness = INTENSITY_23; break;
+			case 23: AppCfg.DisplayBrightness = INTENSITY_23; break;
+			/**/
+			case 24: AppCfg.DisplayBrightness = INTENSITY_25; break;
+			case 25: AppCfg.DisplayBrightness = INTENSITY_25; break;
+			/**/
+			case 26: AppCfg.DisplayBrightness = INTENSITY_27; break;
+			case 27: AppCfg.DisplayBrightness = INTENSITY_27; break;
+			/**/
+			case 28: AppCfg.DisplayBrightness = INTENSITY_29; break;
+			case 29: AppCfg.DisplayBrightness = INTENSITY_29; break;
+			/**/
+			case 30: AppCfg.DisplayBrightness = INTENSITY_31; break;
+			case 31: AppCfg.DisplayBrightness = INTENSITY_31; break;
+			/**/
+			default: AppCfg.DisplayBrightness = INTENSITY_15;
+			}
+			MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
+		}
+		/* Group 4 ***********************************************************************************************************/
+		/*Message ID40*/
+		/*Load*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID40_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID40_STOP)) == 0))
+		{
+			asm("nop");
+		}
+		/*Message ID41*/
+		/*Save*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID41_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID41_STOP)) == 0))
+		{
+			EEPROM_WriteFrame();
 		}
 		Message = (uint8_t*) StopPtr + MSG_ID_LENGTH;
 		MessageLength = strlen((char*)Message);

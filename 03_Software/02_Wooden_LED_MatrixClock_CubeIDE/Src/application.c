@@ -446,7 +446,7 @@ void EEPROM_WriteFrame(void)
 	EE_WriteCharArray(VA_NTP_SSID, AppCfg.NTP_SSID);
 	EE_WriteCharArray(VA_NTP_PassWord, AppCfg.NTP_PassWord);
 	EE_WriteVariable(VA_NTP_SyncEnabled, (AppCfg.NTP_SyncEnabled));
-	EE_WriteVariable(SO_NTP_SyncInterval, (AppCfg.NTP_SyncInterval));
+	EE_WriteVariable(VA_NTP_SyncInterval, (AppCfg.NTP_SyncInterval));
 	/*Text*/
 	EE_WriteCharArray(VA_Text_Message, AppCfg.Text_Message);
 	EE_WriteVariable(VA_Text_Enabled, AppCfg.Text_Enabled);
@@ -468,7 +468,7 @@ void EEPROM_ReadFrame(void)
 	EE_ReadCharArray(VA_NTP_SSID, (uint8_t*)(AppCfg.NTP_SSID));
 	EE_ReadCharArray(VA_NTP_PassWord, (uint8_t*)(AppCfg.NTP_PassWord));
 	EE_ReadVariable(VA_NTP_SyncEnabled, &(AppCfg.NTP_SyncEnabled));
-	EE_ReadVariable(SO_NTP_SyncInterval, &(AppCfg.NTP_SyncInterval));
+	EE_ReadVariable(VA_NTP_SyncInterval, &(AppCfg.NTP_SyncInterval));
 	/*Text*/
 	EE_ReadCharArray(VA_Text_Message, (uint8_t*)(AppCfg.Text_Message));
 	EE_ReadVariable(VA_Text_Enabled, &(AppCfg.Text_Enabled));
@@ -486,17 +486,29 @@ void EEPROM_ReadFrame(void)
 /**/
 void AppConfig_Init(void)
 {
-	AppCfg.FirstRun=1;
-	AppCfg.UpdateTime=0;
-	AppCfg.FlipCounter=0;
-	AppCfg.Point=false;
-	AppCfg.DisplayMode=Time;
-	AppCfg.LastScrolled=Date;
-	AppCfg.ScrollSecCounter=0;
+	/*NTP*/
+	memset(AppCfg.NTP_SSID,0,SO_NTP_SSID);
+	memset(AppCfg.NTP_PassWord,0,SO_NTP_PassWord);
+	AppCfg.NTP_SyncEnabled = 0;
+	AppCfg.NTP_SyncInterval = 0;
+	/*Text*/
+	memset(AppCfg.Text_Message,0,SO_Text_Message);
+	AppCfg.Text_Enabled = 0;
+	AppCfg.Text_ScrollingMode = 0;
+	AppCfg.Text_ScrollIntervalInSec = 0;
+	/*Date*/
+	AppCfg.Date_Enabled = 0;
+	AppCfg.Date_ScrollingMode = 0;
+	AppCfg.Date_ScrollIntervalInSec = 0;
+	/*Other*/
+	AppCfg.TimeAnimation = 0;
+	AppCfg.DisplayBrightnessMode = 0;
+	AppCfg.DisplayBrightness = 0;
 }
 /* Application Main Functions Start ---------------------------------------------------------*/
 HAL_StatusTypeDef Init_Application(void)
 {
+	AppConfig_Init();
 	/**/
 	MAX7219_Init();
 	/**/
@@ -509,13 +521,11 @@ HAL_StatusTypeDef Init_Application(void)
 	//RemoteXY_InitAndRun();
 
 	/*write eeprom*/
-	EE_WriteCharArray(VA_NTP_SSID, "GJWKEGKEPORHKLKE");
 	//EEPROM_WriteFrame();
 
 	/*read eeprom NTP_SSID and NTP_PassWord*/
 	EEPROM_ReadFrame();
 	/**/
-	AppConfig_Init();
 	/**/
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
