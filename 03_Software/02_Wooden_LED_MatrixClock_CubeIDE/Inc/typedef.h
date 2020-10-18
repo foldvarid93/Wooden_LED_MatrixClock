@@ -75,8 +75,9 @@ typedef struct AppConfig_Type{
 	uint8_t		DisplayTextArray[SO_Text_Message];
 	uint8_t 	DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];
 	bool	 	NTP_Connected;
-	uint8_t 	SM_ActualState;
-	uint8_t 	SM_Status;
+	uint32_t 	NTP_SyncTimerCounter;
+	uint8_t 	SM_WiFiStatus;
+	uint8_t 	SM_AppStatus;
 	uint8_t 	SM_NextState;
 	bool		FirstRun;
 	uint8_t 	UpdateTime;

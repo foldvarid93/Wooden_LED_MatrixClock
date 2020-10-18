@@ -176,12 +176,6 @@ HAL_StatusTypeDef ESP8266_AccessPoint_InitAndRun(void)
 		  return HAL_ERROR;
 	}
 	Uart_flush();
-	while(1)
-	{
-		if(HTML_GetMessage(HTML_Message) == HAL_OK){
-			HTML_Interpreter(HTML_Message);
-		}
-	}
 	return HAL_OK;
 }
 /**/
@@ -191,10 +185,12 @@ HAL_StatusTypeDef HTML_GetMessage(uint8_t * Message)
 	uint16_t tail;
 	uint16_t MsgLength;
 
-	if (Wait_for(".-'S.-'T.-'A.-'R.-'T.-'"))
+	//if (Wait_for_timeout(".-'S.-'T.-'A.-'R.-'T.-'",1000))
+	if( ESP8266_AT_ReceiveWithTimeout(".-'S.-'T.-'A.-'R.-'T.-'",1000) == HAL_OK)
 	{
 		tail = rx_buffer.tail;
-		if (Wait_for(".-'S.-'T.-'O.-'P.-'"))
+		//if (Wait_for_timeout(".-'S.-'T.-'O.-'P.-'",1000))
+		if( ESP8266_AT_ReceiveWithTimeout(".-'S.-'T.-'O.-'P.-'",1000) == HAL_OK)
 		{
 			head = rx_buffer.tail - strlen(".-'S.-'T.-'O.-'P.-'");
 			MsgLength = head - tail;
@@ -305,6 +301,7 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			}
 			MSG[i] = '\0';
 			AppCfg.NTP_SyncInterval = atoi((char*) MSG);
+			AppCfg.NTP_SyncTimerCounter = (AppCfg.NTP_SyncInterval * NUMBEROFSECONDS_HOUR);
 		}
 		/*Message ID04*/
 		/*Date Time manual set*/

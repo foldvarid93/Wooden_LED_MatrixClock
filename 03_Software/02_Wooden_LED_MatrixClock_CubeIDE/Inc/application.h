@@ -90,6 +90,7 @@ RTC_DateTypeDef			Date_Data;							//d�tumot t�rol� strukt�rap�ld�ny
 TimeType				_time[2];
 enum 					mode{None, Time, Date , Text , DateDone, TextDone , TextRunning};
 enum 					ScrollMode{JustText, ScrollInAndOut};
+enum					WiFiMode{NTP=1, AccessPoint};
 extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v sz�vegesen
 extern const uint8_t	Months[12][12];						//jan,feb.....dec sz�vegesen
 AppConfig_Type 			AppCfg;
