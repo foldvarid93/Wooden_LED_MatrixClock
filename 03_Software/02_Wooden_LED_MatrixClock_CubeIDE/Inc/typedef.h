@@ -76,12 +76,14 @@ typedef struct AppConfig_Type{
 	uint8_t 	DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];
 	bool	 	NTP_Connected;
 	uint8_t 	SM_ActualState;
+	uint8_t 	SM_Status;
 	uint8_t 	SM_NextState;
 	bool		FirstRun;
 	uint8_t 	UpdateTime;
 	uint8_t		FlipCounter;
 	uint8_t		Point;
-	uint16_t 	ScrollSecCounter;
+	uint32_t 	ScrollSecCounter;
+	uint32_t 	RTCIntSecCounter;
 	uint16_t	LastScrolled;
 	uint8_t 	DisplayMode;
 	uint16_t 	FirstColumn;
@@ -93,6 +95,8 @@ typedef struct AppConfig_Type{
 	bool 		TimeDiffIndicator[6];
 	uint8_t		DisplayData[NumberOf_DisplayColumn];
 	uint32_t	TimeStamp;
+	uint32_t 	Date_LastTimeStamp;
+	uint32_t 	Text_LastTimeStamp;
 }AppConfig_Type;
 // =====================================================================================
 typedef struct RTC_DataType{

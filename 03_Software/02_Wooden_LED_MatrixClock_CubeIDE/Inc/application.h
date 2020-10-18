@@ -87,8 +87,8 @@
 /***********************************************///constants declarations begin
 RTC_TimeTypeDef	 		Time_Data;							//id�t t�rol� strukt�rap�ld�ny
 RTC_DateTypeDef			Date_Data;							//d�tumot t�rol� strukt�rap�ld�ny
-TimeType				time[2];
-enum 					mode{Time, Date , Text , DateDone, TextDone};
+TimeType				_time[2];
+enum 					mode{None, Time, Date , Text , DateDone, TextDone , TextRunning};
 enum 					ScrollMode{JustText, ScrollInAndOut};
 extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v sz�vegesen
 extern const uint8_t	Months[12][12];						//jan,feb.....dec sz�vegesen
@@ -127,6 +127,8 @@ void AppConfig_Init(void);
 HAL_StatusTypeDef Init_Application(void);
 /**/
 void Run_Application(void);
+/**/
+void StateMachine(void);
 /**/
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc);
 /**/

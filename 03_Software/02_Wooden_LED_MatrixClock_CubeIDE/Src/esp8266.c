@@ -314,6 +314,7 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			{
 				return HAL_ERROR;
 			}
+			//AppCfg.SM_NextState = Date;
 		}
 		/* Group 1 ***********************************************************************************************************/
 		/*Message ID10*/
@@ -371,6 +372,7 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			{
 				strcpy((char*)AppCfg.Text_Message,(char*)MSG);
 			}
+			//AppCfg.SM_NextState = Text;
 		}
 		/*Message ID14*/
 		/*date message enabled*/
