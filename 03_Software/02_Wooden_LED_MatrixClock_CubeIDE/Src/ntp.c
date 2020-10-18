@@ -303,7 +303,7 @@ HAL_StatusTypeDef Convert_CharArrayToDateTime(const char* MSG)
 		Tmp += MonthDays[i];
 	}
 	Tmp += Date.Date;
-	Date.WeekDay = ((uint32_t)Tmp % 7);
+	Date.WeekDay = 1+((uint32_t)(Tmp-1) % 7);
 	/*hour*/
 	for(uint8_t j=0 ; MSG[i] != '.' ; i++ , j++)
 	{

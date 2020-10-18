@@ -595,7 +595,7 @@ void StateMachine(void)
 			if((AppCfg.Date_Enabled == true) && (AppCfg.Text_Enabled == false))
 			{
 				AppCfg.RTCIntSecCounter++;
-				if((AppCfg.RTCIntSecCounter - AppCfg.Date_LastTimeStamp) == AppCfg.Date_ScrollIntervalInSec)
+				if((AppCfg.RTCIntSecCounter - AppCfg.Date_LastTimeStamp) >= AppCfg.Date_ScrollIntervalInSec)
 				{
 					AppCfg.SM_Status = Date;
 				}
@@ -603,7 +603,7 @@ void StateMachine(void)
 			if((AppCfg.Date_Enabled == false) && (AppCfg.Text_Enabled == true))
 			{
 				AppCfg.RTCIntSecCounter++;
-				if((AppCfg.RTCIntSecCounter - AppCfg.Text_LastTimeStamp) == AppCfg.Text_ScrollIntervalInSec)
+				if((AppCfg.RTCIntSecCounter - AppCfg.Text_LastTimeStamp) >= AppCfg.Text_ScrollIntervalInSec)
 				{
 					AppCfg.SM_Status = Text;
 				}
