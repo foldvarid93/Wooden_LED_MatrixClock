@@ -1,8 +1,8 @@
 #ifndef _APPLICATION_H_
 #define	_APPLICATION_H_
 /***********************************************///includes begin
+/*stm32 libraries*/
 #include "stm32f4xx_hal.h"
-#include "main.h"
 #include "adc.h"
 #include "i2c.h"
 #include "rtc.h"
@@ -10,60 +10,21 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-/**/
+/*user libraries*/
 #include "characters.h"
-#include "string.h"
-#include "stdbool.h"
 #include "remotexy.h"
-#include "UartRingbuffer_multi.h"
+#include "UartRingbuffer.h"
 #include "eeprom.h"
 #include "ntp.h"
+#include "typedef.h"
+/*std libraries*/
+#include <inttypes.h>
+#include <string.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include "stdbool.h"
 /**/
 /***********************************************///includes end
-/***********************************************///typedef begin
-typedef struct RTC_DATA{
-	uint8_t		sec;
-	uint8_t		min;
-	uint8_t		hour;
-	uint8_t		day;
-	uint8_t		date;
-	uint8_t		month;
-	uint8_t		year;
-}RTC_DATA;
-typedef struct TIME{
-	uint8_t		hour_tens;
-	uint8_t		hour_singles;
-	uint8_t		min_tens;
-	uint8_t		min_singles;
-	uint8_t		sec_tens;
-	uint8_t		sec_singles;
-}TIME;
-typedef struct DATE{
-	uint8_t		day;
-	uint8_t		date_tens;
-	uint8_t		date_singles;
-	uint8_t		month_tens;
-	uint8_t		month_singles;
-	uint8_t 	year_thousands;
-	uint8_t		year_hundreds;
-	uint8_t		year_tens;
-	uint8_t		year_singles;
-}DATE;
-struct {
-	unsigned char TIME_SET : 1;
-	unsigned char DATE_TIME :1;
-} MASK;
-struct {
-	unsigned char B0 :1;
-	unsigned char B1 :1;
-	unsigned char B2 :1;
-	unsigned char B3 :1;
-	unsigned char B4 :1;
-	unsigned char B5 :1;
-	unsigned char B6 :1;
-	unsigned char B7 :1;
-} MASKBYTE;
-/***********************************************///typedef end
 #define DispNum 			12
 #define DispLength 			96
 /***********************************************///MAX7219 define constants begin
@@ -124,54 +85,61 @@ struct {
 #define NOP					0x00
 /***********************************************///MAX7219 define constants end
 /***********************************************///constants declarations begin
-RTC_DATA				RTC_Data;							//sec,min,hour,day,date,month,year
-RTC_TimeTypeDef	 		Time_Data;							//idõt tároló struktúrapéldány
-//RTC_TimeTypeDef			time[2];
-TIME					time[2];
-RTC_DateTypeDef			Date_Data;							//dátumot tároló struktórapéldány
-uint8_t					DisplayData[96];					//kijelzõ oszlopainak adatai
-uint8_t					NewTimeDataArray[36];
-bool 					TimeDiffIndicator[6];
-bool					Point;
-bool					ScrollText;
-bool 					ScrollEnd;
-bool 					FirstRun;
-bool 					UpdateTime;
-bool 					Flip;
-uint8_t 				FlipCounter;
-uint8_t 				StartFrom;
-uint8_t					TextLength;
-uint8_t 				TextArray[256];
-uint8_t 				DisplayDataArray[1536];
-uint8_t 				UartBuff[5];						//HH:MM formátumhoz elég 5 byte
-uint8_t 				TimeData[4];						//ebben van tárolva az idõ
-uint8_t 				seconds;
-enum 					mode{Time, Date} Mode;
-extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v szövegesen
-extern const uint8_t	Months[12][12];						//jan,feb.....dec szövegesen
+RTC_TimeTypeDef	 		Time_Data;							//idï¿½t tï¿½rolï¿½ struktï¿½rapï¿½ldï¿½ny
+RTC_DateTypeDef			Date_Data;							//dï¿½tumot tï¿½rolï¿½ struktï¿½rapï¿½ldï¿½ny
+TimeType				_time[2];
+enum 					mode{None, Time, Date , Text , DateDone, TextDone , TextRunning};
+enum 					ScrollMode{JustText, ScrollInAndOut};
+enum					WiFiMode{NTP=1, AccessPoint};
+extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v szï¿½vegesen
+extern const uint8_t	Months[12][12];						//jan,feb.....dec szï¿½vegesen
+AppConfig_Type 			AppCfg;
 /***********************************************///constants declarations end
 /***********************************************///functions declaration begin
-void Init_MAX7219(void);
+/**/
 void CreateDateData(void);
-void CreateDisplayDataArray(uint8_t* Text);
+/**/
+void Rotate(uint8_t* Dest,uint8_t* Source);
+/**/
+void UpdateTimeOnDisplay(void);
+/**/
+void TextToColumnDataArray(void);
+/**/
 void SendToDisplay(uint16_t from);
-void SPI_Send(uint8_t ADDR, uint8_t CMD);
-void SendFrameToDisplay(void);
-void TestData(void);
-void TestText(uint8_t ch);
+/**/
+void MAX7219_Init(void);
+/**/
+void MAX7219_LoadPulse(void);
+/**/
+void MAX7219_Send(uint8_t ADDR, uint8_t CMD);
+/**/
+void SendTimeToDisplay(void);
+/**/
 uint8_t BitSwapping(uint8_t ch);
-void ClearDisplay(void);
-void ClearDisplayFromTo(uint8_t from, uint8_t to);
-void RTC_Read(void);
-void BinToTensAndSingles(uint8_t binary, uint8_t *tens, uint8_t *singles);
-void ConvertRTCToDateAndTime(RTC_DATA *RTC_DATA,TIME *Time_Data, DATE *Date_Data);
-void FormatDateToText(void);
-void FormatTimeToText(void);
-void CreateFrameFromTime(void);
-void SendTextToDisplay(char *Text);
-void time_out(void);
-void Init_Application(void);
+/**/
+void RemoteXY_InitAndRun(void);
+/**/
+void EEPROM_WriteFrame(void);
+/**/
+void EEPROM_ReadFrame(void);
+/**/
+void AppConfig_Init(void);
+/**/
+HAL_StatusTypeDef Init_Application(void);
+/**/
 void Run_Application(void);
-void Init_ESP8266(void);
+/**/
+void StateMachine(void);
+/**/
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc);
+/**/
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
+/**/
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+/**/
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);
+/**/
+void HAL_SYSTICK_Callback(void);
+
 /***********************************************///functions declaration end
 #endif
