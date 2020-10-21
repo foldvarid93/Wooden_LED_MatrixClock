@@ -447,15 +447,11 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 		{
 			if(strcmp((char*) MSG, (char*) "true") == 0)
 			{
-				AppCfg.DisplayBrightnessMode = 1;
+				AppCfg.DisplayBrightnessMode = DB_Manual;
 			}
 			else if(strcmp((char*) MSG, (char*) "false") == 0)
 			{
-				AppCfg.DisplayBrightnessMode = 0;
-			}
-			else
-			{
-				AppCfg.DisplayBrightnessMode = 0;
+				AppCfg.DisplayBrightnessMode = DB_Automatic;
 			}
 		}
 		/*Message ID32*/
@@ -516,7 +512,7 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			/**/
 			default: AppCfg.DisplayBrightness = INTENSITY_15;
 			}
-			MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
+			//MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
 		}
 		/* Group 4 ***********************************************************************************************************/
 		/*Message ID40*/

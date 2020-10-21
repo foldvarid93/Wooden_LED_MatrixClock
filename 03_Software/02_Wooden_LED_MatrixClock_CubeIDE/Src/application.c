@@ -234,6 +234,7 @@ void UpdateTimeOnDisplay(void)
 /**/
 void TextToColumnDataArray(void)
 {
+	//TODO: handle 3 mode
 	/*locals*/
 	uint16_t StartIndx;
 	AppCfg.TextLength = strlen((const char*)AppCfg.DisplayTextArray);
@@ -358,6 +359,43 @@ void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 	/**/
 	HAL_SPI_Transmit(&hspi2,tmp,24,50);
 	MAX7219_LoadPulse();
+}
+/**/
+void MAX7219_SetIntensity(void)
+{
+//	static uint8_t DisplayBrightnessModePrev = 0xFF;
+//	static uint8_t DisplayBrightnessPrev = 0xFF;
+	/**/
+//	if(DisplayBrightnessModePrev != AppCfg.DisplayBrightnessMode)
+//	{
+//		/*constant brightness*/
+//		if(AppCfg.DisplayBrightnessMode == DB_Automatic)
+//		{
+//			MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
+//		}
+//		/*auto brightness*/
+//		else
+//		{
+//			if(DisplayBrightnessPrev == AppCfg.DisplayBrightness)
+//			{
+//				MAX7219_Send(REG_INTENSITY, INTENSITY_7);
+//			}
+//
+//		}
+//		DisplayBrightnessModePrev = AppCfg.DisplayBrightnessMode;
+//	}
+	if(AppCfg.DisplayBrightnessMode == DB_Automatic)
+	{
+		MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
+		MAX7219_Send(REG_INTENSITY, INTENSITY_7);
+		MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
+	}
+	if(AppCfg.DisplayBrightnessMode == DB_Manual)
+	{
+		MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
+		MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
+		MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
+	}
 }
 /**/
 void SendTimeToDisplay(void)
@@ -531,6 +569,8 @@ void StateMachine(void)
 			AppCfg.NTP_SyncTimerCounter--;
 		}
 	}
+	/**/
+	MAX7219_SetIntensity();
 }
 /**/
 void EEPROM_WriteFrame(void)
@@ -573,7 +613,7 @@ void EEPROM_ReadFrame(void)
 	EE_ReadVariable(VA_Date_ScrollIntervalInSec, &(AppCfg.Date_ScrollIntervalInSec));
 	/*Other*/
 	EE_ReadVariable(VA_TimeAnimation, &(AppCfg.TimeAnimation));
-	EE_ReadVariable(VA_DisplayBrightnessMode, &(AppCfg.DisplayBrightnessMode));
+	EE_ReadVariable(VA_DisplayBrightnessMode, (uint16_t*)(AppCfg.DisplayBrightnessMode));
 	EE_ReadVariable(VA_DisplayBrightness, &(AppCfg.DisplayBrightness));
 }
 /**/

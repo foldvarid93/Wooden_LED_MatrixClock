@@ -102,57 +102,59 @@ typedef enum
 	DM_DateMessageScrollInAndOut
 }DateMode_t;
 
+typedef enum
+{
+	DB_Automatic = 0,
+	DB_Manual
+}DispBrightness_t;
+
 /*AppConfig_t*/
 typedef struct AppConfig_t{
 	/*NTP*/
-	uint8_t 	NTP_SSID[SO_NTP_SSID];
-	uint8_t		NTP_PassWord[SO_NTP_PassWord];
-	uint16_t 	NTP_SyncEnabled;
-	uint16_t	NTP_SyncInterval;
+	uint8_t 			NTP_SSID[SO_NTP_SSID];
+	uint8_t				NTP_PassWord[SO_NTP_PassWord];
+	uint16_t 			NTP_SyncEnabled;
+	uint16_t			NTP_SyncInterval;
 	/*Text*/
-	uint8_t		Text_Message[SO_Text_Message];
-	uint16_t 	Text_Enabled;//0 or 1
-	//uint16_t	Text_ScrollingMode;//0 or 1
-	TextMode_t	Text_ScrollingMode;
-	uint16_t	Text_ScrollIntervalInSec;//0-65536 sec
+	uint8_t				Text_Message[SO_Text_Message];
+	uint16_t 			Text_Enabled;//0 or 1
+	TextMode_t			Text_ScrollingMode;
+	uint16_t			Text_ScrollIntervalInSec;//0-65536 sec
 	/*Date*/
-	uint16_t	Date_Enabled;//0 or 1
-	//uint16_t	Date_ScrollingMode;//0 or 1
-	DateMode_t	Date_ScrollingMode;//0 or 1
-	uint16_t	Date_ScrollIntervalInSec;//0-65536 sec
+	uint16_t			Date_Enabled;//0 or 1
+	DateMode_t			Date_ScrollingMode;//0 or 1
+	uint16_t			Date_ScrollIntervalInSec;//0-65536 sec
 	/*Other*/
-	uint16_t 	TimeAnimation;//0 or 1
-	uint16_t 	DisplayBrightnessMode;//0 or 1
-	uint16_t 	DisplayBrightness;//1,3,5,7.. 31
+	uint16_t 			TimeAnimation;//0 or 1
+	DispBrightness_t 	DisplayBrightnessMode;//0 or 1
+	uint16_t 			DisplayBrightness;//1,3,5,7.. 31
 	/*normal variables*/
-	uint8_t		DisplayTextArray[SO_Text_Message];
-	uint8_t 	DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];
-	bool	 	NTP_Connected;
-	uint32_t 	NTP_SyncTimerCounter;
-	//uint8_t 	SM_WiFiStatus;
-	WiFiState_t	SM_WiFiStatus;
-	//uint8_t 	SM_AppStatus;
-	AppState_t	SM_AppStatus;
-	uint8_t 	SM_NextState;
-	bool		FirstRun;
-	uint8_t 	UpdateTime;
-	uint8_t		FlipCounter;
-	uint8_t		Point;
-	uint32_t 	ScrollSecCounter;
-	uint32_t 	RTCIntSecCounter;
-	uint16_t	LastScrolled;
-	uint8_t 	DisplayMode;
-	uint16_t 	FirstColumn;
-	uint16_t	LastColumn;
-	bool 		TextScrolling;
-	uint8_t 	TextLength;
-	uint8_t		ScrollingMode;
-	uint8_t		NewTimeDataArray[36];
-	bool 		TimeDiffIndicator[6];
-	uint8_t		DisplayData[NumberOf_DisplayColumn];
-	uint32_t	TimeStamp;
-	uint32_t 	Date_LastTimeStamp;
-	uint32_t 	Text_LastTimeStamp;
+	uint8_t				DisplayTextArray[SO_Text_Message];
+	uint8_t 			DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];
+	bool	 			NTP_Connected;
+	uint32_t 			NTP_SyncTimerCounter;
+	WiFiState_t			SM_WiFiStatus;
+	AppState_t			SM_AppStatus;
+	uint8_t 			SM_NextState;
+	bool				FirstRun;
+	uint8_t 			UpdateTime;
+	uint8_t				FlipCounter;
+	uint8_t				Point;
+	uint32_t 			ScrollSecCounter;
+	uint32_t 			RTCIntSecCounter;
+	uint16_t			LastScrolled;
+	uint8_t 			DisplayMode;
+	uint16_t 			FirstColumn;
+	uint16_t			LastColumn;
+	bool 				TextScrolling;
+	uint8_t 			TextLength;
+	uint8_t				ScrollingMode;
+	uint8_t				NewTimeDataArray[36];
+	bool 				TimeDiffIndicator[6];
+	uint8_t				DisplayData[NumberOf_DisplayColumn];
+	uint32_t			TimeStamp;
+	uint32_t 			Date_LastTimeStamp;
+	uint32_t 			Text_LastTimeStamp;
 }AppConfig_t;
 
 /*RTCData_t*/
