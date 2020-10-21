@@ -18,15 +18,20 @@
 #include "ntp.h"
 #include "typedef.h"
 /*std libraries*/
-#include <inttypes.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include "stdbool.h"
 /**/
 /***********************************************///includes end
-#define DispNum 			12
-#define DispLength 			96
+#define StartIdx 			28
+#define HourTensStartIdx 	StartIdx
+#define HourSinglesStartIdx StartIdx+6
+#define HourMinDoubleDot 	HourSinglesStartIdx+6
+#define MinTensStartIdx 	HourMinDoubleDot+2
+#define MinSinglesStartIdx 	MinTensStartIdx+6
+#define MinSecDoubleDot 	MinSinglesStartIdx+6
+#define SecTensStartIdx 	MinSecDoubleDot+2
+#define SecSinglesStartIdx 	SecTensStartIdx+6
 /***********************************************///MAX7219 define constants begin
 #define ESP_RESET_PIN		ESP8266_RST_Pin
 #define ESP_RESET_PORT		ESP8266_RST_GPIO_Port
@@ -85,15 +90,10 @@
 #define NOP					0x00
 /***********************************************///MAX7219 define constants end
 /***********************************************///constants declarations begin
-RTC_TimeTypeDef	 		Time_Data;							//id�t t�rol� strukt�rap�ld�ny
-RTC_DateTypeDef			Date_Data;							//d�tumot t�rol� strukt�rap�ld�ny
-TimeType				_time[2];
-enum 					mode{None, Time, Date , Text , DateDone, TextDone , TextRunning};
-enum 					ScrollMode{JustText, ScrollInAndOut};
-enum					WiFiMode{NTP=1, AccessPoint};
+Time_t					_time[2];
 extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v sz�vegesen
 extern const uint8_t	Months[12][12];						//jan,feb.....dec sz�vegesen
-AppConfig_Type 			AppCfg;
+AppConfig_t 			AppCfg;
 /***********************************************///constants declarations end
 /***********************************************///functions declaration begin
 /**/

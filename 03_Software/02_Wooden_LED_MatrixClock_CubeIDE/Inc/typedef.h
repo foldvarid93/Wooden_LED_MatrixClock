@@ -1,10 +1,18 @@
-#ifndef __TYPEDEF_H
-#define __TYPEDEF_H
-// =====================================================================================
-#include "stdbool.h"
-// =====================================================================================
-typedef struct AppConfig_Type{
-	/*defines*/
+/*
+ * typedeff.h
+ *
+ *  Created on: 2020. okt. 21.
+ *      Author: David
+ */
+
+#ifndef TYPEDEF_H_
+#define TYPEDEF_H_
+/**** INCLUDES ***********************************************************************************/
+#include <stdbool.h>
+#include <stdint.h>
+/**** END OF INCLUDES ****************************************************************************/
+
+/**** MACROS *************************************************************************************/
 #define VA_NTP_SSID							(0x0)
 #define SO_NTP_SSID							(50u)
 	/**/
@@ -53,6 +61,49 @@ typedef struct AppConfig_Type{
 #define NumberOf_ColumnOfOneDisplay			(8)
 #define NumberOf_Display					(12)
 #define NumberOf_DisplayColumn				(NumberOf_Display * NumberOf_ColumnOfOneDisplay)
+/**** END OF MACROS ******************************************************************************/
+
+/**** TYPE DEFINITIONS ***************************************************************************/
+
+/*AppState_t*/
+typedef enum
+{
+	AS_None = 0u,
+	AS_Time,
+	AS_Date,
+	AS_Text,
+	AS_TextDone,
+	AS_TextRunning
+}AppState_t;
+
+/*AppState_t*/
+typedef enum
+{
+	WiFi_None = 0,
+	WiFi_NTP,
+	WiFi_AP
+}WiFiState_t;
+
+/*TextMode_t*/
+typedef enum
+{
+	TM_MessageNoScroll = 0,
+	TM_MessageScroll,
+	TM_MessageScrollInAndOut
+}TextMode_t;
+
+/*DateMode_t*/
+typedef enum
+{
+	DM_DateNoScroll = 0,
+	DM_DateScroll,
+	DM_DateScrollInAndOut,
+	DM_DateMessageScroll,
+	DM_DateMessageScrollInAndOut
+}DateMode_t;
+
+/*AppConfig_t*/
+typedef struct AppConfig_t{
 	/*NTP*/
 	uint8_t 	NTP_SSID[SO_NTP_SSID];
 	uint8_t		NTP_PassWord[SO_NTP_PassWord];
@@ -61,11 +112,13 @@ typedef struct AppConfig_Type{
 	/*Text*/
 	uint8_t		Text_Message[SO_Text_Message];
 	uint16_t 	Text_Enabled;//0 or 1
-	uint16_t	Text_ScrollingMode;//0 or 1
+	//uint16_t	Text_ScrollingMode;//0 or 1
+	TextMode_t	Text_ScrollingMode;
 	uint16_t	Text_ScrollIntervalInSec;//0-65536 sec
 	/*Date*/
 	uint16_t	Date_Enabled;//0 or 1
-	uint16_t	Date_ScrollingMode;//0 or 1
+	//uint16_t	Date_ScrollingMode;//0 or 1
+	DateMode_t	Date_ScrollingMode;//0 or 1
 	uint16_t	Date_ScrollIntervalInSec;//0-65536 sec
 	/*Other*/
 	uint16_t 	TimeAnimation;//0 or 1
@@ -76,8 +129,10 @@ typedef struct AppConfig_Type{
 	uint8_t 	DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];
 	bool	 	NTP_Connected;
 	uint32_t 	NTP_SyncTimerCounter;
-	uint8_t 	SM_WiFiStatus;
-	uint8_t 	SM_AppStatus;
+	//uint8_t 	SM_WiFiStatus;
+	WiFiState_t	SM_WiFiStatus;
+	//uint8_t 	SM_AppStatus;
+	AppState_t	SM_AppStatus;
 	uint8_t 	SM_NextState;
 	bool		FirstRun;
 	uint8_t 	UpdateTime;
@@ -98,9 +153,10 @@ typedef struct AppConfig_Type{
 	uint32_t	TimeStamp;
 	uint32_t 	Date_LastTimeStamp;
 	uint32_t 	Text_LastTimeStamp;
-}AppConfig_Type;
-// =====================================================================================
-typedef struct RTC_DataType{
+}AppConfig_t;
+
+/*RTCData_t*/
+typedef struct RTCData_t{
 	uint8_t		sec;//0-59
 	uint8_t		min;//0-59
 	uint8_t		hour;//0-24
@@ -108,18 +164,20 @@ typedef struct RTC_DataType{
 	uint8_t		date;//1-31
 	uint8_t		month;//1-12
 	uint8_t		year;//0-100
-}RTC_DataType;
-// =====================================================================================
-typedef struct TimeType{
+}RTCData_t;
+
+/*Time_t*/
+typedef struct Time_t{
 	uint8_t		hour_tens;
 	uint8_t		hour_singles;
 	uint8_t		min_tens;
 	uint8_t		min_singles;
 	uint8_t		sec_tens;
 	uint8_t		sec_singles;
-}TimeType;
-// =====================================================================================
-typedef struct DateType{
+}Time_t;
+
+/*Date_t*/
+typedef struct Date_t{
 	uint8_t		day;
 	uint8_t		date_tens;
 	uint8_t		date_singles;
@@ -129,12 +187,15 @@ typedef struct DateType{
 	uint8_t		year_hundreds;
 	uint8_t		year_tens;
 	uint8_t		year_singles;
-}DateType;
-// =====================================================================================
+}Date_t;
+
+/*MASK*/
 struct {
 	unsigned char TIME_SET : 1;
 	unsigned char DATE_TIME :1;
 } MASK;
+
+/*MASKBYTE*/
 struct {
 	unsigned char B0 :1;
 	unsigned char B1 :1;
@@ -145,5 +206,22 @@ struct {
 	unsigned char B6 :1;
 	unsigned char B7 :1;
 } MASKBYTE;
-// =====================================================================================
-#endif
+/**** END OF TYPE DEFINITIONS ********************************************************************/
+
+/**** VARIABLES **********************************************************************************/
+
+/**** END OF VARIABLES ***************************************************************************/
+
+/**** LOCAL FUNCTION DECLARATIONS ****************************************************************/
+
+/**** END OF LOCAL FUNCTION DECLARATIONS *********************************************************/
+
+/**** LOCAL FUNCTION DEFINITIONS *****************************************************************/
+
+/**** END OF LOCAL FUNCTION DEFINITIONS **********************************************************/
+
+/**** GLOBAL FUNCTION DEFINITIONS ****************************************************************/
+
+/**** END OF GLOBAL FUNCTION DEFINITIONS *********************************************************/
+
+#endif /* TYPEDEFF_H_ */

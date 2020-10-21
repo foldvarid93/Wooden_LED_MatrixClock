@@ -419,7 +419,7 @@ uint16_t EE_ReadCharArray(uint16_t VirtAddress, uint8_t *Data)
 	{
 		for(i=0 ; i<Length ; i++)
 		{
-			EE_ReadVariable((VirtAddress+i+1), (uint8_t*)(Data+i));
+			EE_ReadVariable((VirtAddress+i+1), (uint16_t*)(Data+i));
 		}
 		*(Data+i) = '\0';
 	}

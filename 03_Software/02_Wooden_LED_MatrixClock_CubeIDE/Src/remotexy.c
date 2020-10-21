@@ -32,6 +32,37 @@ extern ring_buffer rx_buffer;
 /***************************************************************************************
  * Function declarations
  **************************************************************************************/
+/**/
+void RemoteXY_InitAndRun(void)
+{
+	/*defines*/
+#define	RemoteXY_Timeout 15000
+	/*locals*/
+	uint32_t StartTime=HAL_GetTick();
+	/**/
+	ESP8266_RemoteXY_InitAndStart();
+	/*wait for connection timeout: 30sec*/
+	while((HAL_GetTick()-StartTime) <= RemoteXY_Timeout)
+	{
+		ESP8266_RemoteXY_Handler();
+		if(ESP8266_RemoteXY_IsConnected() == 1)
+		{
+			break;
+		}
+	}
+	/*while connected: run application*/
+	while(ESP8266_RemoteXY_IsConnected() == 1)
+	{
+		/*run application handler*/
+		ESP8266_RemoteXY_Handler();
+		/*if app sent data process and store*/
+		if(RemoteXY.Btn_SSID_Send == 1)
+		{
+			RemoteXY.Btn_SSID_Send = 0;
+		}
+	}
+}
+
 void ESP8266_RemoteXY_InitAndStart(void)
 {
 	/*HW reset*/

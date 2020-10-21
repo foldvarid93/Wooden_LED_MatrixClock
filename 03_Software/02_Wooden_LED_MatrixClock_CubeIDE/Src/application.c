@@ -33,6 +33,9 @@ const uint8_t	Months[12][12]={
 void CreateDateData(void)
 {
 	uint8_t	i=0;
+	RTC_TimeTypeDef	 		Time_Data;
+	RTC_DateTypeDef			Date_Data;
+	/**/
 	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
 	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
 	for(uint8_t j=0;DateText[j]!='\0';i++,j++)
@@ -73,15 +76,10 @@ void Rotate(uint8_t* Dest,uint8_t* Source)
 /**/
 void UpdateTimeOnDisplay(void)
 {
-#define StartIdx 			28
-#define HourTensStartIdx 	StartIdx
-#define HourSinglesStartIdx StartIdx+6
-#define HourMinDoubleDot 	HourSinglesStartIdx+6
-#define MinTensStartIdx 	HourMinDoubleDot+2
-#define MinSinglesStartIdx 	MinTensStartIdx+6
-#define MinSecDoubleDot 	MinSinglesStartIdx+6
-#define SecTensStartIdx 	MinSecDoubleDot+2
-#define SecSinglesStartIdx 	SecTensStartIdx+6
+	/*locals*/
+	RTC_TimeTypeDef	 		Time_Data;
+	RTC_DateTypeDef			Date_Data;
+	/**/
 	if(AppCfg.FirstRun == 1)
 	{
 		AppCfg.UpdateTime = 1;
@@ -240,7 +238,7 @@ void TextToColumnDataArray(void)
 	uint16_t StartIndx;
 	AppCfg.TextLength = strlen((const char*)AppCfg.DisplayTextArray);
 	/**/
-	if((AppCfg.TextLength < SizeOf_WhiteSpaces) && (AppCfg.ScrollingMode == JustText))
+	if((AppCfg.TextLength < SizeOf_WhiteSpaces) && (AppCfg.ScrollingMode == TM_MessageScroll))
 	{
 		AppCfg.TextScrolling = false;
 	}
@@ -251,7 +249,7 @@ void TextToColumnDataArray(void)
 	/**/
 	if(AppCfg.TextScrolling == true)
 	{
-		if(AppCfg.ScrollingMode == ScrollInAndOut)
+		if(AppCfg.ScrollingMode == TM_MessageScrollInAndOut)
 		{
 			for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
 			{
@@ -273,7 +271,7 @@ void TextToColumnDataArray(void)
 			}
 		}
 		/**/
-		if(AppCfg.ScrollingMode == ScrollInAndOut)
+		if(AppCfg.ScrollingMode == TM_MessageScrollInAndOut)
 		{
 			for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
 			{
@@ -353,7 +351,7 @@ void MAX7219_LoadPulse(void)
 void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 {
 	uint8_t tmp[24];
-	for(uint8_t i=0;i<DispNum;i++){
+	for(uint8_t i=0;i<NumberOf_Display;i++){
 		tmp[2*i]=ADDR;
 		tmp[(2*i)+1]=CMD;
 	}
@@ -369,17 +367,20 @@ void SendTimeToDisplay(void)
 	uint8_t tmp2[24];
 	uint8_t tmp3[8][24];
 	/**/
-	for(uint8_t i=0;i<DispNum;i++){
+	for(uint8_t i=0;i<NumberOf_Display;i++)
+	{
 		tmp1[2*i]=REG_SHTDWN;
 		tmp1[(2*i)+1]=SHUTDOWN_MODE;
 		tmp2[2*i]=REG_SHTDWN;
 		tmp2[(2*i)+1]=NORMAL_MODE;
 	}
 	/**/
-	for(uint8_t i=8;i>0;i--){
-		for(uint8_t j=0;j<DispNum;j++){
+	for(uint8_t i=8;i>0;i--)
+	{
+		for(uint8_t j=0;j<NumberOf_Display;j++)
+		{
 			tmp3[i-1][2*j]=i;
-			tmp3[i-1][(2*j)+1]=AppCfg.DisplayData[DispLength-(8*j)-9+i];
+			tmp3[i-1][(2*j)+1]=AppCfg.DisplayData[NumberOf_DisplayColumn-(8*j)-9+i];
 		}
 	}
 	/*Shutdown drivers*/
@@ -410,32 +411,124 @@ uint8_t BitSwapping(uint8_t ch)
 	return ~retval;
 }
 /**/
-void RemoteXY_InitAndRun(void)
+void StateMachine(void)
 {
-	/*defines*/
-#define	RemoteXY_Timeout 15000
-	/*locals*/
-	uint32_t StartTime=HAL_GetTick();
-	/**/
-	ESP8266_RemoteXY_InitAndStart();
-	/*wait for connection timeout: 30sec*/
-	while((HAL_GetTick()-StartTime) <= RemoteXY_Timeout)
+	if((AppCfg.Date_Enabled == false) && (AppCfg.Text_Enabled == false))
 	{
-		ESP8266_RemoteXY_Handler();
-		if(ESP8266_RemoteXY_IsConnected() == 1)
+		//AppCfg.SM_AppStatus = AS_Time;
+		AppCfg.SM_NextState = AS_Time;
+	}
+	/**/
+	if(AppCfg.SM_NextState == AS_Time)
+	{
+		AppCfg.SM_NextState = AS_None;//none
+		AppCfg.SM_AppStatus = AS_Time;
+	}
+	if(AppCfg.SM_NextState == AS_Text)
+	{
+		AppCfg.SM_NextState = AS_None;//none
+		AppCfg.SM_AppStatus = AS_Text;
+	}
+	if(AppCfg.SM_NextState == AS_Date)
+	{
+		AppCfg.SM_NextState = AS_None;//none
+		AppCfg.SM_AppStatus = AS_Date;
+	}
+	/**/
+	switch (AppCfg.SM_AppStatus)
+	{
+	case AS_None:
 		{
 			break;
 		}
-	}
-	/*while connected: run application*/
-	while(ESP8266_RemoteXY_IsConnected() == 1)
-	{
-		/*run application handler*/
-		ESP8266_RemoteXY_Handler();
-		/*if app sent data process and store*/
-		if(RemoteXY.Btn_SSID_Send == 1)
+	case AS_Time:
 		{
-			RemoteXY.Btn_SSID_Send = 0;
+			if((AppCfg.Date_Enabled == true) && (AppCfg.Text_Enabled == false))
+			{
+				AppCfg.RTCIntSecCounter++;
+				if((AppCfg.RTCIntSecCounter - AppCfg.Date_LastTimeStamp) >= AppCfg.Date_ScrollIntervalInSec)
+				{
+					AppCfg.SM_AppStatus = AS_Date;
+				}
+			}
+			if((AppCfg.Date_Enabled == false) && (AppCfg.Text_Enabled == true))
+			{
+				AppCfg.RTCIntSecCounter++;
+				if((AppCfg.RTCIntSecCounter - AppCfg.Text_LastTimeStamp) >= AppCfg.Text_ScrollIntervalInSec)
+				{
+					AppCfg.SM_AppStatus = AS_Text;
+				}
+			}
+			if( (AppCfg.Date_Enabled == true) && (AppCfg.Text_Enabled == true) )
+			{
+				AppCfg.RTCIntSecCounter++;
+				if(AppCfg.LastScrolled == AS_Text)
+				{
+					if((AppCfg.RTCIntSecCounter - AppCfg.Date_LastTimeStamp) >= AppCfg.Date_ScrollIntervalInSec)
+					{
+						AppCfg.SM_AppStatus = AS_Date;
+					}
+				}
+				if(AppCfg.LastScrolled == AS_Date)
+				{
+					if((AppCfg.RTCIntSecCounter - AppCfg.Text_LastTimeStamp) >= AppCfg.Text_ScrollIntervalInSec)
+					{
+						AppCfg.SM_AppStatus = AS_Text;
+					}
+				}
+			}
+			AppCfg.UpdateTime=1;
+			AppCfg.DisplayMode = AS_Time;
+			break;
+		}
+	case AS_Date:
+		{
+			AppCfg.ScrollingMode = AppCfg.Date_ScrollingMode;
+			CreateDateData();
+			TextToColumnDataArray();
+			AppCfg.LastScrolled = AS_Date;
+			AppCfg.SM_AppStatus = AS_TextRunning;
+			AppCfg.DisplayMode = AS_Text;
+			break;
+		}
+	case AS_Text:
+		{
+			AppCfg.ScrollingMode = AppCfg.Text_ScrollingMode;
+			strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.Text_Message);
+			TextToColumnDataArray();
+			AppCfg.LastScrolled = AS_Text;
+			AppCfg.SM_AppStatus = AS_TextRunning;
+			AppCfg.DisplayMode = AS_Text;
+			break;
+		}
+	case AS_TextRunning:
+		{
+
+			break;
+		}
+	case AS_TextDone:
+		{
+			AppCfg.Text_LastTimeStamp = AppCfg.RTCIntSecCounter;
+			AppCfg.Date_LastTimeStamp = AppCfg.RTCIntSecCounter;
+			AppCfg.FirstRun = 1;
+			UpdateTimeOnDisplay();
+			AppCfg.SM_AppStatus = AS_Time;
+			AppCfg.DisplayMode = AS_Time;
+			break;
+		}
+
+	}
+	/**/
+	if(AppCfg.NTP_SyncEnabled)
+	{
+		if(AppCfg.NTP_SyncTimerCounter == 0)
+		{
+			AppCfg.SM_WiFiStatus = WiFi_NTP;
+			AppCfg.NTP_SyncTimerCounter =  (AppCfg.NTP_SyncInterval * NUMBEROFSECONDS_HOUR);
+		}
+		else
+		{
+			AppCfg.NTP_SyncTimerCounter--;
 		}
 	}
 }
@@ -472,11 +565,11 @@ void EEPROM_ReadFrame(void)
 	/*Text*/
 	EE_ReadCharArray(VA_Text_Message, (uint8_t*)(AppCfg.Text_Message));
 	EE_ReadVariable(VA_Text_Enabled, &(AppCfg.Text_Enabled));
-	EE_ReadVariable(VA_Text_ScrollingMode, &(AppCfg.Text_ScrollingMode));
+	EE_ReadVariable(VA_Text_ScrollingMode, (uint16_t*)(AppCfg.Text_ScrollingMode));
 	EE_ReadVariable(VA_Text_ScrollIntervalInSec, &(AppCfg.Text_ScrollIntervalInSec));
 	/*Date*/
 	EE_ReadVariable(VA_Date_Enabled, &(AppCfg.Date_Enabled));
-	EE_ReadVariable(VA_Date_ScrollingMode, &(AppCfg.Date_ScrollingMode));
+	EE_ReadVariable(VA_Date_ScrollingMode, (uint16_t*)(AppCfg.Date_ScrollingMode));
 	EE_ReadVariable(VA_Date_ScrollIntervalInSec, &(AppCfg.Date_ScrollIntervalInSec));
 	/*Other*/
 	EE_ReadVariable(VA_TimeAnimation, &(AppCfg.TimeAnimation));
@@ -498,7 +591,7 @@ void AppConfig_Init(void)
 	AppCfg.Text_ScrollIntervalInSec = 0;
 	/*Date*/
 	AppCfg.Date_Enabled = 0;
-	AppCfg.Date_ScrollingMode = 0;
+	AppCfg.Date_ScrollingMode = DM_DateNoScroll;
 	AppCfg.Date_ScrollIntervalInSec = 0;
 	/*Other*/
 	AppCfg.TimeAnimation = 0;
@@ -506,9 +599,9 @@ void AppConfig_Init(void)
 	AppCfg.DisplayBrightness = 0;
 	//
 	AppCfg.FirstRun = 1;
-	AppCfg.LastScrolled = Text;
-	AppCfg.SM_AppStatus = Time;
-	AppCfg.SM_WiFiStatus = AccessPoint;
+	AppCfg.LastScrolled = AS_Text;
+	AppCfg.SM_AppStatus = AS_Time;
+	AppCfg.SM_WiFiStatus = WiFi_AP;
 	AppCfg.NTP_SyncTimerCounter = 0;
 }
 /* Application Main Functions Start ---------------------------------------------------------*/
@@ -538,11 +631,11 @@ void Run_Application(void)
 	{
 		switch(AppCfg.SM_WiFiStatus)
 		{
-			case None:
+			case WiFi_None:
 			{
 				break;
 			}
-			case NTP:
+			case WiFi_NTP:
 			{
 				if(RTC_NTPSync(AppCfg.NTP_SSID,AppCfg.NTP_PassWord) == HAL_OK)
 				{
@@ -552,16 +645,16 @@ void Run_Application(void)
 				{
 					AppCfg.NTP_Connected = 0;
 				}
-				AppCfg.SM_WiFiStatus = AccessPoint;
+				AppCfg.SM_WiFiStatus = WiFi_AP;
 				break;
 			}
-			case AccessPoint:
+			case WiFi_AP:
 			{
 				while(ESP8266_AccessPoint_InitAndRun() != HAL_OK)
 				{
 					HAL_Delay(8000);
 				}
-				while(AppCfg.SM_WiFiStatus == AccessPoint)
+				while(AppCfg.SM_WiFiStatus == WiFi_AP)
 				{
 					if(HTML_GetMessage(HTML_Message) == HAL_OK)
 					{
@@ -581,123 +674,6 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	StateMachine();
 }
 /**/
-void StateMachine(void)
-{
-	if((AppCfg.Date_Enabled == false) && (AppCfg.Text_Enabled == false))
-	{
-		AppCfg.SM_NextState = Time;
-	}
-	/**/
-	if(AppCfg.SM_NextState == Time)
-	{
-		AppCfg.SM_NextState = None;//none
-		AppCfg.SM_AppStatus = Time;
-	}
-	if(AppCfg.SM_NextState == Text)
-	{
-		AppCfg.SM_NextState = None;//none
-		AppCfg.SM_AppStatus = Text;
-	}
-	if(AppCfg.SM_NextState == Date)
-	{
-		AppCfg.SM_NextState = None;//none
-		AppCfg.SM_AppStatus = Date;
-	}
-	/**/
-	switch (AppCfg.SM_AppStatus)
-	{
-	case Time:
-		{
-			if((AppCfg.Date_Enabled == true) && (AppCfg.Text_Enabled == false))
-			{
-				AppCfg.RTCIntSecCounter++;
-				if((AppCfg.RTCIntSecCounter - AppCfg.Date_LastTimeStamp) >= AppCfg.Date_ScrollIntervalInSec)
-				{
-					AppCfg.SM_AppStatus = Date;
-				}
-			}
-			if((AppCfg.Date_Enabled == false) && (AppCfg.Text_Enabled == true))
-			{
-				AppCfg.RTCIntSecCounter++;
-				if((AppCfg.RTCIntSecCounter - AppCfg.Text_LastTimeStamp) >= AppCfg.Text_ScrollIntervalInSec)
-				{
-					AppCfg.SM_AppStatus = Text;
-				}
-			}
-			if( (AppCfg.Date_Enabled == true) && (AppCfg.Text_Enabled == true) )
-			{
-				AppCfg.RTCIntSecCounter++;
-				if(AppCfg.LastScrolled == Text)
-				{
-					if((AppCfg.RTCIntSecCounter - AppCfg.Date_LastTimeStamp) >= AppCfg.Date_ScrollIntervalInSec)
-					{
-						AppCfg.SM_AppStatus = Date;
-					}
-				}
-				if(AppCfg.LastScrolled == Date)
-				{
-					if((AppCfg.RTCIntSecCounter - AppCfg.Text_LastTimeStamp) >= AppCfg.Text_ScrollIntervalInSec)
-					{
-						AppCfg.SM_AppStatus = Text;
-					}
-				}
-			}
-			AppCfg.UpdateTime=1;
-			AppCfg.DisplayMode = Time;
-			break;
-		}
-	case Date:
-		{
-			AppCfg.ScrollingMode = AppCfg.Date_ScrollingMode;
-			CreateDateData();
-			TextToColumnDataArray();
-			AppCfg.LastScrolled = Date;
-			AppCfg.SM_AppStatus = TextRunning;
-			AppCfg.DisplayMode = Text;
-			break;
-		}
-	case Text:
-		{
-			AppCfg.ScrollingMode = AppCfg.Text_ScrollingMode;
-			strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.Text_Message);
-			TextToColumnDataArray();
-			AppCfg.LastScrolled = Text;
-			AppCfg.SM_AppStatus = TextRunning;
-			AppCfg.DisplayMode = Text;
-			break;
-		}
-	case TextRunning:
-		{
-
-			break;
-		}
-	case TextDone:
-		{
-			AppCfg.Text_LastTimeStamp = AppCfg.RTCIntSecCounter;
-			AppCfg.Date_LastTimeStamp = AppCfg.RTCIntSecCounter;
-			AppCfg.FirstRun = 1;
-			UpdateTimeOnDisplay();
-			AppCfg.SM_AppStatus = Time;
-			AppCfg.DisplayMode = Time;
-			break;
-		}
-
-	}
-	/**/
-	if(AppCfg.NTP_SyncEnabled)
-	{
-		if(AppCfg.NTP_SyncTimerCounter == 0)
-		{
-			AppCfg.SM_WiFiStatus = NTP;
-			AppCfg.NTP_SyncTimerCounter =  (AppCfg.NTP_SyncInterval * NUMBEROFSECONDS_HOUR);
-		}
-		else
-		{
-			AppCfg.NTP_SyncTimerCounter--;
-		}
-	}
-}
-/**/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	UNUSED(htim);
@@ -705,12 +681,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(htim->Instance == TIM3)
 	{
 		/**/
-		if(AppCfg.DisplayMode == Time)
+		if(AppCfg.DisplayMode == AS_Time)
 		{
 			UpdateTimeOnDisplay();
 		}
 		/**/
-		if(AppCfg.DisplayMode == Text)
+		if(AppCfg.DisplayMode == AS_Text)
 		{
 			/*scrolling text on display*/
 			if (AppCfg.TextScrolling == true)
@@ -718,7 +694,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				if (AppCfg.FirstColumn == (AppCfg.LastColumn - NumberOf_DisplayColumn))
 				{
 					/**/
-					if(AppCfg.ScrollingMode == JustText)
+					if(AppCfg.ScrollingMode == TM_MessageScroll)
 					{
 						if((HAL_GetTick()-AppCfg.TimeStamp)<1500)
 						{
@@ -727,20 +703,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 						else
 						{
 							//AppCfg.DisplayMode = TextDone;
-							AppCfg.SM_AppStatus = TextDone;
+							AppCfg.SM_AppStatus = AS_TextDone;
 						}
 
 					}
 					else
 					{
 						//AppCfg.DisplayMode = TextDone;
-						AppCfg.SM_AppStatus = TextDone;
+						AppCfg.SM_AppStatus = AS_TextDone;
 					}
 				}
 				else
 				{
 					SendToDisplay(AppCfg.FirstColumn);
-					if((AppCfg.ScrollingMode == JustText)&&(AppCfg.FirstColumn == 0))
+					if((AppCfg.ScrollingMode == TM_MessageScroll)&&(AppCfg.FirstColumn == 0))
 					{
 						if((HAL_GetTick()-AppCfg.TimeStamp)<1500)
 						{
@@ -770,7 +746,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				else
 				{
 					//AppCfg.DisplayMode = TextDone;
-					AppCfg.SM_AppStatus = TextDone;
+					AppCfg.SM_AppStatus = AS_TextDone;
 				}
 			}
 		}

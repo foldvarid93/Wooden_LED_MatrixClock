@@ -115,6 +115,8 @@ Serial_t serial;
 /***************************************************************************************
  * Function declarations
  **************************************************************************************/
+void RemoteXY_InitAndRun(void);
+
 void ESP8266_RemoteXY_InitAndStart(void);
 
 void ESP8266_RemoteXY_Init(const void * _conf, void * _var,	const char * _accessPassword, const char * _wifiSsid,const char * _wifiPassword, uint16_t _port);

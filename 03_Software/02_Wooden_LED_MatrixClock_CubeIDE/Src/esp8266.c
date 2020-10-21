@@ -337,17 +337,17 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 		{
 			if(strcmp((char*) MSG, (char*)"No Scroll Message") == 0)
 			{
-				AppCfg.Text_ScrollingMode = JustText;
+				AppCfg.Text_ScrollingMode = TM_MessageNoScroll;
 				AppCfg.TextScrolling = false;
 			}
 			else if(strcmp((char*) MSG, (char*)"Scrolling Just Message") == 0)
 			{
-				AppCfg.Text_ScrollingMode = ScrollInAndOut;
-				AppCfg.TextScrolling = false;
+				AppCfg.Text_ScrollingMode = TM_MessageScroll;
+				AppCfg.TextScrolling = true;
 			}
 			else if(strcmp((char*) MSG, (char*)"Scrolling In and Out Message") == 0)
 			{
-				AppCfg.Text_ScrollingMode = ScrollInAndOut;
+				AppCfg.Text_ScrollingMode = TM_MessageScrollInAndOut;
 				AppCfg.TextScrolling = true;
 			}
 			else
@@ -394,19 +394,23 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 		{
 			if(strcmp((char*) MSG, (char*)"Just Date No Scroll") == 0)
 			{
-				AppCfg.Date_ScrollingMode = JustText;
+				AppCfg.Date_ScrollingMode = DM_DateNoScroll;
 			}
 			else if(strcmp((char*) MSG, (char*)"Just Date Scroll") == 0)
 			{
-				AppCfg.Date_ScrollingMode = ScrollInAndOut;
+				AppCfg.Date_ScrollingMode = DM_DateScroll;
 			}
 			else if(strcmp((char*) MSG, (char*)"Scroll Date Message") == 0)
 			{
-				AppCfg.Date_ScrollingMode = ScrollInAndOut;
+				AppCfg.Date_ScrollingMode = DM_DateScrollInAndOut;
 			}
-			else
+			else if(strcmp((char*) MSG, (char*)"Scroll Date Message") == 0)
 			{
-				asm("nop");
+				AppCfg.Date_ScrollingMode = DM_DateMessageScroll;
+			}
+			else if(strcmp((char*) MSG, (char*)"Scroll Date Message") == 0)
+			{
+				AppCfg.Date_ScrollingMode = DM_DateMessageScrollInAndOut;
 			}
 		}
 		/*Message ID16*/
