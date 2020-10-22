@@ -311,24 +311,42 @@ void TextToColumnDataArray(void)
 /**/
 void SendToDisplay(uint16_t from)
 {
-  /**/
-  uint8_t tmp[192];
-  for(uint8_t i=0;i<8;i++){
-	  for(uint8_t j=0;j<NumberOf_Display;j++){
-		  tmp[(i*24)+(2*j)]=8-i;
-		  tmp[192-((i*24)+(2*j)+1)]=AppCfg.DisplayTextColumnArray[from+(j*8)+i];
+	/**/
+	uint8_t tmp1[192];
+	/**/
+
+	/**/
+	for(uint8_t i=0;i<NumberOf_ColumnOfOneDisplay;i++)
+	{
+	  for(uint8_t j=0;j<NumberOf_Display;j++)
+	  {
+		  tmp1[(i*24)+(2*j)]=NumberOf_ColumnOfOneDisplay-i;
+		  tmp1[192-((i*24)+(2*j)+1)]=AppCfg.DisplayTextColumnArray[from+(j*NumberOf_ColumnOfOneDisplay)+i];
 	  }
-  }
-  /**/
-  MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
-  /**/
-  for(uint8_t i=0;i<8;i++){
-	  HAL_SPI_Transmit(&hspi2,&tmp[i*24],24,50);
+	}
+	/**/
+	for(uint8_t i=0;i<8;i++)
+	{
+	  HAL_SPI_Transmit(&hspi2,&tmp1[i*24],24,50);
 	  MAX7219_LoadPulse();
-  }
-  /**/
-  MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
-  asm("nop");
+	}
+	/**/
+/*	if(AppCfg.DisplayBrightnessMode == DB_Automatic)
+	{
+		MAX7219_Send(REG_INTENSITY, INTENSITY_7);
+	}
+	if(AppCfg.DisplayBrightnessMode == DB_Manual)
+	{
+		MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
+	}*/
+}
+/**/
+void MAX7219_ClearDisplay(void)
+{
+	for(uint8_t i=1 ; i<=NumberOf_ColumnOfOneDisplay ; i++)
+	{
+		MAX7219_Send(i, 0);
+	}
 }
 /**/
 void MAX7219_Init(void)
@@ -338,12 +356,15 @@ void MAX7219_Init(void)
 	MAX7219_Send(REG_DECODE, NO_DECODE);
 	MAX7219_Send(REG_SCANLIMIT, DISP0_7);
 	MAX7219_Send(REG_INTENSITY, INTENSITY_7);
+	MAX7219_ClearDisplay();
+	MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
 }
 /**/
-void MAX7219_LoadPulse(void)
+inline void MAX7219_LoadPulse(void)
 {
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	for(uint8_t i=0;i<10;i++){
+	for(uint8_t i=0;i<20;i++)
+	{
 		asm("nop");
 	}
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
@@ -351,8 +372,9 @@ void MAX7219_LoadPulse(void)
 /**/
 void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 {
-	uint8_t tmp[24];
-	for(uint8_t i=0;i<NumberOf_Display;i++){
+	uint8_t tmp[NumberOf_Display * 2];
+	for(uint8_t i=0;i<NumberOf_Display;i++)
+	{
 		tmp[2*i]=ADDR;
 		tmp[(2*i)+1]=CMD;
 	}
@@ -363,6 +385,7 @@ void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 /**/
 void MAX7219_SetIntensity(void)
 {
+	uint8_t tmp[(NumberOf_Display+1) * 2];
 //	static uint8_t DisplayBrightnessModePrev = 0xFF;
 //	static uint8_t DisplayBrightnessPrev = 0xFF;
 	/**/
@@ -386,32 +409,62 @@ void MAX7219_SetIntensity(void)
 //	}
 	if(AppCfg.DisplayBrightnessMode == DB_Automatic)
 	{
-		MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
-		MAX7219_Send(REG_INTENSITY, INTENSITY_7);
-		MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
+		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
+		{
+			tmp[2*i]=REG_SHTDWN;
+			tmp[(2*i)+1]=SHUTDOWN_MODE;
+		}
+		HAL_SPI_Transmit(&hspi2,tmp,26,50);
+		MAX7219_LoadPulse();
+
+		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
+		{
+			tmp[2*i]=REG_INTENSITY;
+			tmp[(2*i)+1]=INTENSITY_7;
+		}
+		HAL_SPI_Transmit(&hspi2,tmp,26,50);
+		MAX7219_LoadPulse();
+
+		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
+		{
+			tmp[2*i]=REG_SHTDWN;
+			tmp[(2*i)+1]=NORMAL_MODE;
+		}
+		HAL_SPI_Transmit(&hspi2,tmp,26,50);
+		MAX7219_LoadPulse();
 	}
 	if(AppCfg.DisplayBrightnessMode == DB_Manual)
 	{
-		MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
-		MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
-		MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
+		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
+		{
+			tmp[2*i]=REG_SHTDWN;
+			tmp[(2*i)+1]=SHUTDOWN_MODE;
+		}
+		HAL_SPI_Transmit(&hspi2,tmp,26,50);
+		MAX7219_LoadPulse();
+
+		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
+		{
+			tmp[2*i]=REG_INTENSITY;
+			tmp[(2*i)+1]=AppCfg.DisplayBrightness;
+		}
+		HAL_SPI_Transmit(&hspi2,tmp,26,50);
+		MAX7219_LoadPulse();
+
+		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
+		{
+			tmp[2*i]=REG_SHTDWN;
+			tmp[(2*i)+1]=NORMAL_MODE;
+		}
+		HAL_SPI_Transmit(&hspi2,tmp,26,50);
+		MAX7219_LoadPulse();
 	}
 }
 /**/
 void SendTimeToDisplay(void)
 {
 	/*locals*/
-	uint8_t tmp1[24];
-	uint8_t tmp2[24];
 	uint8_t tmp3[8][24];
-	/**/
-	for(uint8_t i=0;i<NumberOf_Display;i++)
-	{
-		tmp1[2*i]=REG_SHTDWN;
-		tmp1[(2*i)+1]=SHUTDOWN_MODE;
-		tmp2[2*i]=REG_SHTDWN;
-		tmp2[(2*i)+1]=NORMAL_MODE;
-	}
 	/**/
 	for(uint8_t i=8;i>0;i--)
 	{
@@ -421,18 +474,11 @@ void SendTimeToDisplay(void)
 			tmp3[i-1][(2*j)+1]=AppCfg.DisplayData[NumberOf_DisplayColumn-(8*j)-9+i];
 		}
 	}
-	/*Shutdown drivers*/
-	HAL_SPI_Transmit(&hspi2,tmp1,24,100);
-	MAX7219_LoadPulse();
-	/*Send out data*/
 	for(uint8_t i=NumberOf_ColumnOfOneDisplay ; i>0 ; i--)
 	{
 		HAL_SPI_Transmit(&hspi2, &tmp3[i-1][0], 24, 100);
 		MAX7219_LoadPulse();
 	}
-	/*Turn back on display*/
-	HAL_SPI_Transmit(&hspi2,tmp2,24,100);
-	MAX7219_LoadPulse();
 }
 /**/
 uint8_t BitSwapping(uint8_t ch)
@@ -647,9 +693,10 @@ void AppConfig_Init(void)
 /* Application Main Functions Start ---------------------------------------------------------*/
 HAL_StatusTypeDef Init_Application(void)
 {
-	AppConfig_Init();
 	/**/
 	MAX7219_Init();
+	/**/
+	AppConfig_Init();
 	/**/
 	HAL_FLASH_Unlock();
 	if (EE_Init() != HAL_OK)
@@ -791,6 +838,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			}
 		}
 	}
+
 	/*timer4 interrupt*/
 	if(htim->Instance == TIM4)
 	{
