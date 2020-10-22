@@ -239,11 +239,21 @@ void TextToColumnDataArray(void)
 	uint16_t StartIndx;
 	AppCfg.TextLength = strlen((const char*)AppCfg.DisplayTextArray);
 	/**/
-	if((AppCfg.TextLength < SizeOf_WhiteSpaces) && (AppCfg.ScrollingMode == TM_MessageScroll))
+	if((AppCfg.ScrollingMode == TM_MessageNoScroll) && (AppCfg.TextLength > SizeOf_WhiteSpaces))
+	{
+		AppCfg.ScrollingMode = TM_MessageScroll;
+	}
+	if((AppCfg.ScrollingMode == TM_MessageScroll) && (AppCfg.TextLength <= SizeOf_WhiteSpaces))
+	{
+		AppCfg.ScrollingMode = TM_MessageNoScroll;
+	}
+	/**/
+	if(AppCfg.ScrollingMode == TM_MessageNoScroll)//no scroll
 	{
 		AppCfg.TextScrolling = false;
 	}
-	else
+	/**/
+	if((AppCfg.ScrollingMode == TM_MessageScroll)||(AppCfg.ScrollingMode == TM_MessageScrollInAndOut)) //scroll just text
 	{
 		AppCfg.TextScrolling = true;
 	}
@@ -413,28 +423,15 @@ void MAX7219_SetIntensity(void)
 //	}
 	if(AppCfg.DisplayBrightnessMode == DB_Automatic)
 	{
-
-
-		for(uint8_t i=0;i<(NumberOf_Display);i++)
-		{
-			tmp[2*i]=REG_INTENSITY;
-			tmp[(2*i)+1]=INTENSITY_7;
-		}
-		HAL_SPI_Transmit(&hspi2,tmp,26,50);
-		MAX7219_LoadPulse();
-
+		MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
+		MAX7219_Send(REG_INTENSITY, INTENSITY_7);
+		MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
 	}
 	if(AppCfg.DisplayBrightnessMode == DB_Manual)
 	{
-
-		for(uint8_t i=0;i<(NumberOf_Display);i++)
-		{
-			tmp[2*i]=REG_INTENSITY;
-			tmp[(2*i)+1]=AppCfg.DisplayBrightness;
-		}
-		HAL_SPI_Transmit(&hspi2,tmp,26,50);
-		MAX7219_LoadPulse();
-
+		MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
+		MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
+		MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
 	}
 }
 /**/
@@ -744,7 +741,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	/*timer3 interrupt*/
 	if(htim->Instance == TIM3)
 	{
-		//MAX7219_SetIntensity();
 		/**/
 		if(AppCfg.DisplayMode == AS_Time)
 		{
