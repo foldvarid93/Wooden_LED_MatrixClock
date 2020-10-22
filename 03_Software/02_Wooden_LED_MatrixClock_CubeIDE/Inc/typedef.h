@@ -64,6 +64,11 @@
 /**** END OF MACROS ******************************************************************************/
 
 /**** TYPE DEFINITIONS ***************************************************************************/
+enum
+{
+	SM_JustText = 0,
+	SM_ScrollInAndOut
+};
 
 /*AppState_t*/
 typedef enum
@@ -99,7 +104,6 @@ typedef enum
 typedef enum
 {
 	DM_DateNoScroll = 0,
-	DM_DateScroll,
 	DM_DateScrollInAndOut,
 	DM_DateMessageScroll,
 	DM_DateMessageScrollInAndOut

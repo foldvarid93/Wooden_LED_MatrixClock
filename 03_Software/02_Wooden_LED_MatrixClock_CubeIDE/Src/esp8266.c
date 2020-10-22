@@ -390,16 +390,12 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			}
 		}
 		/*Message ID15*/
-		/*text message display mode*/
+		/*date message display mode*/
 		if(((strcmp((char*) MSG_START,(char*)MSG_ID15_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID15_STOP)) == 0))
 		{
 			if(strcmp((char*) MSG, (char*)"Just Date No Scroll") == 0)
 			{
 				AppCfg.Date_ScrollingMode = DM_DateNoScroll;
-			}
-			else if(strcmp((char*) MSG, (char*)"Just Date Scroll") == 0)
-			{
-				AppCfg.Date_ScrollingMode = DM_DateScroll;
 			}
 			else if(strcmp((char*) MSG, (char*)"Scroll Date Message") == 0)
 			{

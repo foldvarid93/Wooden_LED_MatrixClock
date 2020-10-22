@@ -232,6 +232,153 @@ void UpdateTimeOnDisplay(void)
 	}
 }
 /**/
+void DateToTextArray(void)
+{
+	uint8_t	i=0;
+	RTC_TimeTypeDef	 		Time_Data;
+	RTC_DateTypeDef			Date_Data;
+	/**/
+	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
+/*	DM_DateNoScroll = 0,
+	DM_DateScroll,
+	DM_DateScrollInAndOut,
+	DM_DateMessageScroll,
+	DM_DateMessageScrollInAndOut*/
+	if(AppCfg.ScrollingMode == DM_DateNoScroll)
+	{
+		i=0;
+		for(uint8_t j=0 ; i<3 ; j++)
+		{
+			AppCfg.DisplayTextArray[i++]=' ';
+		}
+
+		AppCfg.DisplayTextArray[i++]='2';
+		AppCfg.DisplayTextArray[i++]='0';
+		AppCfg.DisplayTextArray[i++]=(Date_Data.Year/10)+'0';
+		AppCfg.DisplayTextArray[i++]=(Date_Data.Year%10)+'0';	//?vsz?m
+		AppCfg.DisplayTextArray[i++]='.';							//pont
+		AppCfg.DisplayTextArray[i++]=Date_Data.Month/10+'0';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Month%10+'0';	//h?nap
+		AppCfg.DisplayTextArray[i++]='.';							//pont
+		AppCfg.DisplayTextArray[i++]=Date_Data.Date/10+'0';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Date%10+'0';	//nap
+		AppCfg.DisplayTextArray[i++]='.';							//pont
+		for(uint8_t j=0 ; j<3 ; j++)
+		{
+			AppCfg.DisplayTextArray[i++]=' ';
+		}
+		AppCfg.DisplayTextArray[i++]='\0';							//pont
+		/**/
+		AppCfg.TextScrolling = false;
+	}
+	if(AppCfg.ScrollingMode == DM_DateScrollInAndOut)
+	{
+		i=0;
+		for(uint8_t j=0 ; i<SizeOf_WhiteSpaces ; j++)
+		{
+			AppCfg.DisplayTextArray[i++]=' ';
+		}
+
+		AppCfg.DisplayTextArray[i++]='2';
+		AppCfg.DisplayTextArray[i++]='0';
+		AppCfg.DisplayTextArray[i++]=(Date_Data.Year/10)+'0';
+		AppCfg.DisplayTextArray[i++]=(Date_Data.Year%10)+'0';
+		AppCfg.DisplayTextArray[i++]='.';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Month/10+'0';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Month%10+'0';
+		AppCfg.DisplayTextArray[i++]='.';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Date/10+'0';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Date%10+'0';
+		AppCfg.DisplayTextArray[i++]='.';
+
+		for(uint8_t j=0 ; j<SizeOf_WhiteSpaces ; j++)
+		{
+			AppCfg.DisplayTextArray[i++]=' ';
+		}
+		AppCfg.DisplayTextArray[i]='\0';
+		/**/
+		AppCfg.ScrollingMode = SM_ScrollInAndOut;
+		AppCfg.TextScrolling = true;
+	}
+	if(AppCfg.ScrollingMode == DM_DateMessageScroll)
+	{
+		for(uint8_t j=0, i=0 ; DateText[j]!='\0' ; i++,j++)
+		{
+			AppCfg.DisplayTextArray[i]=DateText[j];
+		}
+		AppCfg.DisplayTextArray[i++]='2';
+		AppCfg.DisplayTextArray[i++]='0';
+		AppCfg.DisplayTextArray[i++]=(Date_Data.Year/10)+'0';
+		AppCfg.DisplayTextArray[i++]=(Date_Data.Year%10)+'0';
+		AppCfg.DisplayTextArray[i++]='.';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Month/10+'0';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Month%10+'0';
+		AppCfg.DisplayTextArray[i++]='.';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Date/10+'0';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Date%10+'0';
+		AppCfg.DisplayTextArray[i++]='.';
+		AppCfg.DisplayTextArray[i++]=',';
+		for(uint8_t j=0;WeekDays[Date_Data.WeekDay-1][j]!='\0';i++,j++)
+		{
+			AppCfg.DisplayTextArray[i]=WeekDays[Date_Data.WeekDay-1][j];
+		}
+		AppCfg.DisplayTextArray[i]='\0';
+		/**/
+		AppCfg.ScrollingMode = SM_JustText;
+		AppCfg.TextScrolling = true;
+	}
+	if(AppCfg.ScrollingMode == DM_DateMessageScrollInAndOut)
+	{
+		i=0;
+		for(uint8_t j=0 ; i<SizeOf_WhiteSpaces ; j++)
+		{
+			AppCfg.DisplayTextArray[i++]=' ';
+		}
+
+		for(uint8_t j=0;DateText[j]!='\0';i++,j++)
+		{
+			AppCfg.DisplayTextArray[i]=DateText[j];
+		}
+		AppCfg.DisplayTextArray[i++]='2';
+		AppCfg.DisplayTextArray[i++]='0';
+		AppCfg.DisplayTextArray[i++]=(Date_Data.Year/10)+'0';
+		AppCfg.DisplayTextArray[i++]=(Date_Data.Year%10)+'0';
+		AppCfg.DisplayTextArray[i++]='.';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Month/10+'0';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Month%10+'0';
+		AppCfg.DisplayTextArray[i++]='.';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Date/10+'0';
+		AppCfg.DisplayTextArray[i++]=Date_Data.Date%10+'0';
+		AppCfg.DisplayTextArray[i++]='.';
+		AppCfg.DisplayTextArray[i++]=',';
+		for(uint8_t j=0;WeekDays[Date_Data.WeekDay-1][j]!='\0';j++)
+		{
+			AppCfg.DisplayTextArray[i++]=WeekDays[Date_Data.WeekDay-1][j];
+		}
+		for(uint8_t j=0 ; j<SizeOf_WhiteSpaces ; j++)
+		{
+			AppCfg.DisplayTextArray[i++]=' ';
+		}
+		AppCfg.DisplayTextArray[i]='\0';
+		/**/
+		AppCfg.ScrollingMode = SM_ScrollInAndOut;
+		AppCfg.TextScrolling = true;
+	}
+	/**/
+	AppCfg.TextLength = strlen((char*)AppCfg.DisplayTextArray);
+	for (uint8_t i=0; i < AppCfg.TextLength; i++)
+	{
+		for (uint8_t j = 0; j < 6; j++)
+		{
+		  AppCfg.DisplayTextColumnArray[(i*6)+j] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
+		}
+	}
+	AppCfg.LastColumn = AppCfg.TextLength * SizeOf_CharacterOnDisplay;
+	AppCfg.FirstColumn = 0;
+	AppCfg.TimeStamp = HAL_GetTick();
+}
+/**/
 void TextToColumnDataArray(void)
 {
 	//TODO: handle 3 mode
@@ -542,8 +689,9 @@ void StateMachine(void)
 	case AS_Date:
 		{
 			AppCfg.ScrollingMode = AppCfg.Date_ScrollingMode;
-			CreateDateData();
-			TextToColumnDataArray();
+			//CreateDateData();
+			//TextToColumnDataArray();
+			DateToTextArray();
 			AppCfg.LastScrolled = AS_Date;
 			AppCfg.SM_AppStatus = AS_TextRunning;
 			AppCfg.DisplayMode = AS_Text;
@@ -755,7 +903,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				if (AppCfg.FirstColumn == (AppCfg.LastColumn - NumberOf_DisplayColumn))
 				{
 					/**/
-					if(AppCfg.ScrollingMode == TM_MessageScroll)
+					if(AppCfg.ScrollingMode == SM_JustText)
 					{
 						if((HAL_GetTick()-AppCfg.TimeStamp)<1500)
 						{
@@ -777,7 +925,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				else
 				{
 					SendToDisplay(AppCfg.FirstColumn);
-					if((AppCfg.ScrollingMode == TM_MessageScroll)&&(AppCfg.FirstColumn == 0))
+					if((AppCfg.ScrollingMode == SM_JustText)&&(AppCfg.FirstColumn == 0))
 					{
 						if((HAL_GetTick()-AppCfg.TimeStamp)<1500)
 						{
@@ -799,8 +947,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			else
 			{
 				SendToDisplay(AppCfg.FirstColumn);
-				uint32_t tmpp = HAL_GetTick();
-				if((tmpp - AppCfg.TimeStamp)<3000)
+				if((HAL_GetTick() - AppCfg.TimeStamp)<3000)
 				{
 					/*wait*/
 				}
