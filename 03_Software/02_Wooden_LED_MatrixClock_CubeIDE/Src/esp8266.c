@@ -223,7 +223,7 @@ HAL_StatusTypeDef HTML_GetMessage(uint8_t * Message)
 /**/
 HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 {
-	uint16_t MessageLength=strlen((char*)Message);
+	uint16_t MessageLength=0;
 #define MSG_ID_LENGTH			(14)
 #define MSG_ID_FRAME_LENGTH		(2*MSG_ID_LENGTH)
 	char MSG_START[MSG_ID_LENGTH + 1];
@@ -234,6 +234,7 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 	uint8_t* MsgPtr;
 	uint16_t MsgLen;
 
+	MessageLength= strlen((char*)Message);
 	while(MessageLength > 0)
 	{
 		StartPtr = (uint8_t*) strstr((const char*)Message, (char*)"MsG_STRT-");
@@ -527,6 +528,7 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 		{
 			EEPROM_WriteFrame();
 		}
+		memset(Message,'\0',((StopPtr-Message) + MSG_ID_LENGTH));
 		Message = (uint8_t*) StopPtr + MSG_ID_LENGTH;
 		MessageLength = strlen((char*)Message);
 	}

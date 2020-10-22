@@ -75,6 +75,7 @@ typedef enum
 	AS_TextDone,
 	AS_TextRunning
 }AppState_t;
+#define AppState_t uint8_t
 
 /*AppState_t*/
 typedef enum
@@ -83,6 +84,7 @@ typedef enum
 	WiFi_NTP,
 	WiFi_AP
 }WiFiState_t;
+#define WiFiState_t uint8_t
 
 /*TextMode_t*/
 typedef enum
@@ -91,6 +93,7 @@ typedef enum
 	TM_MessageScroll,
 	TM_MessageScrollInAndOut
 }TextMode_t;
+#define TextMode_t uint16_t
 
 /*DateMode_t*/
 typedef enum
@@ -101,12 +104,14 @@ typedef enum
 	DM_DateMessageScroll,
 	DM_DateMessageScrollInAndOut
 }DateMode_t;
+#define DateMode_t uint16_t
 
 typedef enum
 {
 	DB_Automatic = 0,
 	DB_Manual
 }DispBrightness_t;
+#define DispBrightness_t uint16_t
 
 /*AppConfig_t*/
 typedef struct AppConfig_t{

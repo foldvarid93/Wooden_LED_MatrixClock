@@ -362,8 +362,12 @@ void MAX7219_Init(void)
 /**/
 inline void MAX7219_LoadPulse(void)
 {
+	for(uint8_t i=0;i<10;i++)
+	{
+		asm("nop");
+	}
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	for(uint8_t i=0;i<20;i++)
+	for(uint8_t i=0;i<10;i++)
 	{
 		asm("nop");
 	}
@@ -409,15 +413,9 @@ void MAX7219_SetIntensity(void)
 //	}
 	if(AppCfg.DisplayBrightnessMode == DB_Automatic)
 	{
-		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
-		{
-			tmp[2*i]=REG_SHTDWN;
-			tmp[(2*i)+1]=SHUTDOWN_MODE;
-		}
-		HAL_SPI_Transmit(&hspi2,tmp,26,50);
-		MAX7219_LoadPulse();
 
-		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
+
+		for(uint8_t i=0;i<(NumberOf_Display);i++)
 		{
 			tmp[2*i]=REG_INTENSITY;
 			tmp[(2*i)+1]=INTENSITY_7;
@@ -425,25 +423,11 @@ void MAX7219_SetIntensity(void)
 		HAL_SPI_Transmit(&hspi2,tmp,26,50);
 		MAX7219_LoadPulse();
 
-		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
-		{
-			tmp[2*i]=REG_SHTDWN;
-			tmp[(2*i)+1]=NORMAL_MODE;
-		}
-		HAL_SPI_Transmit(&hspi2,tmp,26,50);
-		MAX7219_LoadPulse();
 	}
 	if(AppCfg.DisplayBrightnessMode == DB_Manual)
 	{
-		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
-		{
-			tmp[2*i]=REG_SHTDWN;
-			tmp[(2*i)+1]=SHUTDOWN_MODE;
-		}
-		HAL_SPI_Transmit(&hspi2,tmp,26,50);
-		MAX7219_LoadPulse();
 
-		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
+		for(uint8_t i=0;i<(NumberOf_Display);i++)
 		{
 			tmp[2*i]=REG_INTENSITY;
 			tmp[(2*i)+1]=AppCfg.DisplayBrightness;
@@ -451,13 +435,6 @@ void MAX7219_SetIntensity(void)
 		HAL_SPI_Transmit(&hspi2,tmp,26,50);
 		MAX7219_LoadPulse();
 
-		for(uint8_t i=0;i<(NumberOf_Display+1);i++)
-		{
-			tmp[2*i]=REG_SHTDWN;
-			tmp[(2*i)+1]=NORMAL_MODE;
-		}
-		HAL_SPI_Transmit(&hspi2,tmp,26,50);
-		MAX7219_LoadPulse();
 	}
 }
 /**/
@@ -616,7 +593,7 @@ void StateMachine(void)
 		}
 	}
 	/**/
-	MAX7219_SetIntensity();
+	//MAX7219_SetIntensity();
 }
 /**/
 void EEPROM_WriteFrame(void)
@@ -651,15 +628,15 @@ void EEPROM_ReadFrame(void)
 	/*Text*/
 	EE_ReadCharArray(VA_Text_Message, (uint8_t*)(AppCfg.Text_Message));
 	EE_ReadVariable(VA_Text_Enabled, &(AppCfg.Text_Enabled));
-	EE_ReadVariable(VA_Text_ScrollingMode, (uint16_t*)(AppCfg.Text_ScrollingMode));
+	EE_ReadVariable(VA_Text_ScrollingMode, &(AppCfg.Text_ScrollingMode));
 	EE_ReadVariable(VA_Text_ScrollIntervalInSec, &(AppCfg.Text_ScrollIntervalInSec));
 	/*Date*/
 	EE_ReadVariable(VA_Date_Enabled, &(AppCfg.Date_Enabled));
-	EE_ReadVariable(VA_Date_ScrollingMode, (uint16_t*)(AppCfg.Date_ScrollingMode));
+	EE_ReadVariable(VA_Date_ScrollingMode, &(AppCfg.Date_ScrollingMode));
 	EE_ReadVariable(VA_Date_ScrollIntervalInSec, &(AppCfg.Date_ScrollIntervalInSec));
 	/*Other*/
 	EE_ReadVariable(VA_TimeAnimation, &(AppCfg.TimeAnimation));
-	EE_ReadVariable(VA_DisplayBrightnessMode, (uint16_t*)(AppCfg.DisplayBrightnessMode));
+	EE_ReadVariable(VA_DisplayBrightnessMode, &(AppCfg.DisplayBrightnessMode));
 	EE_ReadVariable(VA_DisplayBrightness, &(AppCfg.DisplayBrightness));
 }
 /**/
@@ -767,6 +744,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	/*timer3 interrupt*/
 	if(htim->Instance == TIM3)
 	{
+		//MAX7219_SetIntensity();
 		/**/
 		if(AppCfg.DisplayMode == AS_Time)
 		{
