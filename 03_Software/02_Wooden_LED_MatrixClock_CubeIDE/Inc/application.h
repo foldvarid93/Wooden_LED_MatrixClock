@@ -17,6 +17,7 @@
 #include "eeprom.h"
 #include "ntp.h"
 #include "typedef.h"
+#include "tmp100.h"
 /*std libraries*/
 #include <string.h>
 #include <stdarg.h>

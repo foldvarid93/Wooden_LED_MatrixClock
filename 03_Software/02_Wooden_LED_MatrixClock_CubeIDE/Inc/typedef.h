@@ -164,6 +164,7 @@ typedef struct AppConfig_t{
 	uint32_t			TimeStamp;
 	uint32_t 			Date_LastTimeStamp;
 	uint32_t 			Text_LastTimeStamp;
+	float 				Temperature;
 }AppConfig_t;
 
 /*RTCData_t*/

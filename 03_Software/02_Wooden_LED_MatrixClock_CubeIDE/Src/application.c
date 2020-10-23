@@ -536,15 +536,11 @@ void MAX7219_SetIntensity(void)
 //	}
 	if(AppCfg.DisplayBrightnessMode == DB_Automatic)
 	{
-		MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
 		MAX7219_Send(REG_INTENSITY, INTENSITY_7);
-		MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
 	}
 	if(AppCfg.DisplayBrightnessMode == DB_Manual)
 	{
-		MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
 		MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
-		MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
 	}
 }
 /**/
@@ -701,7 +697,7 @@ void StateMachine(void)
 		}
 	}
 	/**/
-	//MAX7219_SetIntensity();
+	MAX7219_SetIntensity();
 }
 /**/
 void EEPROM_WriteFrame(void)
@@ -778,6 +774,7 @@ void AppConfig_Init(void)
 /* Application Main Functions Start ---------------------------------------------------------*/
 HAL_StatusTypeDef Init_Application(void)
 {
+	TMP100_GetTemp(&AppCfg.Temperature);
 	/**/
 	MAX7219_Init();
 	/**/
