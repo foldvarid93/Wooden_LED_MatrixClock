@@ -103,7 +103,9 @@ void Rotate(uint8_t* Dest,uint8_t* Source);
 /**/
 void UpdateTimeOnDisplay(void);
 /**/
-void TextToColumnDataArray(void);
+void DateToDisplayDataArray(void);
+/**/
+void TextToDisplayDataArray(char* TextMessage);
 /**/
 void SendToDisplay(uint16_t from);
 /**/

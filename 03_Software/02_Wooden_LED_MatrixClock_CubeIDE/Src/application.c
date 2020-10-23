@@ -232,7 +232,7 @@ void UpdateTimeOnDisplay(void)
 	}
 }
 /**/
-void DateToTextArray(void)
+void DateToDisplayDataArray(void)
 {
 	uint8_t	i=0;
 	RTC_TimeTypeDef	 		Time_Data;
@@ -240,11 +240,7 @@ void DateToTextArray(void)
 	/**/
 	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
 	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
-/*	DM_DateNoScroll = 0,
-	DM_DateScroll,
-	DM_DateScrollInAndOut,
-	DM_DateMessageScroll,
-	DM_DateMessageScrollInAndOut*/
+	/**/
 	if(AppCfg.ScrollingMode == DM_DateNoScroll)
 	{
 		i=0;
@@ -306,6 +302,10 @@ void DateToTextArray(void)
 		for(uint8_t j=0, i=0 ; DateText[j]!='\0' ; i++,j++)
 		{
 			AppCfg.DisplayTextArray[i]=DateText[j];
+		}
+		for(uint8_t j=0 ; DateText[j]!='\0' ; j++)
+		{
+			AppCfg.DisplayTextArray[i++] = DateText[j];
 		}
 		AppCfg.DisplayTextArray[i++]='2';
 		AppCfg.DisplayTextArray[i++]='0';
@@ -379,12 +379,9 @@ void DateToTextArray(void)
 	AppCfg.TimeStamp = HAL_GetTick();
 }
 /**/
-void TextToColumnDataArray(void)
+void TextToDisplayDataArray(char* TextMessage)
 {
-	//TODO: handle 3 mode
-	/*locals*/
-	uint16_t StartIndx;
-	AppCfg.TextLength = strlen((const char*)AppCfg.DisplayTextArray);
+	AppCfg.TextLength = strlen((const char*)TextMessage);
 	/**/
 	if((AppCfg.ScrollingMode == TM_MessageNoScroll) && (AppCfg.TextLength > SizeOf_WhiteSpaces))
 	{
@@ -395,75 +392,44 @@ void TextToColumnDataArray(void)
 		AppCfg.ScrollingMode = TM_MessageNoScroll;
 	}
 	/**/
-	if(AppCfg.ScrollingMode == TM_MessageNoScroll)//no scroll
+	if(AppCfg.ScrollingMode == TM_MessageNoScroll)
 	{
+		strcpy((char*)AppCfg.DisplayTextArray,(char*)TextMessage);
+		/**/
 		AppCfg.TextScrolling = false;
 	}
 	/**/
-	if((AppCfg.ScrollingMode == TM_MessageScroll)||(AppCfg.ScrollingMode == TM_MessageScrollInAndOut)) //scroll just text
+	if(AppCfg.ScrollingMode == TM_MessageScroll)
 	{
+		strcpy((char*)AppCfg.DisplayTextArray,(char*)TextMessage);
+		/**/
+		AppCfg.ScrollingMode = SM_JustText;
 		AppCfg.TextScrolling = true;
 	}
 	/**/
-	if(AppCfg.TextScrolling == true)
+	if(AppCfg.ScrollingMode == TM_MessageScrollInAndOut)
 	{
-		if(AppCfg.ScrollingMode == TM_MessageScrollInAndOut)
-		{
-			for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
-			{
-				AppCfg.DisplayTextColumnArray[i]=0;
-			}
-			StartIndx = NumberOf_DisplayColumn;
-		}
-		else
-		{
-			StartIndx = 0;
-		}
-		/*fill up with data*/
-		for (uint8_t i=0; i < AppCfg.TextLength; i++)
-		{
-			for (uint8_t j = 0; j < 6; j++)
-			{
-			  AppCfg.DisplayTextColumnArray[StartIndx] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
-			  StartIndx++;
-			}
-		}
+		AppCfg.DisplayTextArray[0]='\0';
+		strcat((char*)AppCfg.DisplayTextArray,"                ");
+		strcat((char*)AppCfg.DisplayTextArray,(char*)TextMessage);
+		strcat((char*)AppCfg.DisplayTextArray,"                ");
 		/**/
-		if(AppCfg.ScrollingMode == TM_MessageScrollInAndOut)
-		{
-			for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
-			{
-				AppCfg.DisplayTextColumnArray[StartIndx+i]=0;
-			}
-			AppCfg.LastColumn = StartIndx + NumberOf_DisplayColumn;
-		}
-		else
-		{
-			AppCfg.LastColumn = StartIndx;
-			AppCfg.TimeStamp = HAL_GetTick();
-		}
+		AppCfg.ScrollingMode = SM_ScrollInAndOut;
+		AppCfg.TextScrolling = true;
 	}
-	else
-	{
-		for(uint8_t i=0;i<NumberOf_DisplayColumn;i++)
-		{
-			AppCfg.DisplayTextColumnArray[i]=0;
-		}
-		/*fill up with data*/
-		StartIndx = 0;
-		for (uint8_t i=0; i < AppCfg.TextLength; i++)
-		{
-			for (uint8_t j = 0; j < 6; j++)
-			{
-			  AppCfg.DisplayTextColumnArray[StartIndx] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
-			  StartIndx++;
-			}
-		}
-		AppCfg.TimeStamp = HAL_GetTick();
-	}
-
 	/**/
+	AppCfg.TextLength = strlen((char*)AppCfg.DisplayTextArray);
+	memset(AppCfg.DisplayTextColumnArray,0,SizeOf_DisplayTextColumnArray);
+	for (uint8_t i=0; i < AppCfg.TextLength; i++)
+	{
+		for (uint8_t j = 0; j < 6; j++)
+		{
+		  AppCfg.DisplayTextColumnArray[(i*6)+j] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
+		}
+	}
+	AppCfg.LastColumn = AppCfg.TextLength * SizeOf_CharacterOnDisplay;
 	AppCfg.FirstColumn = 0;
+	AppCfg.TimeStamp = HAL_GetTick();
 }
 /**/
 void SendToDisplay(uint16_t from)
@@ -546,7 +512,7 @@ void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 /**/
 void MAX7219_SetIntensity(void)
 {
-	uint8_t tmp[(NumberOf_Display+1) * 2];
+//	uint8_t tmp[(NumberOf_Display+1) * 2];
 //	static uint8_t DisplayBrightnessModePrev = 0xFF;
 //	static uint8_t DisplayBrightnessPrev = 0xFF;
 	/**/
@@ -689,9 +655,7 @@ void StateMachine(void)
 	case AS_Date:
 		{
 			AppCfg.ScrollingMode = AppCfg.Date_ScrollingMode;
-			//CreateDateData();
-			//TextToColumnDataArray();
-			DateToTextArray();
+			DateToDisplayDataArray();
 			AppCfg.LastScrolled = AS_Date;
 			AppCfg.SM_AppStatus = AS_TextRunning;
 			AppCfg.DisplayMode = AS_Text;
@@ -700,8 +664,7 @@ void StateMachine(void)
 	case AS_Text:
 		{
 			AppCfg.ScrollingMode = AppCfg.Text_ScrollingMode;
-			strcpy((char*)AppCfg.DisplayTextArray,(char*)AppCfg.Text_Message);
-			TextToColumnDataArray();
+			TextToDisplayDataArray((char*)(AppCfg.Text_Message));
 			AppCfg.LastScrolled = AS_Text;
 			AppCfg.SM_AppStatus = AS_TextRunning;
 			AppCfg.DisplayMode = AS_Text;
@@ -900,7 +863,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			/*scrolling text on display*/
 			if (AppCfg.TextScrolling == true)
 			{
-				if (AppCfg.FirstColumn == (AppCfg.LastColumn - NumberOf_DisplayColumn))
+				if (AppCfg.FirstColumn >= (AppCfg.LastColumn - NumberOf_DisplayColumn))
 				{
 					/**/
 					if(AppCfg.ScrollingMode == SM_JustText)
