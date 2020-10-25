@@ -77,6 +77,7 @@ typedef enum
 	AS_Time,
 	AS_Date,
 	AS_Text,
+	AS_Temp,
 	AS_TextDone,
 	AS_TextRunning
 }AppState_t;

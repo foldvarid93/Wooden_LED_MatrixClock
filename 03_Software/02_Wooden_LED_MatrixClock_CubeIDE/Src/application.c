@@ -232,6 +232,26 @@ void UpdateTimeOnDisplay(void)
 	}
 }
 /**/
+void SendTimeToDisplay(void)
+{
+	/*locals*/
+	uint8_t tmp3[8][24];
+	/**/
+	for(uint8_t i=8;i>0;i--)
+	{
+		for(uint8_t j=0;j<NumberOf_Display;j++)
+		{
+			tmp3[i-1][2*j]=i;
+			tmp3[i-1][(2*j)+1]=AppCfg.DisplayData[NumberOf_DisplayColumn-(8*j)-9+i];
+		}
+	}
+	for(uint8_t i=NumberOf_ColumnOfOneDisplay ; i>0 ; i--)
+	{
+		HAL_SPI_Transmit(&hspi2, &tmp3[i-1][0], 24, 100);
+		MAX7219_LoadPulse();
+	}
+}
+/**/
 void DateToDisplayDataArray(void)
 {
 	uint8_t	i=0;
@@ -432,6 +452,28 @@ void TextToDisplayDataArray(char* TextMessage)
 	AppCfg.TimeStamp = HAL_GetTick();
 }
 /**/
+/**/
+void TempToDisplayDataArray(void)
+{
+	uint16_t tmp1 = (uint16_t)AppCfg.Temperature;
+	uint16_t tmp2 = ((uint16_t)(AppCfg.Temperature *100)) % 100;
+
+	sprintf((char*)AppCfg.DisplayTextArray,"      Hõmérséklet: %u.%u°C      ", tmp1,tmp2);
+	AppCfg.TextLength = strlen((char*)AppCfg.DisplayTextArray);
+	memset(AppCfg.DisplayTextColumnArray,0,SizeOf_DisplayTextColumnArray);
+	for (uint8_t i=0; i < AppCfg.TextLength; i++)
+	{
+		for (uint8_t j = 0; j < 6; j++)
+		{
+		  AppCfg.DisplayTextColumnArray[(i*6)+j] = BitSwapping(characters[AppCfg.DisplayTextArray[i]][j]);
+		}
+	}
+	AppCfg.ScrollingMode = SM_ScrollInAndOut;
+	AppCfg.TextScrolling = true;
+	AppCfg.LastColumn = AppCfg.TextLength * SizeOf_CharacterOnDisplay;
+	AppCfg.FirstColumn = 0;
+	AppCfg.TimeStamp = HAL_GetTick();
+}
 void SendToDisplay(uint16_t from)
 {
 	/**/
@@ -512,28 +554,6 @@ void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 /**/
 void MAX7219_SetIntensity(void)
 {
-//	uint8_t tmp[(NumberOf_Display+1) * 2];
-//	static uint8_t DisplayBrightnessModePrev = 0xFF;
-//	static uint8_t DisplayBrightnessPrev = 0xFF;
-	/**/
-//	if(DisplayBrightnessModePrev != AppCfg.DisplayBrightnessMode)
-//	{
-//		/*constant brightness*/
-//		if(AppCfg.DisplayBrightnessMode == DB_Automatic)
-//		{
-//			MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
-//		}
-//		/*auto brightness*/
-//		else
-//		{
-//			if(DisplayBrightnessPrev == AppCfg.DisplayBrightness)
-//			{
-//				MAX7219_Send(REG_INTENSITY, INTENSITY_7);
-//			}
-//
-//		}
-//		DisplayBrightnessModePrev = AppCfg.DisplayBrightnessMode;
-//	}
 	if(AppCfg.DisplayBrightnessMode == DB_Automatic)
 	{
 		MAX7219_Send(REG_INTENSITY, INTENSITY_7);
@@ -541,26 +561,6 @@ void MAX7219_SetIntensity(void)
 	if(AppCfg.DisplayBrightnessMode == DB_Manual)
 	{
 		MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
-	}
-}
-/**/
-void SendTimeToDisplay(void)
-{
-	/*locals*/
-	uint8_t tmp3[8][24];
-	/**/
-	for(uint8_t i=8;i>0;i--)
-	{
-		for(uint8_t j=0;j<NumberOf_Display;j++)
-		{
-			tmp3[i-1][2*j]=i;
-			tmp3[i-1][(2*j)+1]=AppCfg.DisplayData[NumberOf_DisplayColumn-(8*j)-9+i];
-		}
-	}
-	for(uint8_t i=NumberOf_ColumnOfOneDisplay ; i>0 ; i--)
-	{
-		HAL_SPI_Transmit(&hspi2, &tmp3[i-1][0], 24, 100);
-		MAX7219_LoadPulse();
 	}
 }
 /**/
@@ -582,8 +582,7 @@ void StateMachine(void)
 {
 	if((AppCfg.Date_Enabled == false) && (AppCfg.Text_Enabled == false))
 	{
-		//AppCfg.SM_AppStatus = AS_Time;
-		AppCfg.SM_NextState = AS_Time;
+		//AppCfg.SM_NextState = AS_Time;
 	}
 	/**/
 	if(AppCfg.SM_NextState == AS_Time)
@@ -666,6 +665,15 @@ void StateMachine(void)
 			AppCfg.DisplayMode = AS_Text;
 			break;
 		}
+	case AS_Temp:
+		{
+			AppCfg.ScrollingMode = AppCfg.Text_ScrollingMode;
+			TempToDisplayDataArray();
+			AppCfg.LastScrolled = AS_Text;
+			AppCfg.SM_AppStatus = AS_TextRunning;
+			AppCfg.DisplayMode = AS_Text;
+			break;
+		}
 	case AS_TextRunning:
 		{
 
@@ -681,7 +689,6 @@ void StateMachine(void)
 			AppCfg.DisplayMode = AS_Time;
 			break;
 		}
-
 	}
 	/**/
 	if(AppCfg.NTP_SyncEnabled)
@@ -697,7 +704,8 @@ void StateMachine(void)
 		}
 	}
 	/**/
-	MAX7219_SetIntensity();
+	//MAX7219_SetIntensity();
+	TMP100_GetTemp(&AppCfg.Temperature);
 }
 /**/
 void EEPROM_WriteFrame(void)
