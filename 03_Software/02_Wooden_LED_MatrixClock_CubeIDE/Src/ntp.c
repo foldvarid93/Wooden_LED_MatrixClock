@@ -183,7 +183,10 @@ HAL_StatusTypeDef Convert_UTCToDateTime(uint32_t UTCTime_Sec)
 {
 	RTC_DateTypeDef Date;
 	RTC_TimeTypeDef Time;
+	int i = 0;
+	UTCTime_Sec += (i*NUMBEROFSECONDS_DAY);
 	uint32_t UNIXTimeHungary_Sec = UTCTime_Sec - SEVENTYYEARS + NUMBEROFSECONDS_UTCOFFSET;
+
 	/*Year*/
 	uint32_t tmp = UTCTime_Sec + NUMBEROFSECONDS_UTCOFFSET;
 	Date.Year = (tmp / NUMBEROFSECONDS_YEAR) - 100;
@@ -226,19 +229,84 @@ HAL_StatusTypeDef Convert_UTCToDateTime(uint32_t UTCTime_Sec)
 	  }
 
 	}
+
 	/*Date*/
 	Date.Date = 1 + tmp3;
+
 	/*Weekday*/
 	tmp2 = tmp / NUMBEROFSECONDS_DAY;
 	tmp2 = tmp2 % 7;
 	Date.WeekDay = tmp2 + 1; // Because Monday is start from 1 not 0
 
+	/*DaylightSaving*/
+	//DST=0 from last sunday in March to last sunday in October
+	//DST=1	from last sunday in October to last sunday in March
+    //January, february, and december are out.
+    if (Date.Month < 3 ||  10 < Date.Month)
+    {
+    	AppCfg.DayLightSavingMode = true;
+    }
+    //April to October are in
+    if (3 < Date.Month && Date.Month < 10)
+    {
+    	AppCfg.DayLightSavingMode = false;
+    }
+    uint8_t NearSunday = Date.Date + (7 - Date.WeekDay);//dow;
+
+    if(NearSunday > 31)
+    {
+    	NearSunday -= 7;
+    }
+    else
+    {
+        while(1)
+        {
+        	if((NearSunday + 7) > 31)
+        	{
+        		break;
+        	}
+        	else
+        	{
+        		NearSunday += 7;
+        	}
+        }
+    }
+    uint8_t LastSunday = NearSunday;
+    //In march, we are DST if our previous sunday was on or after the 8th.
+    if (Date.Month == 3)
+    {
+    	if(Date.Date >= LastSunday)
+    	{
+    		AppCfg.DayLightSavingMode = false;
+    	}
+    	else
+    	{
+    		AppCfg.DayLightSavingMode = true;
+    	}
+    }
+    if (Date.Month == 10)
+    {
+    	if(Date.Date >= LastSunday)
+    	{
+    		AppCfg.DayLightSavingMode = true;
+    	}
+    	else
+    	{
+    		AppCfg.DayLightSavingMode = false;
+    	}
+    }
+
 	/*Hour*/
-	Time.Hours = ((UNIXTimeHungary_Sec % NUMBEROFSECONDS_DAY) / NUMBEROFSECONDS_HOUR);
+
+    Time.Hours = (((UNIXTimeHungary_Sec - (AppCfg.DayLightSavingMode*3600)) % NUMBEROFSECONDS_DAY) / NUMBEROFSECONDS_HOUR);
+	//Time.Hours = ((UNIXTimeHungary_Sec % NUMBEROFSECONDS_DAY) / NUMBEROFSECONDS_HOUR) - AppCfg.DayLightSavingMode;
+
 	/*Minute*/
 	Time.Minutes = ((UNIXTimeHungary_Sec % NUMBEROFSECONDS_HOUR) / NUMBEROFSECONDS_MINUTE);
+
 	/*Second*/
 	Time.Seconds = (UNIXTimeHungary_Sec % NUMBEROFSECONDS_MINUTE);
+
 	/**/
 	Time.StoreOperation = 0;
 	/**/
@@ -324,6 +392,10 @@ HAL_StatusTypeDef Convert_CharArrayToDateTime(const char* MSG)
 	Time.StoreOperation = 0;
 	/**/
 	Time.SecondFraction = 0;
+	/**/
+	Time.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	/**/
+	Time.SubSeconds = 0;
 
 	/*IRQ Disable*/
 	HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);

@@ -452,7 +452,6 @@ void TextToDisplayDataArray(char* TextMessage)
 	AppCfg.TimeStamp = HAL_GetTick();
 }
 /**/
-/**/
 void TempToDisplayDataArray(void)
 {
 	uint16_t tmp1 = (uint16_t)AppCfg.Temperature;
@@ -474,6 +473,7 @@ void TempToDisplayDataArray(void)
 	AppCfg.FirstColumn = 0;
 	AppCfg.TimeStamp = HAL_GetTick();
 }
+/**/
 void SendToDisplay(uint16_t from)
 {
 	/**/
@@ -554,13 +554,18 @@ void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 /**/
 void MAX7219_SetIntensity(void)
 {
-	if(AppCfg.DisplayBrightnessMode == DB_Automatic)
-	{
-		MAX7219_Send(REG_INTENSITY, INTENSITY_7);
-	}
-	if(AppCfg.DisplayBrightnessMode == DB_Manual)
-	{
-		MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
+	static uint8_t i=0;
+	i++;
+	if(i==2){
+		if(AppCfg.DisplayBrightnessMode == DB_Automatic)
+		{
+			MAX7219_Send(REG_INTENSITY, INTENSITY_7);
+		}
+		if(AppCfg.DisplayBrightnessMode == DB_Manual)
+		{
+			MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
+		}
+		i=0;
 	}
 }
 /**/
@@ -704,7 +709,7 @@ void StateMachine(void)
 		}
 	}
 	/**/
-	//MAX7219_SetIntensity();
+	MAX7219_SetIntensity();
 	TMP100_GetTemp(&AppCfg.Temperature);
 }
 /**/

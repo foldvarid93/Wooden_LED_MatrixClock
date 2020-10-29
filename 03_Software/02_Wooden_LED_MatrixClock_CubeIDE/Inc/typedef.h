@@ -138,6 +138,7 @@ typedef struct AppConfig_t{
 	uint16_t 			TimeAnimation;//0 or 1
 	DispBrightness_t 	DisplayBrightnessMode;//0 or 1
 	uint16_t 			DisplayBrightness;//1,3,5,7.. 31
+	uint16_t			DayLightSavingMode;//0,1
 	/*normal variables*/
 	uint8_t				DisplayTextArray[SO_Text_Message];
 	uint8_t 			DisplayTextColumnArray[SizeOf_DisplayTextColumnArray];
