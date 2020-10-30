@@ -104,11 +104,11 @@ void Rotate(uint8_t* Dest,uint8_t* Source);
 /**/
 void UpdateTimeOnDisplay(void);
 /**/
+void SendToDisplay(uint16_t from, uint8_t* Data);
+/**/
 void DateToDisplayDataArray(void);
 /**/
 void TextToDisplayDataArray(char* TextMessage);
-/**/
-void SendToDisplay(uint16_t from);
 /**/
 void MAX7219_Init(void);
 /**/

@@ -134,7 +134,7 @@ void UpdateTimeOnDisplay(void)
 				AppCfg.DisplayData[MinSecDoubleDot] = 0;
 			}
 			/**/
-			SendTimeToDisplay();
+			SendToDisplay(0, AppCfg.DisplayData);//SendTimeToDisplay();
 			/**/
 			if(AppCfg.FirstRun == 1)
 			{
@@ -227,28 +227,44 @@ void UpdateTimeOnDisplay(void)
 		if(AppCfg.TimeDiffIndicator[5]){
 			Rotate(&AppCfg.DisplayData[SecSinglesStartIdx],&AppCfg.NewTimeDataArray[30]);
 		}
-		SendTimeToDisplay();
+		SendToDisplay(0, AppCfg.DisplayData);//SendTimeToDisplay();
 		AppCfg.FlipCounter ++;
 	}
 }
 /**/
-void SendTimeToDisplay(void)
+void SendToDisplay(uint16_t from, uint8_t* Data)
 {
-	/*locals*/
-	uint8_t tmp3[8][24];
 	/**/
-	for(uint8_t i=8;i>0;i--)
+	uint8_t tmp[192+24];
+	uint8_t BrightnessValue = 0;
+	/*data*/
+	for(uint8_t i=0;i<NumberOf_ColumnOfOneDisplay;i++)
 	{
-		for(uint8_t j=0;j<NumberOf_Display;j++)
-		{
-			tmp3[i-1][2*j]=i;
-			tmp3[i-1][(2*j)+1]=AppCfg.DisplayData[NumberOf_DisplayColumn-(8*j)-9+i];
-		}
+	  for(uint8_t j=0;j<NumberOf_Display;j++)
+	  {
+		  tmp[(i*24)+(2*j)]=NumberOf_ColumnOfOneDisplay-i;
+		  tmp[192-((i*24)+(2*j)+1)]= *(Data + from + (j*NumberOf_ColumnOfOneDisplay)+i);
+	  }
 	}
-	for(uint8_t i=NumberOf_ColumnOfOneDisplay ; i>0 ; i--)
+	/*brightness*/
+	if(AppCfg.DisplayBrightnessMode == DB_Manual)
 	{
-		HAL_SPI_Transmit(&hspi2, &tmp3[i-1][0], 24, 100);
-		MAX7219_LoadPulse();
+		BrightnessValue = AppCfg.DisplayBrightness;
+	}
+	else
+	{
+		BrightnessValue = INTENSITY_1;
+	}
+	for(uint8_t i=0 ; i<NumberOf_Display ; i++)
+	{
+		tmp[192 + (2*i)] = REG_INTENSITY;
+		tmp[192 + ((2*i)+1)] = BrightnessValue;
+	}
+	/*send spi*/
+	for(uint8_t i=0  ; i<9 ; i++)
+	{
+	  HAL_SPI_Transmit(&hspi2,&tmp[i*24],24,50);
+	  MAX7219_LoadPulse();
 	}
 }
 /**/
@@ -474,38 +490,6 @@ void TempToDisplayDataArray(void)
 	AppCfg.TimeStamp = HAL_GetTick();
 }
 /**/
-void SendToDisplay(uint16_t from)
-{
-	/**/
-	uint8_t tmp1[192];
-	/**/
-
-	/**/
-	for(uint8_t i=0;i<NumberOf_ColumnOfOneDisplay;i++)
-	{
-	  for(uint8_t j=0;j<NumberOf_Display;j++)
-	  {
-		  tmp1[(i*24)+(2*j)]=NumberOf_ColumnOfOneDisplay-i;
-		  tmp1[192-((i*24)+(2*j)+1)]=AppCfg.DisplayTextColumnArray[from+(j*NumberOf_ColumnOfOneDisplay)+i];
-	  }
-	}
-	/**/
-	for(uint8_t i=0;i<8;i++)
-	{
-	  HAL_SPI_Transmit(&hspi2,&tmp1[i*24],24,50);
-	  MAX7219_LoadPulse();
-	}
-	/**/
-/*	if(AppCfg.DisplayBrightnessMode == DB_Automatic)
-	{
-		MAX7219_Send(REG_INTENSITY, INTENSITY_7);
-	}
-	if(AppCfg.DisplayBrightnessMode == DB_Manual)
-	{
-		MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
-	}*/
-}
-/**/
 void MAX7219_ClearDisplay(void)
 {
 	for(uint8_t i=1 ; i<=NumberOf_ColumnOfOneDisplay ; i++)
@@ -527,12 +511,12 @@ void MAX7219_Init(void)
 /**/
 inline void MAX7219_LoadPulse(void)
 {
-	for(uint8_t i=0;i<10;i++)
+	for(uint8_t i=0;i<100;i++)
 	{
 		asm("nop");
 	}
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	for(uint8_t i=0;i<10;i++)
+	for(uint8_t i=0;i<100;i++)
 	{
 		asm("nop");
 	}
@@ -554,19 +538,19 @@ void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 /**/
 void MAX7219_SetIntensity(void)
 {
-	static uint8_t i=0;
-	i++;
-	if(i==2){
+
 		if(AppCfg.DisplayBrightnessMode == DB_Automatic)
 		{
+			MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
 			MAX7219_Send(REG_INTENSITY, INTENSITY_7);
+			MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
 		}
 		if(AppCfg.DisplayBrightnessMode == DB_Manual)
 		{
+			MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
 			MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
+			MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
 		}
-		i=0;
-	}
 }
 /**/
 uint8_t BitSwapping(uint8_t ch)
@@ -709,7 +693,7 @@ void StateMachine(void)
 		}
 	}
 	/**/
-	MAX7219_SetIntensity();
+	//MAX7219_SetIntensity();
 	TMP100_GetTemp(&AppCfg.Temperature);
 }
 /**/
@@ -897,7 +881,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				}
 				else
 				{
-					SendToDisplay(AppCfg.FirstColumn);
+					SendToDisplay(AppCfg.FirstColumn, AppCfg.DisplayTextColumnArray);
 					if((AppCfg.ScrollingMode == SM_JustText)&&(AppCfg.FirstColumn == 0))
 					{
 						if((HAL_GetTick()-AppCfg.TimeStamp)<1500)
@@ -919,7 +903,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			/*static text on display*/
 			else
 			{
-				SendToDisplay(AppCfg.FirstColumn);
+				SendToDisplay(AppCfg.FirstColumn, AppCfg.DisplayTextColumnArray);
 				if((HAL_GetTick() - AppCfg.TimeStamp)<3000)
 				{
 					/*wait*/

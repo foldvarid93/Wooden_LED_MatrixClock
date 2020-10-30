@@ -502,7 +502,6 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 			/**/
 			default: AppCfg.DisplayBrightness = INTENSITY_15;
 			}
-			//MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
 		}
 		/* Group 4 ***********************************************************************************************************/
 		/*Message ID40*/
