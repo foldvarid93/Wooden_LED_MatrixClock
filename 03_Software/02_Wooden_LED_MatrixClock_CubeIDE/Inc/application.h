@@ -98,8 +98,6 @@ AppConfig_t 			AppCfg;
 /***********************************************///constants declarations end
 /***********************************************///functions declaration begin
 /**/
-void CreateDateData(void);
-/**/
 void Rotate(uint8_t* Dest,uint8_t* Source);
 /**/
 void UpdateTimeOnDisplay(void);

@@ -30,35 +30,6 @@ const uint8_t	Months[12][12]={
 								{"december"}};
 /*********************************/
 /**/
-void CreateDateData(void)
-{
-	uint8_t	i=0;
-	RTC_TimeTypeDef	 		Time_Data;
-	RTC_DateTypeDef			Date_Data;
-	/**/
-	HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
-	HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
-	for(uint8_t j=0;DateText[j]!='\0';i++,j++)
-	{
-		AppCfg.DisplayTextArray[i]=DateText[j];
-	}
-	AppCfg.DisplayTextArray[i++]='2';
-	AppCfg.DisplayTextArray[i++]='0';
-	AppCfg.DisplayTextArray[i++]=(Date_Data.Year/10)+'0';
-	AppCfg.DisplayTextArray[i++]=(Date_Data.Year%10)+'0';	//?vsz?m
-	AppCfg.DisplayTextArray[i++]='.';							//pont
-	AppCfg.DisplayTextArray[i++]=Date_Data.Month/10+'0';
-	AppCfg.DisplayTextArray[i++]=Date_Data.Month%10+'0';	//h?nap
-	AppCfg.DisplayTextArray[i++]='.';							//pont
-	AppCfg.DisplayTextArray[i++]=Date_Data.Date/10+'0';
-	AppCfg.DisplayTextArray[i++]=Date_Data.Date%10+'0';	//nap
-	AppCfg.DisplayTextArray[i++]='.';							//pont
-	AppCfg.DisplayTextArray[i++]=',';							//vessz?
-	for(uint8_t j=0;WeekDays[Date_Data.WeekDay-1][j]!='\0';i++,j++){
-		AppCfg.DisplayTextArray[i]=WeekDays[Date_Data.WeekDay-1][j];		//a h?t napja
-	}
-	AppCfg.DisplayTextArray[i]='\0';			//lez?r? nulla
-}
 /**/
 void Rotate(uint8_t* Dest,uint8_t* Source)
 {
@@ -692,9 +663,9 @@ void StateMachine(void)
 			AppCfg.NTP_SyncTimerCounter--;
 		}
 	}
-	/**/
-	//MAX7219_SetIntensity();
+	/*ambient temperature read*/
 	TMP100_GetTemp(&AppCfg.Temperature);
+	/*ambient light measure*/
 }
 /**/
 void EEPROM_WriteFrame(void)
@@ -784,6 +755,10 @@ HAL_StatusTypeDef Init_Application(void)
 	}
 	/**/
 	EEPROM_ReadFrame();
+	/**/
+	HAL_ADC_Start(&hadc1);
+    HAL_ADC_PollForConversion(&hadc1, 10);
+    raw = HAL_ADC_GetValue(&hadc1);
 	/**/
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
