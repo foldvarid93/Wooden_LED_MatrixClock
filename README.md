@@ -1,5 +1,4 @@
-# Wooden_LED_MatrixClock
-Wooden LED module matrix clock 
+# Wooden LED module matrix clock 
 ![IMG_8520](https://user-images.githubusercontent.com/41072101/77362333-090f5600-6d51-11ea-818b-b3f1a8313dde.JPG)
 ![22829030_1608415815887806_506846079193605210_o](https://user-images.githubusercontent.com/41072101/77362336-0ad91980-6d51-11ea-9500-6dcadb25d2b7.jpg)
 ![IMG_0277](https://user-images.githubusercontent.com/41072101/77362337-0ad91980-6d51-11ea-84ab-e762b77b628f.JPG)
