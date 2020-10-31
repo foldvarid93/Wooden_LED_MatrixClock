@@ -7,3 +7,5 @@ Wooden LED module matrix clock
 ![IMG_1064](https://user-images.githubusercontent.com/41072101/77362346-0d3b7380-6d51-11ea-8f31-775e7d055e81.JPG)
 ![IMG_1067](https://user-images.githubusercontent.com/41072101/77362358-13315480-6d51-11ea-965c-b00b352aa555.JPG)
 ![IMG_1075](https://user-images.githubusercontent.com/41072101/77362374-19bfcc00-6d51-11ea-8c19-e48118eed841.JPG)
+![IMG_3928](https://user-images.githubusercontent.com/41072101/97773870-bb16c800-1b53-11eb-9981-7fc5fcb4ab7d.JPG)
+![2020-10-31_08h34_10](https://user-images.githubusercontent.com/41072101/97773897-f1ecde00-1b53-11eb-9c11-e597b5f31987.png)
