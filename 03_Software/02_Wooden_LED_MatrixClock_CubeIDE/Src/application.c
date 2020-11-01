@@ -33,12 +33,15 @@ const uint8_t	Months[12][12]={
 /**/
 void Rotate(uint8_t* Dest,uint8_t* Source)
 {
-	for(uint8_t i=0;i<6;i++){
+	for(uint8_t i=0;i<6;i++)
+	{
 		(Dest[i])<<=1;
-		if ((Source[i])&0x80){
+		if ((Source[i])&0x80)
+		{
 			(Dest[i])|=0x01;
 		}
-		else{
+		else
+		{
 			(Dest[i])&=0xFE;
 		}
 		Source[i]<<=1;
@@ -57,8 +60,8 @@ void UpdateTimeOnDisplay(void)
 	}
 	if(AppCfg.UpdateTime == 1)
 	{
-		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);//read new time
-		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN); //rtcread_time(&_time[0]);
+		HAL_RTC_GetTime(&hrtc, &Time_Data, RTC_FORMAT_BIN);
+		HAL_RTC_GetDate(&hrtc, &Date_Data, RTC_FORMAT_BIN);
 
 		_time[0].hour_tens=Time_Data.Hours / 10;
 		_time[0].hour_singles=Time_Data.Hours % 10;
@@ -115,58 +118,76 @@ void UpdateTimeOnDisplay(void)
 		/**/
 		else
 		{
-			if(_time[0].sec_singles!=_time[1].sec_singles){
+			if(_time[0].sec_singles!=_time[1].sec_singles)
+			{
 				AppCfg.TimeDiffIndicator[5]=1;
-				for(uint8_t i=0;i<5;i++){
+				for(uint8_t i=0;i<5;i++)
+				{
 					AppCfg.NewTimeDataArray[i + 30] = BitSwapping(characters[_time[0].sec_singles + '0'][i]);
 				}
 			}
-			else {
+			else
+			{
 				AppCfg.TimeDiffIndicator[5]=0;
 			}
-			if(_time[0].sec_tens!=_time[1].sec_tens){
+			if(_time[0].sec_tens!=_time[1].sec_tens)
+			{
 				AppCfg.TimeDiffIndicator[4]=1;
-				for(uint8_t i=0;i<5;i++){
+				for(uint8_t i=0;i<5;i++)
+				{
 					AppCfg.NewTimeDataArray[i + 24] = BitSwapping(characters[_time[0].sec_tens + '0'][i]);
 				}
 			}
-			else {
+			else
+			{
 				AppCfg.TimeDiffIndicator[4]=0;
 			}
-			if(_time[0].min_singles!=_time[1].min_singles){
+			if(_time[0].min_singles!=_time[1].min_singles)
+			{
 				AppCfg.TimeDiffIndicator[3]=1;
-				for(uint8_t i=0;i<5;i++){
+				for(uint8_t i=0;i<5;i++)
+				{
 					AppCfg.NewTimeDataArray[i + 18] = BitSwapping(characters[_time[0].min_singles + '0'][i]);
 				}
 			}
-			else {
+			else
+			{
 				AppCfg.TimeDiffIndicator[3]=0;
 			}
-			if(_time[0].min_tens!=_time[1].min_tens){
+			if(_time[0].min_tens!=_time[1].min_tens)
+			{
 				AppCfg.TimeDiffIndicator[2]=1;
-				for(uint8_t i=0;i<5;i++){
+				for(uint8_t i=0;i<5;i++)
+				{
 					AppCfg.NewTimeDataArray[i + 12] = BitSwapping(characters[_time[0].min_tens + '0'][i]);
 				}
 			}
-			else {
+			else
+			{
 				AppCfg.TimeDiffIndicator[2]=0;
 			}
-			if(_time[0].hour_singles!=_time[1].hour_singles){
+			if(_time[0].hour_singles!=_time[1].hour_singles)
+			{
 				AppCfg.TimeDiffIndicator[1]=1;
-				for(uint8_t i=0;i<5;i++){
+				for(uint8_t i=0;i<5;i++)
+				{
 					AppCfg.NewTimeDataArray[i + 6] = BitSwapping(characters[_time[0].hour_singles + '0'][i]);
 				}
 			}
-			else {
+			else
+			{
 				AppCfg.TimeDiffIndicator[1]=0;
 			}
-			if(_time[0].hour_tens!=_time[1].hour_tens){
+			if(_time[0].hour_tens!=_time[1].hour_tens)
+			{
 				AppCfg.TimeDiffIndicator[0]=1;
-				for(uint8_t i=0;i<5;i++){
+				for(uint8_t i=0;i<5;i++)
+				{
 					AppCfg.NewTimeDataArray[i] = BitSwapping(characters[_time[0].hour_tens + '0'][i]);
 				}
 			}
-			else {
+			else
+			{
 				AppCfg.TimeDiffIndicator[0]=0;
 			}
 			/**/
@@ -180,22 +201,28 @@ void UpdateTimeOnDisplay(void)
 	/**/
 	if( (AppCfg.TimeAnimation == 1) && (AppCfg.FlipCounter < 8) )
 	{
-		if (AppCfg.TimeDiffIndicator[0]){
+		if (AppCfg.TimeDiffIndicator[0])
+		{
 			Rotate(&AppCfg.DisplayData[HourTensStartIdx],&AppCfg.NewTimeDataArray[0]);
 		}
-		if (AppCfg.TimeDiffIndicator[1]){
+		if (AppCfg.TimeDiffIndicator[1])
+		{
 			Rotate(&AppCfg.DisplayData[HourSinglesStartIdx],&AppCfg.NewTimeDataArray[6]);
 		}
-		if (AppCfg.TimeDiffIndicator[2]){
+		if (AppCfg.TimeDiffIndicator[2])
+		{
 			Rotate(&AppCfg.DisplayData[MinTensStartIdx],&AppCfg.NewTimeDataArray[12]);
 		}
-		if(AppCfg.TimeDiffIndicator[3]){
+		if(AppCfg.TimeDiffIndicator[3])
+		{
 			Rotate(&AppCfg.DisplayData[MinSinglesStartIdx],&AppCfg.NewTimeDataArray[18]);
 		}
-		if(AppCfg.TimeDiffIndicator[4]){
+		if(AppCfg.TimeDiffIndicator[4])
+		{
 			Rotate(&AppCfg.DisplayData[SecTensStartIdx],&AppCfg.NewTimeDataArray[24]);
 		}
-		if(AppCfg.TimeDiffIndicator[5]){
+		if(AppCfg.TimeDiffIndicator[5])
+		{
 			Rotate(&AppCfg.DisplayData[SecSinglesStartIdx],&AppCfg.NewTimeDataArray[30]);
 		}
 		SendToDisplay(0, AppCfg.DisplayData);//SendTimeToDisplay();
@@ -232,7 +259,7 @@ void SendToDisplay(uint16_t from, uint8_t* Data)
 		tmp[192 + ((2*i)+1)] = BrightnessValue;
 	}
 	/*send spi*/
-	for(uint8_t i=0  ; i<9 ; i++)
+	for(uint8_t i=0  ; i<8 ; i++)
 	{
 	  HAL_SPI_Transmit(&hspi2,&tmp[i*24],24,50);
 	  MAX7219_LoadPulse();
@@ -509,19 +536,27 @@ void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 /**/
 void MAX7219_SetIntensity(void)
 {
-
-		if(AppCfg.DisplayBrightnessMode == DB_Automatic)
-		{
-			MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
-			MAX7219_Send(REG_INTENSITY, INTENSITY_7);
-			MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
-		}
-		if(AppCfg.DisplayBrightnessMode == DB_Manual)
-		{
-			MAX7219_Send(REG_SHTDWN, SHUTDOWN_MODE);
-			MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
-			MAX7219_Send(REG_SHTDWN, NORMAL_MODE);
-		}
+	MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
+}
+/**/
+HAL_StatusTypeDef LightSensor_Read(void)
+{
+	/**/
+	static uint32_t ADC_Value;
+	static float FilteredValue = 0;
+	/**/
+	if(AppCfg.DisplayBrightnessMode == DB_Manual)
+	{
+		return HAL_OK;
+	}
+	if( HAL_ADC_Start(&hadc1) == HAL_ERROR)
+	{
+		return HAL_ERROR;
+	}
+	ADC_Value = HAL_ADC_GetValue(&hadc1);
+	FilteredValue = (0.3* (ADC_Value * 15) /4096) + (0.7 * FilteredValue);
+	AppCfg.DisplayBrightness = (uint16_t)round(FilteredValue);
+	return HAL_OK;
 }
 /**/
 uint8_t BitSwapping(uint8_t ch)
@@ -757,8 +792,6 @@ HAL_StatusTypeDef Init_Application(void)
 	EEPROM_ReadFrame();
 	/**/
 	HAL_ADC_Start(&hadc1);
-    HAL_ADC_PollForConversion(&hadc1, 10);
-    raw = HAL_ADC_GetValue(&hadc1);
 	/**/
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim4);
@@ -895,7 +928,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	/*timer4 interrupt*/
 	if(htim->Instance == TIM4)
 	{
-
+		LightSensor_Read();
+		MAX7219_SetIntensity();
 	}
 }
 /**/

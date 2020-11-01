@@ -448,60 +448,7 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 		/*Brightness*/
 		if(((strcmp((char*) MSG_START,(char*)MSG_ID32_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID32_STOP)) == 0))
 		{
-			uint16_t Tmp= (uint16_t) (atof (MSG));
-
-			switch (Tmp)
-			{
-			case 0: AppCfg.DisplayBrightness = INTENSITY_1; break;
-			case 1: AppCfg.DisplayBrightness = INTENSITY_1; break;
-			/**/
-			case 2: AppCfg.DisplayBrightness = INTENSITY_3; break;
-			case 3: AppCfg.DisplayBrightness = INTENSITY_3; break;
-			/**/
-			case 4: AppCfg.DisplayBrightness = INTENSITY_5; break;
-			case 5: AppCfg.DisplayBrightness = INTENSITY_5; break;
-			/**/
-			case 6: AppCfg.DisplayBrightness = INTENSITY_7; break;
-			case 7: AppCfg.DisplayBrightness = INTENSITY_7; break;
-			/**/
-			case 8: AppCfg.DisplayBrightness = INTENSITY_9; break;
-			case 9: AppCfg.DisplayBrightness = INTENSITY_9; break;
-			/**/
-			case 10: AppCfg.DisplayBrightness = INTENSITY_11; break;
-			case 11: AppCfg.DisplayBrightness = INTENSITY_11; break;
-			/**/
-			case 12: AppCfg.DisplayBrightness = INTENSITY_13; break;
-			case 13: AppCfg.DisplayBrightness = INTENSITY_13; break;
-			/**/
-			case 14: AppCfg.DisplayBrightness = INTENSITY_15; break;
-			case 15: AppCfg.DisplayBrightness = INTENSITY_15; break;
-			/**/
-			case 16: AppCfg.DisplayBrightness = INTENSITY_17; break;
-			case 17: AppCfg.DisplayBrightness = INTENSITY_17; break;
-			/**/
-			case 18: AppCfg.DisplayBrightness = INTENSITY_19; break;
-			case 19: AppCfg.DisplayBrightness = INTENSITY_19; break;
-			/**/
-			case 20: AppCfg.DisplayBrightness = INTENSITY_21; break;
-			case 21: AppCfg.DisplayBrightness = INTENSITY_21; break;
-			/**/
-			case 22: AppCfg.DisplayBrightness = INTENSITY_23; break;
-			case 23: AppCfg.DisplayBrightness = INTENSITY_23; break;
-			/**/
-			case 24: AppCfg.DisplayBrightness = INTENSITY_25; break;
-			case 25: AppCfg.DisplayBrightness = INTENSITY_25; break;
-			/**/
-			case 26: AppCfg.DisplayBrightness = INTENSITY_27; break;
-			case 27: AppCfg.DisplayBrightness = INTENSITY_27; break;
-			/**/
-			case 28: AppCfg.DisplayBrightness = INTENSITY_29; break;
-			case 29: AppCfg.DisplayBrightness = INTENSITY_29; break;
-			/**/
-			case 30: AppCfg.DisplayBrightness = INTENSITY_31; break;
-			case 31: AppCfg.DisplayBrightness = INTENSITY_31; break;
-			/**/
-			default: AppCfg.DisplayBrightness = INTENSITY_15;
-			}
+			AppCfg.DisplayBrightness = (uint16_t) (atof (MSG));
 		}
 		/* Group 4 ***********************************************************************************************************/
 		/*Message ID40*/

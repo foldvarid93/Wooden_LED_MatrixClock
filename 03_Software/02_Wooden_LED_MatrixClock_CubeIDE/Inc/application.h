@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <math.h>
 /**/
 /***********************************************///includes end
 #define StartIdx 			28
@@ -120,7 +121,7 @@ void SendTimeToDisplay(void);
 /**/
 uint8_t BitSwapping(uint8_t ch);
 /**/
-void RemoteXY_InitAndRun(void);
+HAL_StatusTypeDef LightSensor_Read(void);
 /**/
 void EEPROM_WriteFrame(void);
 /**/
