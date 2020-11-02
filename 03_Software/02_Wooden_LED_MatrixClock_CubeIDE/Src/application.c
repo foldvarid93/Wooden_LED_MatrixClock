@@ -554,7 +554,7 @@ HAL_StatusTypeDef LightSensor_Read(void)
 		return HAL_ERROR;
 	}
 	ADC_Value = HAL_ADC_GetValue(&hadc1);
-	FilteredValue = (0.3* (ADC_Value * 15) /4096) + (0.7 * FilteredValue);
+	FilteredValue = (0.15* (ADC_Value * 15) /4096) + (0.85 * FilteredValue);
 	AppCfg.DisplayBrightness = (uint16_t)round(FilteredValue);
 	return HAL_OK;
 }
