@@ -134,6 +134,10 @@ typedef struct AppConfig_t{
 	uint16_t			Date_Enabled;//0 or 1
 	DateMode_t			Date_ScrollingMode;//0 or 1
 	uint16_t			Date_ScrollIntervalInSec;//0-65536 sec
+	/*Temperature*/
+	uint16_t			Temp_Enabled;//0 or 1
+	TextMode_t			Temp_ScrollingMode;//0 or 1
+	uint16_t			Temp_ScrollIntervalInSec;//0-65536 sec
 	/*Other*/
 	uint16_t 			TimeAnimation;//0 or 1
 	DispBrightness_t 	DisplayBrightnessMode;//0 or 1
@@ -164,8 +168,7 @@ typedef struct AppConfig_t{
 	bool 				TimeDiffIndicator[6];
 	uint8_t				DisplayData[NumberOf_DisplayColumn];
 	uint32_t			TimeStamp;
-	uint32_t 			Date_LastTimeStamp;
-	uint32_t 			Text_LastTimeStamp;
+	uint32_t 			LastTimeStamp;
 	float 				Temperature;
 }AppConfig_t;
 

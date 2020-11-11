@@ -596,7 +596,7 @@ void StateMachine(void)
 			if((AppCfg.Date_Enabled == true) && (AppCfg.Text_Enabled == false))
 			{
 				AppCfg.RTCIntSecCounter++;
-				if((AppCfg.RTCIntSecCounter - AppCfg.Date_LastTimeStamp) >= AppCfg.Date_ScrollIntervalInSec)
+				if((AppCfg.RTCIntSecCounter - AppCfg.LastTimeStamp) >= AppCfg.Date_ScrollIntervalInSec)
 				{
 					AppCfg.SM_AppStatus = AS_Date;
 				}
@@ -604,7 +604,7 @@ void StateMachine(void)
 			if((AppCfg.Date_Enabled == false) && (AppCfg.Text_Enabled == true))
 			{
 				AppCfg.RTCIntSecCounter++;
-				if((AppCfg.RTCIntSecCounter - AppCfg.Text_LastTimeStamp) >= AppCfg.Text_ScrollIntervalInSec)
+				if((AppCfg.RTCIntSecCounter - AppCfg.LastTimeStamp) >= AppCfg.Text_ScrollIntervalInSec)
 				{
 					AppCfg.SM_AppStatus = AS_Text;
 				}
@@ -614,14 +614,14 @@ void StateMachine(void)
 				AppCfg.RTCIntSecCounter++;
 				if(AppCfg.LastScrolled == AS_Text)
 				{
-					if((AppCfg.RTCIntSecCounter - AppCfg.Date_LastTimeStamp) >= AppCfg.Date_ScrollIntervalInSec)
+					if((AppCfg.RTCIntSecCounter - AppCfg.LastTimeStamp) >= AppCfg.Date_ScrollIntervalInSec)
 					{
 						AppCfg.SM_AppStatus = AS_Date;
 					}
 				}
 				if(AppCfg.LastScrolled == AS_Date)
 				{
-					if((AppCfg.RTCIntSecCounter - AppCfg.Text_LastTimeStamp) >= AppCfg.Text_ScrollIntervalInSec)
+					if((AppCfg.RTCIntSecCounter - AppCfg.LastTimeStamp) >= AppCfg.Text_ScrollIntervalInSec)
 					{
 						AppCfg.SM_AppStatus = AS_Text;
 					}
@@ -651,7 +651,7 @@ void StateMachine(void)
 		}
 	case AS_Temp:
 		{
-			AppCfg.ScrollingMode = AppCfg.Text_ScrollingMode;
+			AppCfg.ScrollingMode = AppCfg.Temp_ScrollingMode;
 			TempToDisplayDataArray();
 			AppCfg.LastScrolled = AS_Text;
 			AppCfg.SM_AppStatus = AS_TextRunning;
@@ -665,8 +665,7 @@ void StateMachine(void)
 		}
 	case AS_TextDone:
 		{
-			AppCfg.Text_LastTimeStamp = AppCfg.RTCIntSecCounter;
-			AppCfg.Date_LastTimeStamp = AppCfg.RTCIntSecCounter;
+			AppCfg.LastTimeStamp = AppCfg.RTCIntSecCounter;
 			AppCfg.FirstRun = 1;
 			UpdateTimeOnDisplay();
 			AppCfg.SM_AppStatus = AS_Time;
