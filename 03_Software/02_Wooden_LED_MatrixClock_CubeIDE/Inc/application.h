@@ -115,8 +115,6 @@ void MAX7219_LoadPulse(void);
 /**/
 void MAX7219_Send(uint8_t ADDR, uint8_t CMD);
 /**/
-void MAX7219_SetIntensity(void);
-/**/
 void SendTimeToDisplay(void);
 /**/
 uint8_t BitSwapping(uint8_t ch);

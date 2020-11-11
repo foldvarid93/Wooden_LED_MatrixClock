@@ -509,15 +509,9 @@ void MAX7219_Init(void)
 /**/
 inline void MAX7219_LoadPulse(void)
 {
-	for(uint8_t i=0;i<100;i++)
-	{
-		asm("nop");
-	}
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_RESET);
-	for(uint8_t i=0;i<100;i++)
-	{
-		asm("nop");
-	}
+	asm("nop");
+	asm("nop");
 	HAL_GPIO_WritePin(MAX7219_CS_PORT,MAX7219_CS_PIN,GPIO_PIN_SET);
 }
 /**/
@@ -532,11 +526,6 @@ void MAX7219_Send(uint8_t ADDR, uint8_t CMD)
 	/**/
 	HAL_SPI_Transmit(&hspi2,tmp,24,50);
 	MAX7219_LoadPulse();
-}
-/**/
-void MAX7219_SetIntensity(void)
-{
-	MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
 }
 /**/
 HAL_StatusTypeDef LightSensor_Read(void)
@@ -929,7 +918,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(htim->Instance == TIM4)
 	{
 		LightSensor_Read();
-		MAX7219_SetIntensity();
+		MAX7219_Send(REG_INTENSITY, AppCfg.DisplayBrightness);
 	}
 }
 /**/

@@ -299,7 +299,6 @@ HAL_StatusTypeDef Convert_UTCToDateTime(uint32_t UTCTime_Sec)
 	/*Hour*/
 
     Time.Hours = (((UNIXTimeHungary_Sec - (AppCfg.DayLightSavingMode*3600)) % NUMBEROFSECONDS_DAY) / NUMBEROFSECONDS_HOUR);
-	//Time.Hours = ((UNIXTimeHungary_Sec % NUMBEROFSECONDS_DAY) / NUMBEROFSECONDS_HOUR) - AppCfg.DayLightSavingMode;
 
 	/*Minute*/
 	Time.Minutes = ((UNIXTimeHungary_Sec % NUMBEROFSECONDS_HOUR) / NUMBEROFSECONDS_MINUTE);
@@ -308,9 +307,15 @@ HAL_StatusTypeDef Convert_UTCToDateTime(uint32_t UTCTime_Sec)
 	Time.Seconds = (UNIXTimeHungary_Sec % NUMBEROFSECONDS_MINUTE);
 
 	/**/
-	Time.StoreOperation = 0;
+	Time.TimeFormat = RTC_HOURFORMAT12_AM;
+	/**/
+	Time.SubSeconds = 0;
 	/**/
 	Time.SecondFraction = 0;
+	/**/
+	Time.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	/**/
+	Time.StoreOperation = 0;
 
 	/*IRQ Disable*/
 	HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
@@ -389,13 +394,15 @@ HAL_StatusTypeDef Convert_CharArrayToDateTime(const char* MSG)
 	/**/
 	Time.Seconds = 0;
 	/**/
-	Time.StoreOperation = 0;
+	Time.TimeFormat = RTC_HOURFORMAT12_AM;
+	/**/
+	Time.SubSeconds = 0;
 	/**/
 	Time.SecondFraction = 0;
 	/**/
 	Time.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
 	/**/
-	Time.SubSeconds = 0;
+	Time.StoreOperation = 0;
 
 	/*IRQ Disable*/
 	HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
