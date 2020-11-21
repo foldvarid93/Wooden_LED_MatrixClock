@@ -564,10 +564,10 @@ uint8_t BitSwapping(uint8_t ch)
 /**/
 void StateMachine(void)
 {
-	if((AppCfg.Date_Enabled == false) && (AppCfg.Text_Enabled == false))
-	{
-		//AppCfg.SM_NextState = AS_Time;
-	}
+	static uint32_t MaskByte = 0x00000000;
+	static uint32_t Mask = 0x00000001;
+	static uint32_t MaskResult = 0x00000000;
+
 	/**/
 	if(AppCfg.SM_NextState == AS_Time)
 	{
@@ -593,38 +593,88 @@ void StateMachine(void)
 		}
 	case AS_Time:
 		{
-			if((AppCfg.Date_Enabled == true) && (AppCfg.Text_Enabled == false))
+			AppCfg.RTCIntSecCounter++;
+			uint32_t Diff;
+			if(AppCfg.RTCIntSecCounter >= AppCfg.LastTimeStamp)
 			{
-				AppCfg.RTCIntSecCounter++;
-				if((AppCfg.RTCIntSecCounter - AppCfg.LastTimeStamp) >= AppCfg.Date_ScrollIntervalInSec)
-				{
-					AppCfg.SM_AppStatus = AS_Date;
-				}
+				Diff = AppCfg.RTCIntSecCounter - AppCfg.LastTimeStamp;
 			}
-			if((AppCfg.Date_Enabled == false) && (AppCfg.Text_Enabled == true))
+			else
 			{
-				AppCfg.RTCIntSecCounter++;
-				if((AppCfg.RTCIntSecCounter - AppCfg.LastTimeStamp) >= AppCfg.Text_ScrollIntervalInSec)
-				{
-					AppCfg.SM_AppStatus = AS_Text;
-				}
+				Diff = (0xFFFFFFFF - AppCfg.LastTimeStamp) + AppCfg.RTCIntSecCounter;
 			}
-			if( (AppCfg.Date_Enabled == true) && (AppCfg.Text_Enabled == true) )
+			/**/
+			switch (MaskResult)
 			{
-				AppCfg.RTCIntSecCounter++;
-				if(AppCfg.LastScrolled == AS_Text)
+				case 0x00000000:
 				{
-					if((AppCfg.RTCIntSecCounter - AppCfg.LastTimeStamp) >= AppCfg.Date_ScrollIntervalInSec)
+					MaskByte = 0x00000000;
+					if(AppCfg.Date_Enabled == true)
+					{
+						MaskByte |= 0x00000001;
+					}
+					if(AppCfg.Text_Enabled == true)
+					{
+						MaskByte |= 0x00000002;
+					}
+					if(AppCfg.Temp_Enabled == true)
+					{
+						MaskByte |= 0x00000004;
+					}
+					/**/
+					if (MaskByte == 0x00000000)
+					{
+						MaskResult = 0;
+					}
+					else
+					{
+						while(1)
+						{
+							if((MaskByte & Mask) == Mask)
+							{
+								MaskResult =  Mask;
+								Mask = Mask << 1;
+								if( Mask > (0x0000001 << 2))
+								{
+									Mask = 0x00000001;
+								}
+								break;
+							}
+							Mask = Mask << 1;
+							if( Mask > (0x0000001 << 2))
+							{
+								Mask = 0x00000001;
+							}
+						}
+					}
+					break;
+				}
+				case 0x00000001:
+				{
+					if(Diff >= AppCfg.Date_ScrollIntervalInSec)
 					{
 						AppCfg.SM_AppStatus = AS_Date;
+						MaskResult = 0;
 					}
+					break;
 				}
-				if(AppCfg.LastScrolled == AS_Date)
+				case 0x00000002:
 				{
-					if((AppCfg.RTCIntSecCounter - AppCfg.LastTimeStamp) >= AppCfg.Text_ScrollIntervalInSec)
+					if(Diff >= AppCfg.Text_ScrollIntervalInSec)
 					{
 						AppCfg.SM_AppStatus = AS_Text;
+						MaskResult = 0;
 					}
+					break;
+				}
+				case 0x00000004:
+				{
+					if(Diff >= AppCfg.Temp_ScrollIntervalInSec)
+					{
+						AppCfg.SM_AppStatus = AS_Temp;
+						MaskResult = 0;
+					}
+					break;
 				}
 			}
 			AppCfg.UpdateTime=1;
@@ -707,6 +757,10 @@ void EEPROM_WriteFrame(void)
 	EE_WriteVariable(VA_Date_Enabled, AppCfg.Date_Enabled);
 	EE_WriteVariable(VA_Date_ScrollingMode, AppCfg.Date_ScrollingMode);
 	EE_WriteVariable(VA_Date_ScrollIntervalInSec, AppCfg.Date_ScrollIntervalInSec);
+	/*Temp*/
+	EE_WriteVariable(VA_Temp_Enabled, AppCfg.Temp_Enabled);
+	EE_WriteVariable(VA_Temp_ScrollingMode, AppCfg.Temp_ScrollingMode);
+	EE_WriteVariable(VA_Temp_ScrollIntervalInSec, AppCfg.Temp_ScrollIntervalInSec);
 	/*Other*/
 	EE_WriteVariable(VA_TimeAnimation, AppCfg.TimeAnimation);
 	EE_WriteVariable(VA_DisplayBrightnessMode, AppCfg.DisplayBrightnessMode);
@@ -729,6 +783,10 @@ void EEPROM_ReadFrame(void)
 	EE_ReadVariable(VA_Date_Enabled, &(AppCfg.Date_Enabled));
 	EE_ReadVariable(VA_Date_ScrollingMode, &(AppCfg.Date_ScrollingMode));
 	EE_ReadVariable(VA_Date_ScrollIntervalInSec, &(AppCfg.Date_ScrollIntervalInSec));
+	/*Temp*/
+	EE_ReadVariable(VA_Temp_Enabled, &(AppCfg.Temp_Enabled));
+	EE_ReadVariable(VA_Temp_ScrollingMode, &(AppCfg.Temp_ScrollingMode));
+	EE_ReadVariable(VA_Temp_ScrollIntervalInSec, &(AppCfg.Temp_ScrollIntervalInSec));
 	/*Other*/
 	EE_ReadVariable(VA_TimeAnimation, &(AppCfg.TimeAnimation));
 	EE_ReadVariable(VA_DisplayBrightnessMode, &(AppCfg.DisplayBrightnessMode));

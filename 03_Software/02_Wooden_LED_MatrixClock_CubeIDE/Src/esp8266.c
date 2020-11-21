@@ -409,6 +409,51 @@ HAL_StatusTypeDef HTML_Interpreter(uint8_t * Message)
 		{
 			AppCfg.Date_ScrollIntervalInSec = atoi((char*) MSG);
 		}
+		/*Message ID17*/
+		/* Temperature scroll Interval*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID17_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID17_STOP)) == 0))
+		{
+			if(strcmp((char*) MSG, (char*) "true") == 0)
+			{
+				AppCfg.Temp_Enabled = 1;
+			}
+			else if(strcmp((char*) MSG, (char*) "false") == 0)
+			{
+				AppCfg.Temp_Enabled = 0;
+			}
+			else
+			{
+				AppCfg.Temp_Enabled = 0;
+			}
+		}
+		/*Message ID18*/
+		/* Temperature scroll Interval*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID18_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID18_STOP)) == 0))
+		{
+			//TODO:
+			if(strcmp((char*) MSG, (char*)"Temp No Scroll") == 0)
+			{
+				AppCfg.Temp_ScrollingMode = DM_DateNoScroll;
+			}
+			else if(strcmp((char*) MSG, (char*)"Temp Scroll In Out") == 0)
+			{
+				AppCfg.Temp_ScrollingMode = DM_DateScrollInAndOut;
+			}
+			else if(strcmp((char*) MSG, (char*)"Temp Message Scroll") == 0)
+			{
+				AppCfg.Temp_ScrollingMode = DM_DateMessageScroll;
+			}
+			else if(strcmp((char*) MSG, (char*)"Temp Message Scroll In Out") == 0)
+			{
+				AppCfg.Temp_ScrollingMode = DM_DateMessageScrollInAndOut;
+			}
+		}
+		/*Message ID19*/
+		/* Temperature scroll Interval*/
+		if(((strcmp((char*) MSG_START,(char*)MSG_ID19_START)) == 0) && ((strcmp((char*) MSG_STOP,(char*)MSG_ID19_STOP)) == 0))
+		{
+			AppCfg.Temp_ScrollIntervalInSec = atoi((char*) MSG);
+		}
 		/* Group 2 ***********************************************************************************************************/
 
 

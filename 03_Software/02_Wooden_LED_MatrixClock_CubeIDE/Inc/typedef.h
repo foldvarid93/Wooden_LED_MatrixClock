@@ -24,7 +24,7 @@
 	/**/
 #define VA_NTP_SyncInterval 				(VA_NTP_SyncEnabled + SO_NTP_SyncEnabled)
 #define SO_NTP_SyncInterval					(2u)
-	/**/
+	/*Text*/
 #define VA_Text_Message						(VA_NTP_SyncInterval + SO_NTP_SyncInterval)
 #define SO_Text_Message						(256u)
 	/**/
@@ -36,7 +36,7 @@
 	/**/
 #define VA_Text_ScrollIntervalInSec			(VA_Text_ScrollingMode + SO_Text_ScrollingMode)
 #define SO_Text_ScrollIntervalInSec			(2u)
-	/**/
+	/*Date*/
 #define VA_Date_Enabled						(VA_Text_ScrollIntervalInSec + SO_Text_ScrollIntervalInSec)
 #define SO_Date_Enabled						(2u)
 	/**/
@@ -45,8 +45,17 @@
 	/**/
 #define VA_Date_ScrollIntervalInSec			(VA_Date_ScrollingMode + SO_Date_ScrollingMode)
 #define SO_Date_ScrollIntervalInSec			(2u)
+	/*Temp*/
+#define VA_Temp_Enabled						(VA_Date_ScrollIntervalInSec + SO_Date_ScrollIntervalInSec)
+#define SO_Temp_Enabled						(2u)
 	/**/
-#define VA_TimeAnimation					(VA_Date_ScrollIntervalInSec + SO_Date_ScrollIntervalInSec)
+#define VA_Temp_ScrollingMode				(VA_Temp_Enabled + SO_Temp_Enabled)
+#define SO_Temp_ScrollingMode				(2u)
+	/**/
+#define VA_Temp_ScrollIntervalInSec			(VA_Temp_ScrollingMode + SO_Temp_ScrollingMode)
+#define SO_Temp_ScrollIntervalInSec			(2u)
+	/*Others*/
+#define VA_TimeAnimation					(VA_Temp_ScrollIntervalInSec + SO_Temp_ScrollIntervalInSec)
 #define SO_TimeAnimation					(2u)
 	/**/
 #define VA_DisplayBrightnessMode			(VA_TimeAnimation + SO_TimeAnimation)
