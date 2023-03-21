@@ -8,6 +8,8 @@
 /*globals*/
 CRemoteXY remotexy;
 
+RemoteXY remoteXY;
+
 Serial_t serial = { .read = NULL, .write = NULL, .available = NULL , .find = NULL, .println = NULL};
 /*config field*/
 /*
@@ -26,7 +28,6 @@ uint8_t RemoteXY_CONF[] =
 
 
 /*externs*/
-
 extern ring_buffer rx_buffer;
 
 /***************************************************************************************
@@ -56,9 +57,9 @@ void RemoteXY_InitAndRun(void)
 		/*run application handler*/
 		ESP8266_RemoteXY_Handler();
 		/*if app sent data process and store*/
-		if(RemoteXY.Btn_SSID_Send == 1)
+		if(remoteXY.Btn_SSID_Send == 1)
 		{
-			RemoteXY.Btn_SSID_Send = 0;
+			remoteXY.Btn_SSID_Send = 0;
 		}
 	}
 }
@@ -74,7 +75,7 @@ void ESP8266_RemoteXY_InitAndStart(void)
 	/**/
 	Ringbuf_init();
 	/**/
-	ESP8266_RemoteXY_Init(RemoteXY_CONF, &RemoteXY, REMOTEXY_ACCESS_PASSWORD,REMOTEXY_WIFI_SSID, REMOTEXY_WIFI_PASSWORD, REMOTEXY_SERVER_PORT);
+	ESP8266_RemoteXY_Init(RemoteXY_CONF, &remoteXY, REMOTEXY_ACCESS_PASSWORD,REMOTEXY_WIFI_SSID, REMOTEXY_WIFI_PASSWORD, REMOTEXY_SERVER_PORT);
 }
 
 void ESP8266_RemoteXY_Init(const void * _conf, void * _var,	const char * _accessPassword, const char * _wifiSsid,const char * _wifiPassword, uint16_t _port)

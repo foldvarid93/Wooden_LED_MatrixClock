@@ -29,6 +29,8 @@ const uint8_t	Months[12][12]={
 								{"november"},
 								{"december"}};
 /*********************************/
+AppConfig_t 			AppCfg;
+Time_t					_time[2];
 /**/
 /**/
 void Rotate(uint8_t* Dest,uint8_t* Source)

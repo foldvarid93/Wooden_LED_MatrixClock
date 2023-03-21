@@ -216,13 +216,13 @@ typedef struct Date_t{
 }Date_t;
 
 /*MASK*/
-struct {
+typedef struct {
 	unsigned char TIME_SET : 1;
 	unsigned char DATE_TIME :1;
 } MASK;
 
 /*MASKBYTE*/
-struct {
+typedef struct {
 	unsigned char B0 :1;
 	unsigned char B1 :1;
 	unsigned char B2 :1;

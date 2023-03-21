@@ -10,7 +10,6 @@
 
 /**** define the UART you are using  ****/
 
-UART_HandleTypeDef huart3;
 
 #define uart &huart3
 

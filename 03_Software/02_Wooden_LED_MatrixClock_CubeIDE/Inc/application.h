@@ -92,10 +92,10 @@
 #define NOP					0x00
 /***********************************************///MAX7219 define constants end
 /***********************************************///constants declarations begin
-Time_t					_time[2];
+extern Time_t					_time[2];
 extern const uint8_t	WeekDays[7][10];					//h,k,sz,cs,p,sz,v sz�vegesen
 extern const uint8_t	Months[12][12];						//jan,feb.....dec sz�vegesen
-AppConfig_t 			AppCfg;
+extern AppConfig_t 			AppCfg;
 /***********************************************///constants declarations end
 /***********************************************///functions declaration begin
 /**/

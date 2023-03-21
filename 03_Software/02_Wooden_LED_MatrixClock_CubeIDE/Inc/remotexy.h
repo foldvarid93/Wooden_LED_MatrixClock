@@ -44,7 +44,7 @@
 //		/*other variable*/
 //		uint8_t connect_flag;  // =1 if wire connected, else =0
 //} RemoteXY;
-struct {
+typedef struct {
 
     // input variables
   char TextBox_SSID[31];  // string UTF8 end zero
@@ -109,9 +109,9 @@ struct Serial_t
  * Variables
  **************************************************************************************/
 /*globals*/
-CRemoteXY remotexy;
+extern CRemoteXY remotexy;
 
-Serial_t serial;
+extern Serial_t serial;
 /***************************************************************************************
  * Function declarations
  **************************************************************************************/
